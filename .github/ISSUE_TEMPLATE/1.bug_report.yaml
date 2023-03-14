@@ -15,7 +15,7 @@ body:
         - label: I have [searched for duplicate or closed issues](https://github.com/aws-amplify/amplify-ui-android/issues?q=is%3Aissue+).
           required: true
         - label: I have read the guide for [submitting bug reports](https://github.com/aws-amplify/amplify-ui-android/blob/main/CONTRIBUTING.md#reporting-bugsfeature-requests).
-            required: true
+          required: true
 
   - type: markdown
     attributes:

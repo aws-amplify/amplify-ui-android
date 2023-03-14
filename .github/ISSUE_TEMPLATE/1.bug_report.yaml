@@ -27,9 +27,8 @@ body:
       description: What programming language is being used?
       multiple: true
       options:
-        - Java
         - Kotlin
-        - Kotlin - Coroutines
+        - Java
         - RxJava
         - Not applicable
     validations:
@@ -50,15 +49,10 @@ body:
       description: |
         Please provide the version of Amplify UI Android being used from your `build.gradle (Module: app)` file.
       value: |
-        <details>
-
         ```groovy
         // Put output below this line
 
-
         ```
-
-        </details>
     validations:
       required: true
   - type: textarea
@@ -70,15 +64,11 @@ body:
           ./gradlew --version
         ```
       value: |
-        <details>
-
         ```
         # Put output below this line
 
 
         ```
-
-        </details>
     validations:
       required: true
   - type: markdown
@@ -124,15 +114,11 @@ body:
 
         **Be sure to remove any sensitive data.**
       value: |
-        <details>
-
         ```
         // Put your logs below this line
 
 
         ```
-
-        </details>
   - type: markdown
     attributes:
       value: |

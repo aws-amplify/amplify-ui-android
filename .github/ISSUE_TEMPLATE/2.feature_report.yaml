@@ -21,9 +21,8 @@ body:
       description: What programming language is being used?
       multiple: true
       options:
-        - Java
         - Kotlin
-        - Kotlin - Coroutines
+        - Java
         - RxJava
         - Not applicable
     validations:

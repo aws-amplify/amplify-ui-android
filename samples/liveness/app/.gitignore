@@ -1,0 +1,4 @@
+/build
+/buildNative
+**/awsconfiguration.json
+**/amplifyconfiguration.json

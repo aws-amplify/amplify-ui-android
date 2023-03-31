@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License").
+  ~ You may not use this file except in compliance with the License.
+  ~ A copy of the License is located at
+  ~
+  ~  http://aws.amazon.com/apache2.0
+  ~
+  ~ or in the "license" file accompanying this file. This file is distributed
+  ~ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  ~ express or implied. See the License for the specific language governing
+  ~ permissions and limitations under the License.
+  -->
+
+<resources>
+    <string name="amplify_ui_liveness_get_ready_page_title">Liveness Check</string>
+    <string name="amplify_ui_liveness_get_ready_page_description">You will go through a face verification process to prove that you are a real person. Your screen\'s brightness will temporarily be set to 100\% for highest accuracy.</string>
+    <string name="amplify_ui_liveness_get_ready_photosensitivity_title">Photosensitivity Warning</string>
+    <string name="amplify_ui_liveness_get_ready_photosensitivity_description">This check displays colored lights. Use caution if you are photosensitive.</string>
+    <string name="amplify_ui_liveness_get_ready_a11y_photosensitivity_icon_content_description">Photosensitivity Information</string>
+    <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_title">Photosensitivity warning</string>
+    <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_description">A small percentage of individuals may experience epileptic seizures when exposed to colored lights. Use caution if you, or anyone in your family, have an epileptic condition.</string>
+    <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_dismiss">Got it</string>
+    <string name="amplify_ui_liveness_get_ready_steps_title">Follow these instructions to complete the check:</string>
+    <string name="amplify_ui_liveness_get_ready_a11y_illustration_content_description">Illustration of face</string>
+    <string name="amplify_ui_liveness_get_ready_a11y_good_face_fit_icon_content_description">Face fills the oval</string>
+    <string name="amplify_ui_liveness_get_ready_a11y_wrong_face_fit_icon_content_description">Face does not fill the oval</string>
+    <string name="amplify_ui_liveness_get_ready_good_fit">Good fit</string>
+    <string name="amplify_ui_liveness_get_ready_too_far">Too far</string>
+    <string name="amplify_ui_liveness_get_ready_step_1">When an oval appears, fill the oval with your face within 7 seconds.</string>
+    <string name="amplify_ui_liveness_get_ready_step_2">Make sure your face is not covered with sunglasses or a mask.</string>
+    <string name="amplify_ui_liveness_get_ready_step_3">Move to a well-lit place that is not in direct sunlight.</string>
+    <string name="amplify_ui_liveness_get_ready_begin_check">Begin check</string>
+    <string name="amplify_ui_liveness_challenge_recording_indicator_label">REC</string>
+    <string name="amplify_ui_liveness_challenge_instruction_hold_face_during_countdown">Hold face position during countdown</string>
+    <string name="amplify_ui_liveness_challenge_instruction_hold_face_during_freshness">Hold still</string>
+    <string name="amplify_ui_liveness_challenge_instruction_move_face_further">Move back</string>
+    <string name="amplify_ui_liveness_challenge_instruction_move_face_closer">Move closer</string>
+    <string name="amplify_ui_liveness_challenge_instruction_move_face">Move face in front of camera</string>
+    <string name="amplify_ui_liveness_challenge_instruction_multiple_faces_detected">Ensure only one face is in front of camera</string>
+    <string name="amplify_ui_liveness_challenge_connecting">Connecting…</string>
+    <string name="amplify_ui_liveness_challenge_verifying">Verifying</string>
+    <string name="amplify_ui_liveness_challenge_a11y_cancel_content_description">Cancel Challenge</string>
+</resources>

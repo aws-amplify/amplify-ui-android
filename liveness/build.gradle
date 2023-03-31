@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
-apply from: rootProject.file("configuration/checkstyle.gradle")
 apply from: rootProject.file("configuration/publishing.gradle")
 
 group = POM_GROUP
@@ -40,8 +39,10 @@ android {
 
 dependencies {
 
-    implementation dependency.amplify.auth
-    implementation dependency.amplify.predictions
+    api dependency.amplify.auth
+    api dependency.amplify.predictions
+    api dependency.amplify.core
+    api dependency.amplify.awsCore
 
     implementation dependency.androidx.camera.core
     implementation dependency.androidx.camera.camera2

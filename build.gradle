@@ -69,6 +69,8 @@ ext {
     cameraXVersion = '1.2.0'
     dependency = [
             amplify: [
+                    core: "com.amplifyframework:core:$amplifyVersion",
+                    awsCore: "com.amplifyframework:aws-core:$amplifyVersion",
                     auth: "com.amplifyframework:aws-api:$amplifyVersion",
                     predictions: "com.amplifyframework:aws-predictions:$amplifyVersion",
             ],

@@ -1,0 +1,65 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+apply from: rootProject.file("configuration/checkstyle.gradle")
+apply from: rootProject.file("configuration/publishing.gradle")
+
+group = POM_GROUP
+
+android {
+    namespace 'com.amplifyframework.ui.liveness'
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+                arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
+            }
+        }
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+
+    externalNativeBuild {
+        cmake {
+            // AGP doesn't allow us to use project.buildDir (or subdirs) for CMake's generated
+            // build files (ninja build files, CMakeCache.txt, etc.). Use a staging directory that
+            // lives alongside the project's buildDir.
+            buildStagingDirectory "${project.buildDir}/../buildNative"
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
+        }
+    }
+
+    buildFeatures {
+        mlModelBinding true
+    }
+
+    androidResources {
+        noCompress 'tflite'
+    }
+}
+
+dependencies {
+
+    implementation dependency.amplify.auth
+    implementation dependency.amplify.predictions
+
+    implementation dependency.androidx.camera.core
+    implementation dependency.androidx.camera.camera2
+    implementation dependency.androidx.camera.lifecycle
+    implementation dependency.androidx.futures
+    implementation dependency.androidx.material
+    implementation dependency.androidx.uiTooling
+    implementation dependency.androidx.lifecycle_ktx
+
+    implementation dependency.kotlin.serializationJson
+
+    implementation dependency.tensorFlow
+    implementation dependency.tensorFlowSupport
+
+    testImplementation dependency.test.androidx.espresso
+    testImplementation dependency.test.androidx.junit
+    testImplementation dependency.test.junit
+    testImplementation dependency.test.robolectric
+    testImplementation dependency.test.mockk
+
+}

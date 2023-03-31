@@ -39,8 +39,8 @@ android {
 
 dependencies {
 
-    implementation dependency.amplify.auth
-    implementation dependency.amplify.predictions
+    api dependency.amplify.auth
+    api dependency.amplify.predictions
 
     implementation dependency.androidx.camera.core
     implementation dependency.androidx.camera.camera2

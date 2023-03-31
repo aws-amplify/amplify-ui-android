@@ -56,6 +56,12 @@ afterEvaluate { project ->
                 version VERSION_NAME
 
                 artifact("${buildDir}/outputs/aar/${artifactId}-release.aar")
+                if (project.getPlugins().hasPlugin('com.android.application') ||
+                        project.getPlugins().hasPlugin('com.android.library')) {
+                    artifact(androidSourcesJar)
+                } else {
+                    artifact(sourcesJar)
+                }
 
                 pom {
                     name = POM_NAME
@@ -90,11 +96,19 @@ afterEvaluate { project ->
                         // Note that this only handles implementation
                         // dependencies. In the future, may need to add api,
                         // etc.
+                        configurations.api.allDependencies.each {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                            dependencyNode.appendNode('scope', "compile")
+                        }
                         configurations.implementation.allDependencies.each {
                             def dependencyNode = dependenciesNode.appendNode('dependency')
                             dependencyNode.appendNode('groupId', it.group)
                             dependencyNode.appendNode('artifactId', it.name)
                             dependencyNode.appendNode('version', it.version)
+                            dependencyNode.appendNode('scope', "runtime")
                         }
                     }
                 }
@@ -121,15 +135,5 @@ afterEvaluate { project ->
             useInMemoryPgpKeys(keyId, signingKey, signingPassword)
         }
         sign publishing.publications.library
-    }
-
-
-    artifacts {
-        if (project.getPlugins().hasPlugin('com.android.application') ||
-                project.getPlugins().hasPlugin('com.android.library')) {
-            archives androidSourcesJar
-        } else {
-            archives sourcesJar
-        }
     }
 }

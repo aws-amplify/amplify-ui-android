@@ -26,7 +26,6 @@ import io.mockk.verify
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-
 internal class FreshnessStateTest {
 
     @Test
@@ -103,7 +102,7 @@ internal class FreshnessStateTest {
 
         // Then
         assertEquals(expectedFrame2, frame2)
-        verify {onColorDisplayed(rgbColor2, rgbColor1, 1, 1001) }
+        verify { onColorDisplayed(rgbColor2, rgbColor1, 1, 1001) }
         verify(exactly = 2) { onColorDisplayed(any(), any(), any(), any()) }
         verify(exactly = 0) { onComplete() }
 
@@ -118,10 +117,9 @@ internal class FreshnessStateTest {
         // When
         val frame4 = state.nextFrame(3001)
 
-
         // Then
         assertEquals(expectedFrame4, frame4)
-        verify {onColorDisplayed(rgbColor3, rgbColor2, 2, 3001) }
+        verify { onColorDisplayed(rgbColor3, rgbColor2, 2, 3001) }
         verify(exactly = 3) { onColorDisplayed(any(), any(), any(), any()) }
         verify(exactly = 0) { onComplete() }
 

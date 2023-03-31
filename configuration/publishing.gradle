@@ -101,14 +101,14 @@ afterEvaluate { project ->
                             dependencyNode.appendNode('groupId', it.group)
                             dependencyNode.appendNode('artifactId', it.name)
                             dependencyNode.appendNode('version', it.version)
-                            dependencyNode.appendNode('scope', "compile")
+                            //dependencyNode.appendNode('scope', "compile")
                         }
                         configurations.implementation.allDependencies.each {
                             def dependencyNode = dependenciesNode.appendNode('dependency')
                             dependencyNode.appendNode('groupId', it.group)
                             dependencyNode.appendNode('artifactId', it.name)
                             dependencyNode.appendNode('version', it.version)
-                            dependencyNode.appendNode('scope', "runtime")
+                            //dependencyNode.appendNode('scope', "runtime")
                         }
                     }
                 }

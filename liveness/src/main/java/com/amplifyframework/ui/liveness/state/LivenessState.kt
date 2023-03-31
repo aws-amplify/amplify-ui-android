@@ -308,8 +308,8 @@ internal data class LivenessState(
                     if (!detectedFaceMatchedOval && faceGuideRect != null) {
                         readyForOval = false
                         val timeoutError =
-                            FaceLivenessDetectionException.SessionTimedOutException(
-                                "Session timed out. Face did not match oval within time limit."
+                            FaceLivenessDetectionException(
+                                "Face did not match oval within time limit."
                             )
                         onSessionError(timeoutError, true)
                     }

@@ -21,7 +21,6 @@ import com.amplifyframework.AmplifyException
 import com.amplifyframework.api.aws.AWSApiPlugin
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.core.Amplify
-import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
 
 class LivenessApp : Application() {
 
@@ -31,7 +30,6 @@ class LivenessApp : Application() {
         try {
             Amplify.addPlugin(AWSApiPlugin())
             Amplify.addPlugin(AWSCognitoAuthPlugin())
-            Amplify.addPlugin(AWSPredictionsPlugin())
             Amplify.configure(applicationContext)
             Log.d(TAG, "Initialized Amplify")
         } catch (error: AmplifyException) {

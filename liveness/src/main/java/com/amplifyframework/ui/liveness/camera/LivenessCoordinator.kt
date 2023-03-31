@@ -29,8 +29,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
-import com.amplifyframework.core.Amplify
 import com.amplifyframework.core.Consumer
+import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
 import com.amplifyframework.predictions.aws.exceptions.AccessDeniedException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionNotFoundException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionTimeoutException
@@ -169,7 +169,7 @@ internal class LivenessCoordinator(
             this@LivenessCoordinator.credentialsProvider?.let { credentialsProvider(it) }
         }.build()
 
-        Amplify.Predictions.startFaceLivenessSession(
+        AWSPredictionsPlugin.startFaceLivenessSession(
             sessionId,
             faceLivenessSessionInformation,
             faceLivenessSessionOptions,

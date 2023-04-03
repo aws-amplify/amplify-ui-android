@@ -93,22 +93,30 @@ afterEvaluate { project ->
 
                     withXml {
                         def dependenciesNode = asNode().appendNode('dependencies')
-                        // Note that this only handles implementation
-                        // dependencies. In the future, may need to add api,
-                        // etc.
-                        configurations.api.allDependencies.each {
+
+                        def apiDependencies = configurations.api.allDependencies
+
+                        // Dependency may exist in both api and implementation block.
+                        // Prioritize as api over implementation.
+                        def implementationDependencies =
+                                configurations.implementation.allDependencies.findAll {
+                                    !apiDependencies.contains(it)
+                                }
+
+                        apiDependencies.each {
                             def dependencyNode = dependenciesNode.appendNode('dependency')
                             dependencyNode.appendNode('groupId', it.group)
                             dependencyNode.appendNode('artifactId', it.name)
                             dependencyNode.appendNode('version', it.version)
-                            //dependencyNode.appendNode('scope', "compile")
+                            dependencyNode.appendNode('scope', "compile")
                         }
-                        configurations.implementation.allDependencies.each {
+
+                        implementationDependencies.each {
                             def dependencyNode = dependenciesNode.appendNode('dependency')
                             dependencyNode.appendNode('groupId', it.group)
                             dependencyNode.appendNode('artifactId', it.name)
                             dependencyNode.appendNode('version', it.version)
-                            //dependencyNode.appendNode('scope', "runtime")
+                            dependencyNode.appendNode('scope', "runtime")
                         }
                     }
                 }

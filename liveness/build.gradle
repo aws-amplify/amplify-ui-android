@@ -47,8 +47,6 @@ dependencies {
 
     api dependency.amplify.auth
     api dependency.amplify.predictions
-    api dependency.amplify.core
-    api dependency.amplify.awsCore
 
     implementation dependency.androidx.camera.core
     implementation dependency.androidx.camera.camera2

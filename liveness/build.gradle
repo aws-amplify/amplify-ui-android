@@ -35,6 +35,12 @@ android {
     androidResources {
         noCompress 'tflite'
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
 }
 
 dependencies {
@@ -62,5 +68,4 @@ dependencies {
     testImplementation dependency.test.junit
     testImplementation dependency.test.robolectric
     testImplementation dependency.test.mockk
-
 }

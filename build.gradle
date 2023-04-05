@@ -131,10 +131,7 @@ subprojects { project ->
 }
 
 private void configureAndroidLibrary(Project project) {
-    project.ext.VERSION_NAME = project.hasProperty('VERSION_NAME') ?
-            project.findProperty('VERSION_NAME') :
-            rootProject.findProperty('VERSION_NAME')
-
+    project.ext.VERSION_NAME = project.findProperty('VERSION_NAME')
     if (project.hasProperty('signingKeyId')) {
         System.out.println("Getting signing info from protected source.")
         project.ext.'signing.keyId' = findProperty('signingKeyId')
@@ -143,7 +140,6 @@ private void configureAndroidLibrary(Project project) {
     }
 
     project.android {
-        //buildToolsVersion rootProject.ext.buildToolsVersion
         compileSdkVersion rootProject.ext.compileSdkVersion
 
         defaultConfig {

@@ -1,0 +1,77 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+}
+
+android {
+    namespace 'com.amplifyframework.ui.sample.liveness'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.amplifyframework.ui.sample.liveness"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1"
+        buildConfigField "boolean", "SHOW_DEBUG_UI", "false"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.3'
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    // Use this to pull in local module of Amplify UI
+    // Must also uncomment liveness sample project settings.gradle includeBuild
+    //implementation 'com.amplifyframework.ui:liveness'
+
+    // or
+
+    // Use this to use published version of Amplify UI
+    implementation "com.amplifyframework.ui:liveness$amplifyUIVersion"
+
+
+    implementation "com.amplifyframework:core-kotlin:$amplifyVersion"
+    implementation "com.amplifyframework:aws-api:$amplifyVersion"
+    implementation "com.amplifyframework:aws-auth-cognito:$amplifyVersion"
+    implementation "com.amplifyframework:aws-predictions:$amplifyVersion"
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation "com.google.accompanist:accompanist-permissions:0.28.0"
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.navigation:navigation-compose:2.5.3'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation "androidx.compose.ui:ui:$compose_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
+    implementation 'androidx.compose.material3:material3:1.0.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+}

@@ -19,6 +19,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -178,6 +179,17 @@ internal fun GetReadyView(readyButtonOnClick: () -> Unit) {
             Step(1, stringResource(R.string.amplify_ui_liveness_get_ready_step_1))
             Step(2, stringResource(R.string.amplify_ui_liveness_get_ready_step_2))
             Step(3, stringResource(R.string.amplify_ui_liveness_get_ready_step_3))
+
+            val textColor = if (isSystemInDarkTheme()) {
+                Color(0xFFEFF0F0)
+            } else {
+                Color(0xFF5C6670)
+            }
+            Text(
+                text = stringResource(R.string.amplify_ui_liveness_get_ready_legal_consent),
+                style = MaterialTheme.typography.bodySmall,
+                color = textColor
+            )
         }
 
         Button(

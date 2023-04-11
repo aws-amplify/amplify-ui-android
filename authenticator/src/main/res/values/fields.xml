@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License").
+  ~ You may not use this file except in compliance with the License.
+  ~ A copy of the License is located at
+  ~
+  ~  http://aws.amazon.com/apache2.0
+  ~
+  ~ or in the "license" file accompanying this file. This file is distributed
+  ~ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  ~ express or implied. See the License for the specific language governing
+  ~ permissions and limitations under the License.
+  -->
+
+<resources>
+    <!-- General field strings -->
+    <string name="amplify_ui_authenticator_field_hint">Enter your %s</string>
+    <string name="amplify_ui_authenticator_field_optional">%s (optional)</string>
+    <string name="amplify_ui_authenticator_field_warn_not_found">%s not found</string>
+    <string name="amplify_ui_authenticator_field_warn_empty">%s field must not be blank</string>
+    <string name="amplify_ui_authenticator_field_warn_invalid_format">Invalid %s format</string>
+    <string name="amplify_ui_authenticator_field_warn_existing">%s already exists</string>
+
+    <!-- Field Labels -->
+    <string name="amplify_ui_authenticator_field_label_username">Username</string>
+    <string name="amplify_ui_authenticator_field_label_password">Password</string>
+    <string name="amplify_ui_authenticator_field_label_password_confirm">Confirm Password</string>
+    <string name="amplify_ui_authenticator_field_label_new_password">New Password</string>
+    <string name="amplify_ui_authenticator_field_label_new_password_confirm">Confirm New Password</string>
+    <string name="amplify_ui_authenticator_field_label_confirmation_code">Confirmation Code</string>
+    <string name="amplify_ui_authenticator_field_label_phone_number">Phone Number</string>
+    <string name="amplify_ui_authenticator_field_label_email">Email</string>
+    <string name="amplify_ui_authenticator_field_label_birthdate">Birthdate</string>
+    <string name="amplify_ui_authenticator_field_label_family_name">Family Name</string>
+    <string name="amplify_ui_authenticator_field_label_middle_name">Middle Name</string>
+    <string name="amplify_ui_authenticator_field_label_given_name">Given Name</string>
+    <string name="amplify_ui_authenticator_field_label_name">Name</string>
+    <string name="amplify_ui_authenticator_field_label_nickname">Nickname</string>
+    <string name="amplify_ui_authenticator_field_label_preferred_username">Preferred Username</string>
+    <string name="amplify_ui_authenticator_field_label_profile">Profile</string>
+    <string name="amplify_ui_authenticator_field_label_website">Website</string>
+    <string name="amplify_ui_authenticator_field_label_verification_attribute">Verification Attribute</string>
+
+    <!-- Password field specific strings -->
+    <string name="amplify_ui_authenticator_field_a11y_password_show">Show password</string>
+    <string name="amplify_ui_authenticator_field_a11y_password_hide">Hide password</string>
+    <string name="amplify_ui_authenticator_field_password_requirements">Password must include:</string>
+    <string name="amplify_ui_authenticator_field_password_missing_special">* at least one special character</string>
+    <string name="amplify_ui_authenticator_field_password_missing_number">* at least one number</string>
+    <string name="amplify_ui_authenticator_field_password_missing_upper">* at least one uppercase letter</string>
+    <string name="amplify_ui_authenticator_field_password_missing_lower">* at least one lowercase letter</string>
+    <!-- Plurals string for the number of characters. The value can be between 6-99 -->
+    <plurals name="amplify_ui_authenticator_field_password_too_short">
+        <!-- in English 6-99 all use the same grammar -->
+        <item quantity="other">* at least %d characters</item>
+    </plurals>
+
+    <!-- Confirm Password field specific strings -->
+    <string name="amplify_ui_authenticator_field_hint_password_confirm">Re-enter your password</string>
+    <string name="amplify_ui_authenticator_field_warn_unmatched_password">Passwords do not match</string>
+
+    <!-- Confirmation code specific strings -->
+    <string name="amplify_ui_authenticator_field_warn_incorrect_code">Confirmation code is incorrect</string>
+</resources>

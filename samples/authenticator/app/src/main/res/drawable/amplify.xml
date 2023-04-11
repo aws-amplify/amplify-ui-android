@@ -1,0 +1,48 @@
+<!--
+  ~ Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License").
+  ~ You may not use this file except in compliance with the License.
+  ~ A copy of the License is located at
+  ~
+  ~  http://aws.amazon.com/apache2.0
+  ~
+  ~ or in the "license" file accompanying this file. This file is distributed
+  ~ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  ~ express or implied. See the License for the specific language governing
+  ~ permissions and limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="250dp"
+    android:height="190dp"
+    android:viewportWidth="2500"
+    android:viewportHeight="1900">
+    <path
+        android:pathData="M200,1889c0,-6 -30,-10 -85,-8 -47,1 -85,-2 -85,-7 -1,-25 38,-75 74,-94 23,-11 100,-57 171,-101 72,-44 144,-87 162,-95 18,-9 37,-22 44,-30 16,-20 80,-19 73,1 -5,13 37,15 344,15l350,0 20,38c49,94 126,228 138,243 8,8 14,19 14,22 0,4 -40,7 -90,7 -53,0 -90,4 -90,10 0,7 -180,10 -520,10 -360,0 -520,-3 -520,-11z"
+        android:fillColor="#FFB300" />
+    <path
+        android:pathData="M2108,1823c-25,-43 -87,-152 -138,-243 -51,-91 -132,-235 -180,-320 -48,-85 -97,-171 -107,-190 -11,-19 -62,-109 -113,-200 -51,-91 -121,-214 -155,-275 -34,-60 -74,-132 -90,-160 -16,-27 -45,-79 -65,-115 -124,-220 -145,-258 -162,-282 -10,-14 -18,-29 -18,-32 0,-3 76,-6 168,-6l168,0 46,77c25,43 60,105 78,138 18,33 78,139 133,235 55,96 115,203 134,238 19,35 66,117 104,183 38,67 69,122 69,124 0,2 41,74 90,160 50,86 90,159 90,161 0,2 18,33 40,69 22,36 40,67 40,69 0,2 34,64 76,137 42,74 90,159 106,189 17,30 37,63 46,73 8,9 13,20 9,23 -3,3 -76,5 -162,5 -107,-1 -155,1 -150,9 3,5 2,10 -3,10 -5,0 -29,-35 -54,-77z"
+        android:fillColor="#FFB300" />
+    <path
+        android:pathData="M1583,1843c-12,-21 -31,-56 -43,-78 -32,-58 -328,-583 -430,-765 -48,-85 -133,-235 -189,-334 -99,-175 -110,-202 -92,-221 4,-6 22,-35 38,-65 76,-140 105,-190 113,-195 5,-3 15,7 23,22 16,32 143,258 327,583 70,124 198,351 285,505 87,154 195,346 241,427 46,81 84,150 84,153 0,3 -76,5 -168,5l-168,0 -21,-37z"
+        android:fillColor="#FFB300" />
+    <path
+        android:pathData="M27,1883c-3,-5 19,-50 49,-102 30,-52 54,-95 54,-97 0,-2 13,-25 29,-51 23,-40 127,-223 231,-408 12,-22 83,-148 158,-280 74,-132 142,-253 150,-268 8,-16 18,-25 22,-20 17,18 170,293 170,306 0,7 -4,17 -9,23 -8,8 -168,288 -248,434 -54,98 -88,150 -97,150 -5,0 -17,6 -25,14 -9,8 -34,24 -56,36 -22,12 -93,55 -158,94 -65,39 -139,83 -165,97 -26,15 -59,39 -74,53 -15,14 -29,23 -31,19z"
+        android:fillColor="#FF9300" />
+    <path
+        android:pathData="M1226,1210c-9,-17 -13,-30 -8,-30 9,0 35,50 29,56 -2,2 -11,-10 -21,-26z"
+        android:fillColor="#FF9300" />
+    <path
+        android:pathData="M1151,1071c-29,-56 -26,-65 4,-12 14,24 23,46 21,48 -3,3 -14,-13 -25,-36z"
+        android:fillColor="#FF9300" />
+    <path
+        android:pathData="M1040,881c-6,-12 -7,-21 -1,-21 10,0 24,30 17,37 -2,3 -9,-5 -16,-16z"
+        android:fillColor="#FF9300" />
+    <path
+        android:pathData="M972,755c-17,-37 -14,-45 4,-12 9,16 14,31 11,33 -2,2 -9,-7 -15,-21z"
+        android:fillColor="#FF9300" />
+    <path
+        android:pathData="M200,1890c0,-7 180,-10 520,-10 340,0 520,3 520,10 0,7 -180,10 -520,10 -340,0 -520,-3 -520,-10z"
+        android:fillColor="#FFDAA7" />
+</vector>

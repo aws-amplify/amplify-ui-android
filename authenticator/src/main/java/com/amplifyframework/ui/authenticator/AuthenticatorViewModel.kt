@@ -33,6 +33,7 @@ import com.amplifyframework.auth.cognito.exceptions.service.UserNotConfirmedExce
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotFoundException
 import com.amplifyframework.auth.cognito.exceptions.service.UsernameExistsException
 import com.amplifyframework.auth.exceptions.NotAuthorizedException
+import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.AuthSignInResult
@@ -69,11 +70,13 @@ import com.amplifyframework.ui.authenticator.util.CodeSentMessage
 import com.amplifyframework.ui.authenticator.util.ExpiredCodeMessage
 import com.amplifyframework.ui.authenticator.util.InvalidLoginMessage
 import com.amplifyframework.ui.authenticator.util.MissingConfigurationException
+import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
 import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
 import com.amplifyframework.ui.authenticator.util.toFieldError
+import java.net.UnknownHostException
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -509,6 +512,13 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
             is CodeDeliveryFailureException -> sendMessage(CannotSendCodeMessage(error))
             is CodeExpiredException -> sendMessage(ExpiredCodeMessage(error))
             is CodeValidationException -> sendMessage(UnknownErrorMessage(error))
+            is UnknownException -> {
+                if (error.cause is UnknownHostException) {
+                    sendMessage(NetworkErrorMessage(error))
+                } else {
+                    sendMessage(UnknownErrorMessage(error))
+                }
+            }
             else -> sendMessage(UnknownErrorMessage(error))
         }
     }

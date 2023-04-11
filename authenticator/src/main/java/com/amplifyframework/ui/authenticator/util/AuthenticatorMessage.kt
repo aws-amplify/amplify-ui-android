@@ -114,3 +114,10 @@ internal class CannotSendCodeMessage(
 internal class ExpiredCodeMessage(
     override val cause: AuthException
 ) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_expired_code), AuthenticatorMessage.Error
+
+/**
+ * The device may not have connectivity.
+ */
+internal class NetworkErrorMessage(
+    override val cause: AuthException
+): AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network), AuthenticatorMessage.Error

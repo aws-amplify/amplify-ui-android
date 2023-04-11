@@ -44,7 +44,9 @@ import kotlinx.coroutines.launch
 fun VerifyUser(
     state: VerifyUserState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (VerifyUserState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_verify_user)) },
+    headerContent: @Composable (VerifyUserState) -> Unit = {
+        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_verify_user))
+    },
     footerContent: @Composable (VerifyUserState) -> Unit = { VerifyUserFooter(it) }
 ) {
     val scope = rememberCoroutineScope()

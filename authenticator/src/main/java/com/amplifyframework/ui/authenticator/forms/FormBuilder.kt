@@ -18,8 +18,8 @@ package com.amplifyframework.ui.authenticator.forms
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.KeyboardType
 import com.amplifyframework.auth.AuthUserAttributeKey
-import com.amplifyframework.ui.authenticator.amplify.SignInMethod
-import com.amplifyframework.ui.authenticator.amplify.toFieldKey
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
+import com.amplifyframework.ui.authenticator.auth.toFieldKey
 
 internal data class FormData(val fields: List<FieldConfig>)
 

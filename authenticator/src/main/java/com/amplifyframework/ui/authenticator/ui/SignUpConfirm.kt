@@ -38,7 +38,9 @@ import kotlinx.coroutines.launch
 fun SignUpConfirm(
     state: SignUpConfirmState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (SignUpConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signup_confirm)) },
+    headerContent: @Composable (SignUpConfirmState) -> Unit = {
+        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signup_confirm))
+    },
     footerContent: @Composable (SignUpConfirmState) -> Unit = { SignUpConfirmFooter(it) },
     deliveryNoticeContent: @Composable (AuthCodeDeliveryDetails?) -> Unit = { DeliveryDetails(it) }
 ) {

@@ -11,7 +11,7 @@
  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
- */
+ */ // ktlint-disable filename
 
 package com.amplifyframework.ui.authenticator.util
 
@@ -24,7 +24,10 @@ import com.amplifyframework.ui.authenticator.forms.FieldError
 // or an InvalidFormat if none
 internal fun InvalidPasswordException.toFieldError(): FieldError {
     val cause = this.cause
-    return if (cause is aws.sdk.kotlin.services.cognitoidentityprovider.model.InvalidPasswordException && cause.localizedMessage != null) {
+    return if (
+        cause is aws.sdk.kotlin.services.cognitoidentityprovider.model.InvalidPasswordException &&
+        cause.localizedMessage != null
+    ) {
         FieldError.Custom(cause.localizedMessage!!)
     } else {
         FieldError.InvalidFormat

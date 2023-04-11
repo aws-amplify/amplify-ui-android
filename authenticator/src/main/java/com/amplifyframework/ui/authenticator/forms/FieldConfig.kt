@@ -18,7 +18,6 @@ package com.amplifyframework.ui.authenticator.forms
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.input.KeyboardType
-import java.util.*
 
 /**
  * An [FieldConfig] specifies the metadata for an input field within the Authenticator composable. The

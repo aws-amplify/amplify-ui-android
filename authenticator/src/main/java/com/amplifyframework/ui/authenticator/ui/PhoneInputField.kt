@@ -54,7 +54,7 @@ import com.amplifyframework.ui.authenticator.forms.MutableFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
 import com.amplifyframework.ui.authenticator.util.dialCodeFor
 import com.amplifyframework.ui.authenticator.util.dialCodeList
-import java.util.*
+import java.util.Locale
 
 @Stable
 private class PhoneNumberFieldState(

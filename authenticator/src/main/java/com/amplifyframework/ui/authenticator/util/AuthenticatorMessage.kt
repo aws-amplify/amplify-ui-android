@@ -120,4 +120,4 @@ internal class ExpiredCodeMessage(
  */
 internal class NetworkErrorMessage(
     override val cause: AuthException
-): AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network), AuthenticatorMessage.Error
+) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network), AuthenticatorMessage.Error

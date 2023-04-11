@@ -36,7 +36,9 @@ import kotlinx.coroutines.launch
 fun SignIn(
     state: SignInState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (SignInState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin)) },
+    headerContent: @Composable (SignInState) -> Unit = {
+        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin))
+    },
     footerContent: @Composable (SignInState) -> Unit = { SignInFooter(it) }
 ) {
     val scope = rememberCoroutineScope()

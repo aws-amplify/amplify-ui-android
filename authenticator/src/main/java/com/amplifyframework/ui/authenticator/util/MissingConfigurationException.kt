@@ -23,5 +23,6 @@ import com.amplifyframework.auth.AuthException
  */
 class MissingConfigurationException : AuthException(
     "Missing auth configuration",
-    "Make sure the Auth plugin is added and Amplify.configure is called. See https://docs.amplify.aws/lib/auth/getting-started/q/platform/android/ for details"
+    "Make sure the Auth plugin is added and Amplify.configure is called. See " +
+        "https://docs.amplify.aws/lib/auth/getting-started/q/platform/android/ for details"
 )

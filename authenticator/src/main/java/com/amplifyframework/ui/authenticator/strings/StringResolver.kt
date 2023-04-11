@@ -57,9 +57,11 @@ internal open class StringResolver {
             FieldKey.Website -> stringResource(R.string.amplify_ui_authenticator_field_label_website)
             FieldKey.PhoneNumber -> stringResource(R.string.amplify_ui_authenticator_field_label_phone_number)
             FieldKey.Nickname -> stringResource(R.string.amplify_ui_authenticator_field_label_nickname)
-            FieldKey.PreferredUsername -> stringResource(R.string.amplify_ui_authenticator_field_label_preferred_username)
+            FieldKey.PreferredUsername ->
+                stringResource(R.string.amplify_ui_authenticator_field_label_preferred_username)
             FieldKey.Profile -> stringResource(R.string.amplify_ui_authenticator_field_label_profile)
-            FieldKey.VerificationAttribute -> stringResource(R.string.amplify_ui_authenticator_field_label_verification_attribute)
+            FieldKey.VerificationAttribute ->
+                stringResource(R.string.amplify_ui_authenticator_field_label_verification_attribute)
             else -> ""
         }
     }
@@ -68,7 +70,8 @@ internal open class StringResolver {
     @ReadOnlyComposable
     open fun hint(config: FieldConfig): String? {
         return config.hint ?: when {
-            config.key == FieldKey.ConfirmPassword -> stringResource(R.string.amplify_ui_authenticator_field_hint_password_confirm)
+            config.key == FieldKey.ConfirmPassword ->
+                stringResource(R.string.amplify_ui_authenticator_field_hint_password_confirm)
             config is FieldConfig.Date -> "yyyy-mm-dd"
             else -> {
                 val label = label(config)
@@ -105,7 +108,8 @@ internal open class StringResolver {
                 }
                 errorText
             }
-            FieldError.PasswordsDoNotMatch -> stringResource(R.string.amplify_ui_authenticator_field_warn_unmatched_password)
+            FieldError.PasswordsDoNotMatch ->
+                stringResource(R.string.amplify_ui_authenticator_field_warn_unmatched_password)
             FieldError.MissingRequired -> {
                 val label = title(config)
                 stringResource(R.string.amplify_ui_authenticator_field_warn_empty, label)
@@ -130,6 +134,7 @@ internal open class StringResolver {
         }
     }
 
+    @Suppress("UNUSED_EXPRESSION")
     @Composable
     @ReadOnlyComposable
     open fun error(error: AuthException): String {

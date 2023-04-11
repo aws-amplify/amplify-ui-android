@@ -73,6 +73,9 @@ ext {
                     auth: "com.amplifyframework:aws-auth-cognito:$amplifyVersion",
                     predictions: "com.amplifyframework:aws-predictions:$amplifyVersion",
             ],
+            android: [
+                    desugar: "com.android.tools:desugar_jdk_libs:1.1.8"
+            ],
             androidx: [
                     camera: [
                       core: "androidx.camera:camera-core:$cameraXVersion",

@@ -39,13 +39,13 @@ import com.amplifyframework.ui.authenticator.amplify.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.amplify.PasswordCriteria
 import com.amplifyframework.ui.authenticator.amplify.SignInMethod
 import com.amplifyframework.ui.authenticator.amplify.VerificationMechanism
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.json.JSONException
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * An abstraction of the Amplify.Auth API that allows us to use coroutines with no exceptions

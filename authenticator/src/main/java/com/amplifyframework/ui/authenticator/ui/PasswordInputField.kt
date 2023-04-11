@@ -89,8 +89,8 @@ private fun getTrailingIcon(hidden: Boolean, onClick: () -> Unit): @Composable (
             false -> R.drawable.ic_authenticator_invisible
         }
         val contentDescription = when (hidden) {
-            true -> R.string.authenticator_field_a11y_password_hide
-            false -> R.string.authenticator_field_a11y_password_show
+            true -> R.string.amplify_ui_authenticator_field_a11y_password_hide
+            false -> R.string.amplify_ui_authenticator_field_a11y_password_show
         }
         IconButton(onClick = onClick) {
             Icon(painter = painterResource(icon), contentDescription = stringResource(contentDescription))

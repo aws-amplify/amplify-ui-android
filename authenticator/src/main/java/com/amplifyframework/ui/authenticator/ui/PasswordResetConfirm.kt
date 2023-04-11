@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 fun PasswordResetConfirm(
     state: PasswordResetConfirmState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (PasswordResetConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.authenticator_title_password_reset)) },
+    headerContent: @Composable (PasswordResetConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_password_reset)) },
     footerContent: @Composable (PasswordResetConfirmState) -> Unit = { PasswordResetConfirmFooter(it) },
     deliveryNoticeContent: @Composable (details: AuthCodeDeliveryDetails?) -> Unit = { DeliveryDetails(it) }
 ) {
@@ -64,7 +64,7 @@ fun PasswordResetConfirmFooter(
 ) {
     Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         TextButton(onClick = { state.moveTo(AuthenticatorStep.SignIn) }) {
-            Text(stringResource(R.string.authenticator_button_back_to_signin))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
         }
     }
 }

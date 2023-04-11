@@ -14,7 +14,7 @@
   -->
 
 <resources>
-    <string name="authenticator_message_account_created">Account created</string>
-    <string name="authenticator_message_password_reset">Password has been reset</string>
-    <string name="authenticator_message_code_sent">Confirmation code sent</string>
+    <string name="amplify_ui_authenticator_message_account_created">Account created</string>
+    <string name="amplify_ui_authenticator_message_password_reset">Password has been reset</string>
+    <string name="amplify_ui_authenticator_message_code_sent">Confirmation code sent</string>
 </resources>

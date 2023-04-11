@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 fun SignInConfirmCustom(
     state: SignInConfirmCustomState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (state: SignInConfirmCustomState) -> Unit = { AuthenticatorTitle(stringResource(R.string.authenticator_title_signin_confirm_mfa)) },
+    headerContent: @Composable (state: SignInConfirmCustomState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin_confirm_mfa)) },
     footerContent: @Composable (state: SignInConfirmCustomState) -> Unit = { SignInConfirmCustomFooter(it) },
     deliveryDetailsContent: @Composable (details: AuthCodeDeliveryDetails?) -> Unit = { DeliveryDetails(it) }
 ) {
@@ -68,7 +68,7 @@ fun SignInConfirmCustomFooter(
         contentAlignment = Alignment.Center
     ) {
         TextButton(onClick = { state.moveTo(AuthenticatorStep.SignIn) }) {
-            Text(stringResource(R.string.authenticator_button_back_to_signin))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
         }
     }
 }

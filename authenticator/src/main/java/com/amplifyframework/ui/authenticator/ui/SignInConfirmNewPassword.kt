@@ -44,9 +44,9 @@ private object NewPasswordStringResolver : StringResolver() {
     override fun label(config: FieldConfig): String {
         return when (config.key) {
             is FieldKey.Password ->
-                stringResource(R.string.authenticator_field_label_new_password)
+                stringResource(R.string.amplify_ui_authenticator_field_label_new_password)
             is FieldKey.ConfirmPassword ->
-                stringResource(R.string.authenticator_field_label_new_password_confirm)
+                stringResource(R.string.amplify_ui_authenticator_field_label_new_password_confirm)
             else ->
                 super.label(config)
         }
@@ -58,7 +58,7 @@ fun SignInConfirmNewPassword(
     state: SignInConfirmNewPasswordState,
     modifier: Modifier = Modifier,
     headerContent: @Composable (state: SignInConfirmNewPasswordState) -> Unit = {
-        AuthenticatorTitle(stringResource(R.string.authenticator_title_signin_confirm_new_password))
+        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin_confirm_new_password))
     },
     footerContent: @Composable (state: SignInConfirmNewPasswordState) -> Unit = { SignInConfirmNewPasswordFooter(it) }
 ) {
@@ -75,7 +75,7 @@ fun SignInConfirmNewPassword(
         AuthenticatorButton(
             onClick = { scope.launch { state.confirmSignIn() } },
             loading = state.form.submitting,
-            label = stringResource(R.string.authenticator_button_change_password)
+            label = stringResource(R.string.amplify_ui_authenticator_button_change_password)
         )
         footerContent(state)
     }
@@ -91,7 +91,7 @@ fun SignInConfirmNewPasswordFooter(
         contentAlignment = Alignment.Center
     ) {
         TextButton(onClick = { state.moveTo(AuthenticatorStep.SignIn) }) {
-            Text(stringResource(R.string.authenticator_button_back_to_signin))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
         }
     }
 }

@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 fun SignUp(
     state: SignUpState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (SignUpState) -> Unit = { AuthenticatorTitle(stringResource(R.string.authenticator_title_signup)) },
+    headerContent: @Composable (SignUpState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signup)) },
     footerContent: @Composable (SignUpState) -> Unit = { SignUpFooter(it) }
 ) {
     val scope = rememberCoroutineScope()
@@ -47,7 +47,7 @@ fun SignUp(
         AuthenticatorButton(
             onClick = { scope.launch { state.signUp() } },
             loading = state.form.submitting,
-            label = stringResource(R.string.authenticator_button_signup),
+            label = stringResource(R.string.amplify_ui_authenticator_button_signup),
             modifier = Modifier.testTag("SignUpButton")
         )
         footerContent(state)
@@ -61,7 +61,7 @@ fun SignUpFooter(
 ) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         TextButton(onClick = { state.moveTo(AuthenticatorStep.SignIn) }) {
-            Text(stringResource(R.string.authenticator_button_back_to_signin))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
         }
     }
 }

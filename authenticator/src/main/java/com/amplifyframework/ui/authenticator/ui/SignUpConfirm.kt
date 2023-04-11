@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 fun SignUpConfirm(
     state: SignUpConfirmState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (SignUpConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.authenticator_title_signup_confirm)) },
+    headerContent: @Composable (SignUpConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signup_confirm)) },
     footerContent: @Composable (SignUpConfirmState) -> Unit = { SignUpConfirmFooter(it) },
     deliveryNoticeContent: @Composable (AuthCodeDeliveryDetails?) -> Unit = { DeliveryDetails(it) }
 ) {
@@ -70,13 +70,13 @@ fun SignUpConfirmFooter(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(stringResource(R.string.authenticator_button_lost_code))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_lost_code))
             TextButton(onClick = { scope.launch { state.resendCode() } }) {
-                Text(stringResource(R.string.authenticator_button_resend_code))
+                Text(stringResource(R.string.amplify_ui_authenticator_button_resend_code))
             }
         }
         TextButton(onClick = { state.moveTo(AuthenticatorStep.SignIn) }) {
-            Text(stringResource(R.string.authenticator_button_back_to_signin))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
         }
     }
 }

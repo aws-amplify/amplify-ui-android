@@ -15,6 +15,6 @@
 
 <resources>
     <!-- Confirmation Code Screen -->
-    <string name="authenticator_confirmation_code_sent">A confirmation code has been sent to <b>%s</b>.</string>
-    <string name="authenticator_confirmation_code_sent_unknown">A confirmation code has been sent.</string>
+    <string name="amplify_ui_authenticator_confirmation_code_sent">A confirmation code has been sent to <b>%s</b>.</string>
+    <string name="amplify_ui_authenticator_confirmation_code_sent_unknown">A confirmation code has been sent.</string>
 </resources>

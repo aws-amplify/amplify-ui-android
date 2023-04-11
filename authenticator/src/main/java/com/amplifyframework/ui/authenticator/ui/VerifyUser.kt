@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 fun VerifyUser(
     state: VerifyUserState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (VerifyUserState) -> Unit = { AuthenticatorTitle(stringResource(R.string.authenticator_title_verify_user)) },
+    headerContent: @Composable (VerifyUserState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_verify_user)) },
     footerContent: @Composable (VerifyUserState) -> Unit = { VerifyUserFooter(it) }
 ) {
     val scope = rememberCoroutineScope()
@@ -91,8 +91,8 @@ internal fun VerifyUserAttributeSelect(
                 )
 
                 val label = when (attribute.key) {
-                    AuthUserAttributeKey.email() -> R.string.authenticator_field_label_email
-                    else -> R.string.authenticator_field_label_phone_number
+                    AuthUserAttributeKey.email() -> R.string.amplify_ui_authenticator_field_label_email
+                    else -> R.string.amplify_ui_authenticator_field_label_phone_number
                 }
 
                 Text(stringResource(label))
@@ -108,7 +108,7 @@ fun VerifyUserFooter(
 ) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         TextButton(onClick = { state.skip() }) {
-            Text(stringResource(R.string.authenticator_button_skip))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_skip))
         }
     }
 }

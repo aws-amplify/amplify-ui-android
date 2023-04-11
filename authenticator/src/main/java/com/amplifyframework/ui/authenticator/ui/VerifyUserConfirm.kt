@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 fun VerifyUserConfirm(
     state: VerifyUserConfirmState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (VerifyUserConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.authenticator_title_verify_user)) },
+    headerContent: @Composable (VerifyUserConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_verify_user)) },
     footerContent: @Composable (VerifyUserConfirmState) -> Unit = {
         VerifyUserConfirmFooter(it)
     },
@@ -75,13 +75,13 @@ fun VerifyUserConfirmFooter(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(stringResource(R.string.authenticator_button_lost_code))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_lost_code))
             TextButton(onClick = { scope.launch { state.resendCode() } }) {
-                Text(stringResource(R.string.authenticator_button_resend_code))
+                Text(stringResource(R.string.amplify_ui_authenticator_button_resend_code))
             }
         }
         TextButton(onClick = { state.skip() }) {
-            Text(stringResource(R.string.authenticator_button_skip))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_skip))
         }
     }
 }

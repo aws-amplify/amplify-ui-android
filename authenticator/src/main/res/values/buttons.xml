@@ -15,13 +15,13 @@
 
 <resources>
     <!-- Buttons -->
-    <string name="authenticator_button_submit">Submit</string>
-    <string name="authenticator_button_signin">Sign In</string>
-    <string name="authenticator_button_change_password">Change Password</string>
-    <string name="authenticator_button_signup">Create Account</string>
-    <string name="authenticator_button_forgot_password">Forgot Password?</string>
-    <string name="authenticator_button_back_to_signin">Back to Sign In</string>
-    <string name="authenticator_button_lost_code">Lost your code?</string>
-    <string name="authenticator_button_resend_code">Send Code</string>
-    <string name="authenticator_button_skip">Skip</string>
+    <string name="amplify_ui_authenticator_button_submit">Submit</string>
+    <string name="amplify_ui_authenticator_button_signin">Sign In</string>
+    <string name="amplify_ui_authenticator_button_change_password">Change Password</string>
+    <string name="amplify_ui_authenticator_button_signup">Create Account</string>
+    <string name="amplify_ui_authenticator_button_forgot_password">Forgot Password?</string>
+    <string name="amplify_ui_authenticator_button_back_to_signin">Back to Sign In</string>
+    <string name="amplify_ui_authenticator_button_lost_code">Lost your code?</string>
+    <string name="amplify_ui_authenticator_button_resend_code">Send Code</string>
+    <string name="amplify_ui_authenticator_button_skip">Skip</string>
 </resources>

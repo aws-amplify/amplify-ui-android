@@ -70,7 +70,7 @@ internal fun AuthenticatorButton(
     onClick: () -> Unit,
     loading: Boolean,
     modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.authenticator_button_submit),
+    label: String = stringResource(R.string.amplify_ui_authenticator_button_submit),
     loadingIndicator: @Composable () -> Unit = { LoadingIndicator() }
 ) {
     Button(

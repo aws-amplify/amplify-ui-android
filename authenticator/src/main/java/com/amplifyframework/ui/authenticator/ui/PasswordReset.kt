@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 fun PasswordReset(
     state: PasswordResetState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (PasswordResetState) -> Unit = { AuthenticatorTitle(stringResource(R.string.authenticator_title_password_reset)) },
+    headerContent: @Composable (PasswordResetState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_password_reset)) },
     footerContent: @Composable (PasswordResetState) -> Unit = { PasswordResetFooter(it) }
 ) {
     val scope = rememberCoroutineScope()
@@ -62,7 +62,7 @@ fun PasswordResetFooter(
 ) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         TextButton(onClick = { state.moveTo(AuthenticatorStep.SignIn) }) {
-            Text(stringResource(R.string.authenticator_button_back_to_signin))
+            Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
         }
     }
 }

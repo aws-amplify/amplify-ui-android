@@ -65,7 +65,7 @@ ext {
     compileSdkVersion = 33
     minSdkVersion = 24
     targetSdkVersion = 33
-    amplifyVersion = '2.7.0'
+    amplifyVersion = '2.7.1'
     cameraXVersion = '1.2.0'
     dependency = [
             amplify: [

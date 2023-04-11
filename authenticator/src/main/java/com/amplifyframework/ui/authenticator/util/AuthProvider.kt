@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.authenticator.util
 
 import com.amplifyframework.annotations.InternalAmplifyApi
+import com.amplifyframework.auth.AWSCognitoAuthMetadataType
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthException
@@ -112,7 +113,7 @@ internal class RealAuthProvider : AuthProvider {
 
     init {
         val cognitoPlugin = getCognitoPlugin()
-        // TODO After Amplify release cognitoPlugin?.addToUserAgent(AWSCognitoAuthMetadataType.Authenticator, BuildConfig.AUTHENTICATOR_VERSION)
+        cognitoPlugin?.addToUserAgent(AWSCognitoAuthMetadataType.Authenticator, BuildConfig.VERSION_NAME)
     }
 
     override suspend fun signIn(username: String, password: String) = suspendCoroutine { continuation ->

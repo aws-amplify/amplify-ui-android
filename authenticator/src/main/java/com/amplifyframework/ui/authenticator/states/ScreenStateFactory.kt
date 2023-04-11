@@ -20,10 +20,10 @@ import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.result.AuthSignOutResult
-import com.amplifyframework.ui.authenticator.amplify.AmplifyAuthConfiguration
-import com.amplifyframework.ui.authenticator.amplify.PasswordCriteria
-import com.amplifyframework.ui.authenticator.amplify.SignInMethod
-import com.amplifyframework.ui.authenticator.amplify.toFieldKey
+import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
+import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
+import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.FieldValidators

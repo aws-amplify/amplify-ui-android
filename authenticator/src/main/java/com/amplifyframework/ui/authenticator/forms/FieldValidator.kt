@@ -16,7 +16,7 @@
 package com.amplifyframework.ui.authenticator.forms
 
 import android.util.Patterns
-import com.amplifyframework.ui.authenticator.amplify.PasswordCriteria
+import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.forms.FieldError.InvalidFormat
 import com.amplifyframework.ui.authenticator.forms.FieldError.PasswordsDoNotMatch
 import com.amplifyframework.ui.authenticator.forms.FieldKey.Password

@@ -42,10 +42,10 @@ import com.amplifyframework.auth.result.step.AuthResetPasswordStep
 import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.auth.result.step.AuthSignUpStep
 import com.amplifyframework.core.Amplify
-import com.amplifyframework.ui.authenticator.amplify.AmplifyAuthConfiguration
-import com.amplifyframework.ui.authenticator.amplify.toAttributeKey
-import com.amplifyframework.ui.authenticator.amplify.toFieldKey
-import com.amplifyframework.ui.authenticator.amplify.toVerifiedAttributeKey
+import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
+import com.amplifyframework.ui.authenticator.auth.toAttributeKey
+import com.amplifyframework.ui.authenticator.auth.toFieldKey
+import com.amplifyframework.ui.authenticator.auth.toVerifiedAttributeKey
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldError

@@ -123,7 +123,6 @@ abstract class FieldConfig private constructor() {
      * @param validator The [FieldValidator] instance for this field.
      * @param label The label for this field. This is null for standard fields.
      * @param hint The hint for this field. This is null for standard fields.
-     * @param defaultCountryCode The default country code that is pre-selected for this phone number.
      */
     @Immutable
     data class PhoneNumber internal constructor(

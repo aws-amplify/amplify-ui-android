@@ -213,6 +213,9 @@ internal class ScreenStateFactory(
             verificationAttribute()
         }.toState()
 
+        // Default to the first attribute selected
+        form.fields[FieldKey.VerificationAttribute]?.state?.content = attributes.firstOrNull()?.key?.keyString ?: ""
+
         form.onSubmit {
             val keyString = form.getTrimmed(FieldKey.VerificationAttribute)!!
             val key = AuthUserAttributeKey.custom(keyString)

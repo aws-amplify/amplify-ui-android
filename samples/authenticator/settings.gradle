@@ -17,4 +17,4 @@ include ':app'
 
 // Uncomment this to use local authenticator module from Amplify UI Repo
 // Must also change samples/authenticator/app/build.gradle implementation
-includeBuild('../../') {}
+//includeBuild('../../') {}

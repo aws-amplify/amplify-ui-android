@@ -47,12 +47,12 @@ android {
 dependencies {
     // Use this to pull in local module of Amplify UI
     // Must also uncomment authenticator sample project settings.gradle includeBuild
-    implementation 'com.amplifyframework.ui:authenticator'
+    //implementation 'com.amplifyframework.ui:authenticator'
 
     // or
 
     // Use this to use published version of Amplify UI
-    //implementation "com.amplifyframework.ui:authenticator$authenticatorVersion"
+    implementation "com.amplifyframework.ui:authenticator:$authenticatorVersion"
 
     implementation "com.amplifyframework:core-kotlin:$amplifyVersion"
     implementation "com.amplifyframework:aws-auth-cognito:$amplifyVersion"

@@ -37,7 +37,9 @@ import kotlinx.coroutines.launch
 fun VerifyUserConfirm(
     state: VerifyUserConfirmState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (VerifyUserConfirmState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_verify_user)) },
+    headerContent: @Composable (VerifyUserConfirmState) -> Unit = {
+        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_verify_user))
+    },
     footerContent: @Composable (VerifyUserConfirmState) -> Unit = {
         VerifyUserConfirmFooter(it)
     },

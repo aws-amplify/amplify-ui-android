@@ -37,7 +37,9 @@ import kotlinx.coroutines.launch
 fun SignInConfirmMfa(
     state: SignInConfirmMfaState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (state: SignInConfirmMfaState) -> Unit = { AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin_confirm_mfa)) },
+    headerContent: @Composable (state: SignInConfirmMfaState) -> Unit = {
+        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin_confirm_mfa))
+    },
     footerContent: @Composable (state: SignInConfirmMfaState) -> Unit = { SignInConfirmMfaFooter(it) },
     deliveryNoticeContent: @Composable (details: AuthCodeDeliveryDetails?) -> Unit = { DeliveryDetails(details = it) }
 ) {

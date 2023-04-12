@@ -542,6 +542,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     }
 
     private fun handleGeneralFailure(error: AuthException) {
+        logger.error(error.toString())
         moveTo(ErrorState(error))
     }
 

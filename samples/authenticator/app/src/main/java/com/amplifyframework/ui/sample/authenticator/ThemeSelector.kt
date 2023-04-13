@@ -26,7 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.amplifyframework.ui.sample.authenticator.theme.amplify.AmplifyTheme
+import com.amplifyframework.ui.sample.authenticator.theme.amplifytheme.AmplifyTheme
 import com.amplifyframework.ui.sample.authenticator.theme.default.AppTheme
 
 enum class SupportedTheme {

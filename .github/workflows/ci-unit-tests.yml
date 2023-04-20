@@ -1,0 +1,31 @@
+name: Unit tests
+run-name: Unit tests for ${{ github.ref }}
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+  merge_group:
+    types: [checks_requested]
+
+env:
+  AWS_REGION: "us-east-1"
+
+jobs:
+  ci-unit-tests:
+    permissions:
+      id-token: write # This is required for requesting the JWT with configure-aws-credentials
+      contents: read # This is required for actions/checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AMPLIFY_UI_ANDROID_CI_TESTS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Run Unit Tests
+        uses: aws-actions/aws-codebuild-run-build@v1
+        with:
+          project-name: Amplify-UI-Android-Build

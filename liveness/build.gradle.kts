@@ -61,5 +61,5 @@ dependencies {
     implementation(dependency.tensorflow)
     implementation(dependency.tensorflow.support)
 
-    testImplementation(dependency.bundles.test)
+    testImplementation(project(":testing"))
 }

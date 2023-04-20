@@ -20,3 +20,4 @@ dependencyResolutionManagement {
 rootProject.name = "amplify-ui-android"
 include(":liveness")
 include(":authenticator")
+include(":testing")

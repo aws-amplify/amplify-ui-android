@@ -28,7 +28,7 @@ import org.junit.Test
 class SignInScreenshots : ScreenshotTestBase() {
 
     @Test
-    fun signin_default_state() {
+    fun default_state() {
         screenshot {
             SignIn(state = mockSignInState())
         }

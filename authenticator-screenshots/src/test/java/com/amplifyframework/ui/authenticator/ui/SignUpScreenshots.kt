@@ -26,8 +26,9 @@ import com.amplifyframework.ui.authenticator.mockForm
 import org.junit.Test
 
 class SignUpScreenshots : ScreenshotTestBase() {
+
     @Test
-    fun signup_default_state() {
+    fun default_state() {
         screenshot {
             SignUp(state = mockSignUpState())
         }

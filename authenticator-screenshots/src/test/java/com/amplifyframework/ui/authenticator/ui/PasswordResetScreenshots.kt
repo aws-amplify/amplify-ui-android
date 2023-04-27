@@ -27,8 +27,9 @@ import com.amplifyframework.ui.authenticator.mockForm
 import org.junit.Test
 
 class PasswordResetScreenshots : ScreenshotTestBase() {
+
     @Test
-    fun passwordreset_default_state() {
+    fun default_state() {
         screenshot {
             PasswordReset(state = mockPasswordResetState())
         }

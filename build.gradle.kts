@@ -123,8 +123,8 @@ fun Project.configureAndroid() {
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
+            sourceCompatibility = JavaVersion.VERSION_11
+            targetCompatibility = JavaVersion.VERSION_11
         }
 
         // Needed when running integration tests. The oauth2 library uses relies on two

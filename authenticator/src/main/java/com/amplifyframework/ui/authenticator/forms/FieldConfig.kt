@@ -68,7 +68,7 @@ abstract class FieldConfig private constructor() {
      * @param maxLength The maximum number of characters that can be input into this field.
      */
     @Immutable
-    data class Text internal constructor(
+    data class Text(
         override val key: FieldKey,
         override val required: Boolean = true,
         override val validator: FieldValidator = FieldValidators.None,
@@ -89,7 +89,7 @@ abstract class FieldConfig private constructor() {
      * @param keyboardType The type of soft keyboard that is shown when the field is focused.
      */
     @Immutable
-    data class Password internal constructor(
+    data class Password(
         override val key: FieldKey,
         override val required: Boolean = true,
         override val validator: FieldValidator = FieldValidators.None,
@@ -107,7 +107,7 @@ abstract class FieldConfig private constructor() {
      * @param hint The hint for this field. This is null for standard fields.
      */
     @Immutable
-    data class Date internal constructor(
+    data class Date(
         override val key: FieldKey,
         override val required: Boolean = true,
         override val validator: FieldValidator = FieldValidators.date(),
@@ -124,7 +124,7 @@ abstract class FieldConfig private constructor() {
      * @param hint The hint for this field. This is null for standard fields.
      */
     @Immutable
-    data class PhoneNumber internal constructor(
+    data class PhoneNumber(
         override val key: FieldKey,
         override val required: Boolean = true,
         override val validator: FieldValidator = FieldValidators.phoneNumber(),
@@ -143,7 +143,7 @@ abstract class FieldConfig private constructor() {
      *                that provides the state holder instance for the field.
      */
     @Immutable
-    data class Custom internal constructor(
+    data class Custom(
         override val key: FieldKey,
         override val required: Boolean = false,
         override val validator: FieldValidator = FieldValidators.None,

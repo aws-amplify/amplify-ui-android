@@ -31,5 +31,5 @@ dependencies {
     implementation(dependency.androidx.compose.viewmodel)
     coreLibraryDesugaring(dependency.android.desugar)
 
-    testImplementation(project(":testing"))
+    testImplementation(projects.testing)
 }

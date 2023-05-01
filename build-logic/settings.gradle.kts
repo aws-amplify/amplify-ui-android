@@ -17,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://plugins.gradle.org/m2/")
     }
     versionCatalogs {
         create("dependency") {
@@ -26,4 +27,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "build-logic"
-include(":amplify")
+include(":plugins")

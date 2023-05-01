@@ -20,9 +20,12 @@ import com.amplifyframework.ui.authenticator.ScreenshotTestBase
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
+import com.amplifyframework.ui.authenticator.forms.FieldError
+import com.amplifyframework.ui.authenticator.forms.FieldError.NotFound
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.MutableFormState
 import com.amplifyframework.ui.authenticator.mockFieldData
+import com.amplifyframework.ui.authenticator.mockFieldState
 import com.amplifyframework.ui.authenticator.mockForm
 import org.junit.Test
 
@@ -35,11 +38,20 @@ class PasswordResetScreenshots : ScreenshotTestBase() {
         }
     }
 
-    private fun mockPasswordResetState() = object : PasswordResetState {
+    @Test
+    fun username_not_found() {
+        screenshot {
+            PasswordReset(state = mockPasswordResetState(error = NotFound))
+        }
+    }
+
+    private fun mockPasswordResetState(
+        error: FieldError? = null
+    ) = object : PasswordResetState {
         override fun moveTo(step: AuthenticatorInitialStep) {}
         override suspend fun submitPasswordReset() {}
         override val form: MutableFormState = mockForm(
-            mockFieldData(FieldConfig.Text(FieldKey.Email))
+            mockFieldData(FieldConfig.Text(FieldKey.Username), state = mockFieldState(error = error))
         )
         override val step = AuthenticatorStep.PasswordReset
     }

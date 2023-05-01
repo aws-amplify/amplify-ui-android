@@ -20,9 +20,14 @@ import com.amplifyframework.ui.authenticator.SignUpState
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
+import com.amplifyframework.ui.authenticator.forms.FieldError
 import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.forms.PasswordError
 import com.amplifyframework.ui.authenticator.mockFieldData
+import com.amplifyframework.ui.authenticator.mockFieldState
 import com.amplifyframework.ui.authenticator.mockForm
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Test
 
 class SignUpScreenshots : ScreenshotTestBase() {
@@ -34,14 +39,135 @@ class SignUpScreenshots : ScreenshotTestBase() {
         }
     }
 
-    private fun mockSignUpState() = object : SignUpState {
+    @Test
+    fun ready_to_submit() {
+        screenshot {
+            SignUp(
+                state = mockSignUpState(
+                    username = "username",
+                    password = "password",
+                    confirmPassword = "password",
+                    email = "email@email.com"
+                )
+            )
+        }
+    }
+
+    @Test
+    fun password_visible() {
+        screenshot {
+            SignUp(
+                state = mockSignUpState(
+                    username = "username",
+                    password = "password",
+                    confirmPassword = "password",
+                    email = "email@email.com",
+                    fieldsHidden = false
+                )
+            )
+        }
+    }
+
+    @Test
+    fun username_exists() {
+        screenshot {
+            SignUp(
+                state = mockSignUpState(
+                    username = "username",
+                    password = "password",
+                    confirmPassword = "password",
+                    email = "email@email.com",
+                    usernameError = FieldError.FieldValueExists
+                )
+            )
+        }
+    }
+
+    @Test
+    fun invalid_password() {
+        val error = mockk<FieldError.InvalidPassword> {
+            every { errors } returns listOf(
+                PasswordError.InvalidPasswordLength(10),
+                PasswordError.InvalidPasswordMissingUpper,
+                PasswordError.InvalidPasswordMissingSpecial,
+                PasswordError.InvalidPasswordMissingNumber
+            )
+        }
+
+        screenshot {
+            SignUp(
+                state = mockSignUpState(
+                    username = "username",
+                    password = "password",
+                    confirmPassword = "password",
+                    email = "email@email.com",
+                    passwordError = error
+                )
+            )
+        }
+    }
+
+    @Test
+    fun passwords_do_not_match() {
+        screenshot {
+            SignUp(
+                state = mockSignUpState(
+                    username = "username",
+                    password = "password",
+                    confirmPassword = "password2",
+                    email = "email@email.com",
+                    confirmPasswordError = FieldError.PasswordsDoNotMatch
+                )
+            )
+        }
+    }
+
+    @Test
+    fun invalid_email() {
+        screenshot {
+            SignUp(
+                state = mockSignUpState(
+                    username = "username",
+                    password = "password",
+                    confirmPassword = "password2",
+                    email = "email@email.com",
+                    emailError = FieldError.InvalidFormat
+                )
+            )
+        }
+    }
+
+    private fun mockSignUpState(
+        username: String = "",
+        password: String = "",
+        confirmPassword: String = "",
+        email: String = "",
+        usernameError: FieldError? = null,
+        passwordError: FieldError? = null,
+        confirmPasswordError: FieldError? = null,
+        emailError: FieldError? = null,
+        fieldsHidden: Boolean = true
+    ) = object : SignUpState {
         override fun moveTo(step: AuthenticatorInitialStep) {}
         override suspend fun signUp() {}
         override val form = mockForm(
-            mockFieldData(FieldConfig.Text(FieldKey.Username)),
-            mockFieldData(FieldConfig.Password(FieldKey.Password)),
-            mockFieldData(FieldConfig.Password(FieldKey.ConfirmPassword)),
-            mockFieldData(FieldConfig.Text(FieldKey.Email))
+            mockFieldData(
+                config = FieldConfig.Text(FieldKey.Username),
+                state = mockFieldState(content = username, error = usernameError)
+            ),
+            mockFieldData(
+                config = FieldConfig.Password(FieldKey.Password),
+                state = mockFieldState(content = password, error = passwordError)
+            ),
+            mockFieldData(
+                config = FieldConfig.Password(FieldKey.ConfirmPassword),
+                state = mockFieldState(content = confirmPassword, error = confirmPasswordError)
+            ),
+            mockFieldData(
+                config = FieldConfig.Text(FieldKey.Email),
+                state = mockFieldState(content = email, error = emailError)
+            ),
+            fieldsHidden = fieldsHidden
         )
         override val step = AuthenticatorStep.SignUp
     }

@@ -37,9 +37,13 @@ interface PasswordError {
     object InvalidPasswordMissingSpecial : PasswordError
 
     /**
-     * Password requires at least one upper
+     * Password requires at least one uppercase letter.
      */
     object InvalidPasswordMissingUpper : PasswordError
+
+    /**
+     * Password requires at least one lowercase letter.
+     */
     object InvalidPasswordMissingLower : PasswordError
 }
 

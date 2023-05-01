@@ -20,8 +20,10 @@ import com.amplifyframework.ui.authenticator.SignInState
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
+import com.amplifyframework.ui.authenticator.forms.FieldError
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.mockFieldData
+import com.amplifyframework.ui.authenticator.mockFieldState
 import com.amplifyframework.ui.authenticator.mockForm
 import org.junit.Test
 
@@ -34,12 +36,45 @@ class SignInScreenshots : ScreenshotTestBase() {
         }
     }
 
-    private fun mockSignInState() = object : SignInState {
+    @Test
+    fun ready_to_submit() {
+        screenshot {
+            SignIn(state = mockSignInState(username = "username", password = "password"))
+        }
+    }
+
+    @Test
+    fun password_visible() {
+        screenshot {
+            SignIn(state = mockSignInState(username = "username", password = "password", fieldsHidden = false))
+        }
+    }
+
+    @Test
+    fun username_not_found() {
+        screenshot {
+            SignIn(state = mockSignInState(username = "username", usernameError = FieldError.NotFound))
+        }
+    }
+
+    private fun mockSignInState(
+        username: String = "",
+        password: String = "",
+        usernameError: FieldError? = null,
+        fieldsHidden: Boolean = true
+    ) = object : SignInState {
         override fun moveTo(step: AuthenticatorInitialStep) {}
         override suspend fun signIn() {}
         override val form = mockForm(
-            mockFieldData(FieldConfig.Text(FieldKey.Username)),
-            mockFieldData(FieldConfig.Password(FieldKey.Password))
+            mockFieldData(
+                config = FieldConfig.Text(FieldKey.Username),
+                state = mockFieldState(content = username, error = usernameError)
+            ),
+            mockFieldData(
+                FieldConfig.Password(FieldKey.Password),
+                state = mockFieldState(content = password)
+            ),
+            fieldsHidden = fieldsHidden
         )
         override val step = AuthenticatorStep.SignIn
     }

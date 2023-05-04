@@ -37,11 +37,6 @@ interface FormState {
      * Flag indicating whether the form is currently being submitted.
      */
     val submitting: Boolean
-
-    /**
-     * Flag indicating whether sensitive fields such as passwords are hidden from the user.
-     */
-    val fieldsHidden: Boolean
 }
 
 /**
@@ -55,11 +50,6 @@ interface MutableFormState : FormState {
      * holding configuration options and mutable state for the field.
      */
     override val fields: Map<FieldKey, MutableFieldData>
-
-    /**
-     * Toggle the visibility of hidden fields (e.g. passwords) within the form.
-     */
-    fun toggleHiddenFields()
 }
 
 /**
@@ -102,8 +92,6 @@ internal class FormStateImpl : MutableFormState {
 
     override var submitting by mutableStateOf(false)
 
-    override var fieldsHidden by mutableStateOf(true)
-
     private var onSubmit: suspend () -> Unit = {}
 
     fun add(config: FieldConfig) {
@@ -131,10 +119,6 @@ internal class FormStateImpl : MutableFormState {
 
     fun getContent(key: FieldKey): String? {
         return fields[key]?.state?.content
-    }
-
-    override fun toggleHiddenFields() {
-        fieldsHidden = !fieldsHidden
     }
 
     suspend fun submit() {

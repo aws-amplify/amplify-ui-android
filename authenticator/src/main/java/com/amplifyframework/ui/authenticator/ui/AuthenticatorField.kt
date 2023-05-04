@@ -22,6 +22,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.FieldError
@@ -45,14 +49,17 @@ internal fun AuthenticatorField(
             fieldState = fieldState,
             enabled = !formState.submitting
         )
-        is FieldConfig.Password -> PasswordInputField(
-            modifier = modifier,
-            fieldConfig = fieldConfig,
-            fieldState = fieldState,
-            enabled = !formState.submitting,
-            hidden = formState.fieldsHidden,
-            onClickHideShow = { formState.toggleHiddenFields() }
-        )
+        is FieldConfig.Password -> {
+            var hidden by remember { mutableStateOf(true) }
+            PasswordInputField(
+                modifier = modifier,
+                fieldConfig = fieldConfig,
+                fieldState = fieldState,
+                hidden = hidden,
+                onClickHideShow = { hidden = !hidden },
+                enabled = !formState.submitting
+            )
+        }
         is FieldConfig.Date -> DateInputField(
             modifier = modifier,
             fieldConfig = fieldConfig,

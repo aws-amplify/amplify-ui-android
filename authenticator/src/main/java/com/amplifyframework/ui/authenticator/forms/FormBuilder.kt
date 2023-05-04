@@ -35,18 +35,92 @@ interface SignUpFormBuilder {
      * Adds the standard username field.
      */
     fun username()
+
+    /**
+     * Adds the standard password field.
+     */
     fun password()
+
+    /**
+     * Adds the standard password confirmation field.
+     */
     fun confirmPassword()
+
+    /**
+     * Adds the standard email field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun email(required: Boolean = false)
+
+    /**
+     * Adds the standard phone number field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun phoneNumber(required: Boolean = false)
+
+    /**
+     * Adds the standard birthdate field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun birthdate(required: Boolean = false)
+
+    /**
+     * Adds the standard family name field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun familyName(required: Boolean = false)
+
+    /**
+     * Adds the standard given name field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun givenName(required: Boolean = false)
+
+    /**
+     * Adds the standard middle name field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun middleName(required: Boolean = false)
+
+    /**
+     * Adds the standard name field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun name(required: Boolean = false)
+
+    /**
+     * Adds the standard nickname field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun nickname(required: Boolean = false)
+
+    /**
+     * Adds the standard preferred username field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun preferredUsername(required: Boolean = false)
+
+    /**
+     * Adds the standard profile field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun profile(required: Boolean = false)
+
+    /**
+     * Adds the standard website field.
+     * @param required Set to true to mark the field as required. Default is false. Note that this value will be
+     * overridden if this field is marked as a required sign-up field in your configuration.
+     */
     fun website(required: Boolean = false)
 
     fun text(
@@ -91,12 +165,12 @@ interface SignUpFormBuilder {
  */
 interface FieldScope {
     /**
-     * The [FieldState] for the custom field.
+     * The [MutableFieldState] for the custom field.
      */
     val fieldState: MutableFieldState
 
     /**
-     * The [FormState] for the entire form.
+     * The read-only [FormState] for the entire form.
      */
     val formState: FormState
 }

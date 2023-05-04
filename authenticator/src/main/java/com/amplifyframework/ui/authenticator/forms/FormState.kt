@@ -22,31 +22,75 @@ import androidx.compose.runtime.setValue
 import com.amplifyframework.auth.AuthUserAttribute
 
 /**
- * The state holder class for an input form within the Authenticator. Holds a collection of fields as well as
- * some state values relating to the entire form.
+ * A [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for an input form within the
+ * Authenticator.
  */
 @Stable
 interface FormState {
+    /**
+     * The individual fields within a form. Each field is uniquely identified by a [FieldKey], which maps to a [FieldData]
+     * holding configuration options and state for the field.
+     */
     val fields: Map<FieldKey, FieldData>
+
+    /**
+     * Flag indicating whether the form is currently being submitted.
+     */
     val submitting: Boolean
+
+    /**
+     * Flag indicating whether sensitive fields such as passwords are hidden from the user.
+     */
     val fieldsHidden: Boolean
 }
 
+/**
+ * A mutable [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for an input form within the
+ * Authenticator.
+ */
 @Stable
 interface MutableFormState : FormState {
+    /**
+     * The individual fields within a form. Each field is uniquely identified by a [FieldKey], which maps to a [FieldData]
+     * holding configuration options and mutable state for the field.
+     */
     override val fields: Map<FieldKey, MutableFieldData>
+
+    /**
+     * Toggle the visibility of hidden fields (e.g. passwords) within the form.
+     */
     fun toggleHiddenFields()
 }
 
+/**
+ * Holds the data relevant to a single field within a [FormState].
+ */
 @Stable
 interface FieldData {
+    /**
+     * The configuration options for the field.
+     */
     val config: FieldConfig
+
+    /**
+     * The [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for the field.
+     */
     val state: FieldState
+
+    /**
+     * The validator function that determines whether the field's contents are valid prior to form submission.
+     */
     val validator: FieldValidator
 }
 
+/**
+ * Holds the data relevant to a single field within a [MutableFormState].
+ */
 @Stable
 interface MutableFieldData : FieldData {
+    /**
+     * The mutable [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for the field.
+     */
     override val state: MutableFieldState
 }
 

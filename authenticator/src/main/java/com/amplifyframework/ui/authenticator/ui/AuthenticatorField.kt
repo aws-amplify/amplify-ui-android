@@ -48,14 +48,12 @@ internal fun AuthenticatorField(
             fieldState = fieldState,
             enabled = !formState.submitting
         )
-        is FieldConfig.Password -> {
-            PasswordInputField(
-                modifier = modifier,
-                fieldConfig = fieldConfig,
-                fieldState = fieldState as MutablePasswordFieldState,
-                enabled = !formState.submitting
-            )
-        }
+        is FieldConfig.Password -> PasswordInputField(
+            modifier = modifier,
+            fieldConfig = fieldConfig,
+            fieldState = fieldState as MutablePasswordFieldState,
+            enabled = !formState.submitting
+        )
         is FieldConfig.Date -> DateInputField(
             modifier = modifier,
             fieldConfig = fieldConfig,

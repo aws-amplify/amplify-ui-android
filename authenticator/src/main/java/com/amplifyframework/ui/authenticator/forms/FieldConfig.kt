@@ -95,7 +95,7 @@ abstract class FieldConfig private constructor() {
         override val validator: FieldValidator = FieldValidators.None,
         override val label: String? = null,
         override val hint: String? = null,
-        val keyboardType: KeyboardType = KeyboardType.Password,
+        val keyboardType: KeyboardType = KeyboardType.Password
     ) : FieldConfig()
 
     /**

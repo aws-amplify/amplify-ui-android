@@ -43,8 +43,8 @@ allprojects {
             maxHeapSize = "4g"
         }
         tasks.withType<KotlinCompile> {
-            kotlinOptions {
-                freeCompilerArgs = freeCompilerArgs + optInAnnotations.map { "-opt-in=$it" }
+            compilerOptions {
+                freeCompilerArgs.addAll(optInAnnotations.map { "-opt-in=$it" })
             }
         }
     }

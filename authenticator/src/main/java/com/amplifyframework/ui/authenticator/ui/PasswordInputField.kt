@@ -31,28 +31,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation.Companion.None
 import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
-import com.amplifyframework.ui.authenticator.forms.MutableFieldState
+import com.amplifyframework.ui.authenticator.forms.MutablePasswordFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PasswordInputField(
     fieldConfig: FieldConfig.Password,
-    fieldState: MutableFieldState,
+    fieldState: MutablePasswordFieldState,
     enabled: Boolean,
-    hidden: Boolean,
-    onClickHideShow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
 
     val label = StringResolver.label(fieldConfig)
     val hint = StringResolver.hint(fieldConfig)
-    val transformation = if (hidden) PasswordVisualTransformation() else VisualTransformation.None
-    val trailingIcon = getTrailingIcon(hidden = hidden, onClick = onClickHideShow)
+    val transformation = if (fieldState.fieldContentVisible) None else PasswordVisualTransformation()
+    val trailingIcon = getTrailingIcon(
+        visible = fieldState.fieldContentVisible,
+        onClick = { fieldState.fieldContentVisible = !fieldState.fieldContentVisible }
+    )
 
     OutlinedTextField(
         modifier = modifier,
@@ -82,13 +83,13 @@ internal fun PasswordInputField(
     )
 }
 
-private fun getTrailingIcon(hidden: Boolean, onClick: () -> Unit): @Composable (() -> Unit) {
+private fun getTrailingIcon(visible: Boolean, onClick: () -> Unit): @Composable (() -> Unit) {
     return {
-        val icon = when (hidden) {
-            true -> R.drawable.ic_authenticator_visible
-            false -> R.drawable.ic_authenticator_invisible
+        val icon = when (visible) {
+            false -> R.drawable.ic_authenticator_visible
+            true -> R.drawable.ic_authenticator_invisible
         }
-        val contentDescription = when (hidden) {
+        val contentDescription = when (visible) {
             true -> R.string.amplify_ui_authenticator_field_a11y_password_hide
             false -> R.string.amplify_ui_authenticator_field_a11y_password_show
         }

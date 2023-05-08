@@ -25,6 +25,7 @@ import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.mockFieldData
 import com.amplifyframework.ui.authenticator.mockFieldState
 import com.amplifyframework.ui.authenticator.mockForm
+import com.amplifyframework.ui.authenticator.mockPasswordFieldState
 import org.junit.Test
 
 class SignInScreenshots : ScreenshotTestBase() {
@@ -46,7 +47,7 @@ class SignInScreenshots : ScreenshotTestBase() {
     @Test
     fun password_visible() {
         screenshot {
-            SignIn(state = mockSignInState(username = "username", password = "password", fieldsHidden = false))
+            SignIn(state = mockSignInState(username = "username", password = "password", passwordVisible = true))
         }
     }
 
@@ -61,7 +62,7 @@ class SignInScreenshots : ScreenshotTestBase() {
         username: String = "",
         password: String = "",
         usernameError: FieldError? = null,
-        fieldsHidden: Boolean = true
+        passwordVisible: Boolean = false
     ) = object : SignInState {
         override fun moveTo(step: AuthenticatorInitialStep) {}
         override suspend fun signIn() {}
@@ -72,9 +73,8 @@ class SignInScreenshots : ScreenshotTestBase() {
             ),
             mockFieldData(
                 FieldConfig.Password(FieldKey.Password),
-                state = mockFieldState(content = password)
-            ),
-            fieldsHidden = fieldsHidden
+                state = mockPasswordFieldState(content = password, visible = passwordVisible)
+            )
         )
         override val step = AuthenticatorStep.SignIn
     }

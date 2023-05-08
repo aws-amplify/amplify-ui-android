@@ -26,6 +26,7 @@ import com.amplifyframework.ui.authenticator.forms.PasswordError
 import com.amplifyframework.ui.authenticator.mockFieldData
 import com.amplifyframework.ui.authenticator.mockFieldState
 import com.amplifyframework.ui.authenticator.mockForm
+import com.amplifyframework.ui.authenticator.mockPasswordFieldState
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
@@ -62,7 +63,7 @@ class SignUpScreenshots : ScreenshotTestBase() {
                     password = "password",
                     confirmPassword = "password",
                     email = "email@email.com",
-                    fieldsHidden = false
+                    passwordVisible = true
                 )
             )
         }
@@ -146,7 +147,7 @@ class SignUpScreenshots : ScreenshotTestBase() {
         passwordError: FieldError? = null,
         confirmPasswordError: FieldError? = null,
         emailError: FieldError? = null,
-        fieldsHidden: Boolean = true
+        passwordVisible: Boolean = false
     ) = object : SignUpState {
         override fun moveTo(step: AuthenticatorInitialStep) {}
         override suspend fun signUp() {}
@@ -157,17 +158,20 @@ class SignUpScreenshots : ScreenshotTestBase() {
             ),
             mockFieldData(
                 config = FieldConfig.Password(FieldKey.Password),
-                state = mockFieldState(content = password, error = passwordError)
+                state = mockPasswordFieldState(content = password, error = passwordError, visible = passwordVisible)
             ),
             mockFieldData(
                 config = FieldConfig.Password(FieldKey.ConfirmPassword),
-                state = mockFieldState(content = confirmPassword, error = confirmPasswordError)
+                state = mockPasswordFieldState(
+                    content = confirmPassword,
+                    error = confirmPasswordError,
+                    visible = passwordVisible
+                )
             ),
             mockFieldData(
                 config = FieldConfig.Text(FieldKey.Email),
                 state = mockFieldState(content = email, error = emailError)
-            ),
-            fieldsHidden = fieldsHidden
+            )
         )
         override val step = AuthenticatorStep.SignUp
     }

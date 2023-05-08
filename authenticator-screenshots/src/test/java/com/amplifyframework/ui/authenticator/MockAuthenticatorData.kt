@@ -21,16 +21,14 @@ import com.amplifyframework.ui.authenticator.forms.FieldValidator
 import com.amplifyframework.ui.authenticator.forms.MutableFieldData
 import com.amplifyframework.ui.authenticator.forms.MutableFieldState
 import com.amplifyframework.ui.authenticator.forms.MutableFormState
+import com.amplifyframework.ui.authenticator.forms.MutablePasswordFieldState
 
 fun mockForm(
     vararg fields: MutableFieldData,
-    submitting: Boolean = false,
-    fieldsHidden: Boolean = true
+    submitting: Boolean = false
 ) = object : MutableFormState {
     override val fields = fields.associateBy { it.config.key }
-    override fun toggleHiddenFields() {}
     override val submitting = submitting
-    override var fieldsHidden = fieldsHidden
 }
 
 fun mockFieldData(
@@ -49,4 +47,14 @@ fun mockFieldState(
 ) = object : MutableFieldState {
     override var content = content
     override val error = error
+}
+
+fun mockPasswordFieldState(
+    content: String = "",
+    error: FieldError? = null,
+    visible: Boolean = false
+) = object : MutablePasswordFieldState {
+    override var fieldContentVisible = visible
+    override var content = content
+    override val error: FieldError? = error
 }

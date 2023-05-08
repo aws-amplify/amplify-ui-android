@@ -101,9 +101,14 @@ internal class FormStateImpl : MutableFormState {
             fieldValidator = FieldValidators.required() + fieldValidator
         }
 
+        val state = when (config) {
+            is FieldConfig.Password -> PasswordFieldStateImpl()
+            else -> FieldStateImpl()
+        }
+
         fields[config.key] = FieldDataImpl(
             config = config,
-            state = FieldStateImpl(),
+            state = state,
             validator = fieldValidator
         )
     }

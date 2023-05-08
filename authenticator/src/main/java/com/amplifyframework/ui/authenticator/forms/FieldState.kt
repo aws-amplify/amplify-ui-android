@@ -50,9 +50,37 @@ interface MutableFieldState : FieldState {
     override var content: String
 }
 
-internal class FieldStateImpl constructor(
+/**
+ * The [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for a password field.
+ */
+@Stable
+interface PasswordFieldState : FieldState {
+    /**
+     * Flag indicating whether the field content is visible.
+     */
+    val fieldContentVisible: Boolean
+}
+
+/**
+ * The mutable [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for a password field.
+ */
+@Stable
+interface MutablePasswordFieldState : PasswordFieldState, MutableFieldState {
+    /**
+     * Flag indicating whether the field content is visible.
+     */
+    override var fieldContentVisible: Boolean
+}
+
+internal open class FieldStateImpl constructor(
     initialValue: String = ""
 ) : MutableFieldState {
     override var content by mutableStateOf(initialValue)
     override var error by mutableStateOf<FieldError?>(null)
+}
+
+internal class PasswordFieldStateImpl(
+    initialFieldContentVisible: Boolean = false
+) : FieldStateImpl(), MutablePasswordFieldState {
+    override var fieldContentVisible by mutableStateOf(initialFieldContentVisible)
 }

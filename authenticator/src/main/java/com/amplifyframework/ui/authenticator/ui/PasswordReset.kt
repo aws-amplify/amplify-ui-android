@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.PasswordResetState
@@ -50,6 +51,7 @@ fun PasswordReset(
         headerContent(state)
         AuthenticatorForm(state = state.form)
         AuthenticatorButton(
+            modifier = Modifier.testTag("PasswordResetButton"),
             onClick = { scope.launch { state.submitPasswordReset() } },
             loading = state.form.submitting
         )

@@ -15,9 +15,7 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.PasswordResetState
-import com.amplifyframework.ui.authenticator.forms.buildForm
-import com.amplifyframework.ui.authenticator.forms.toState
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
 import com.amplifyframework.ui.authenticator.ui.robots.passwordReset
 import com.amplifyframework.ui.testing.ComposeTest
@@ -55,10 +53,9 @@ class PasswordResetTest : ComposeTest() {
         }
     }
 
-    private fun mockPasswordResetState(): PasswordResetState {
-        val form = buildForm {
-            username()
-        }.toState()
-        return PasswordResetStateImpl(form, {})
-    }
+    private fun mockPasswordResetState() = PasswordResetStateImpl(
+        signInMethod = SignInMethod.Username,
+        onSubmit = {},
+        onMoveTo = {}
+    )
 }

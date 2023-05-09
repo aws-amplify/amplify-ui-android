@@ -48,6 +48,12 @@ interface MutableFieldState : FieldState {
      * The mutable content value of the field.
      */
     override var content: String
+
+    /**
+     * The error, if any, associated with this field. Errors may represent client-side validation errors or certain
+     * classes of server-side error responses.
+     */
+    override var error: FieldError?
 }
 
 /**

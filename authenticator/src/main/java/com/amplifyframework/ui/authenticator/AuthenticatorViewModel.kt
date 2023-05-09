@@ -56,12 +56,8 @@ import com.amplifyframework.ui.authenticator.forms.FieldKey.ConfirmationCode
 import com.amplifyframework.ui.authenticator.forms.FieldKey.Password
 import com.amplifyframework.ui.authenticator.forms.FormState
 import com.amplifyframework.ui.authenticator.forms.buildForm
-import com.amplifyframework.ui.authenticator.forms.markSubmitting
 import com.amplifyframework.ui.authenticator.forms.setFieldError
-import com.amplifyframework.ui.authenticator.states.PasswordResetConfirmStateImpl
-import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
 import com.amplifyframework.ui.authenticator.states.ScreenStateFactory
-import com.amplifyframework.ui.authenticator.states.VerifyUserStateImpl
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
@@ -174,27 +170,21 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     //region SignUp
 
     private suspend fun signUp(username: String, password: String, attributes: List<AuthUserAttribute>) {
-        val state = getState<SignUpState>() ?: return
         viewModelScope.launch {
-            state.form.markSubmitting {
-                val options = AuthSignUpOptions.builder().userAttributes(attributes).build()
+            val options = AuthSignUpOptions.builder().userAttributes(attributes).build()
 
-                when (val result = authProvider.signUp(username, password, options)) {
-                    is AmplifyResult.Error -> handleSignUpFailure(result.error)
-                    is AmplifyResult.Success -> handleSignUpSuccess(username, password, result.data)
-                }
+            when (val result = authProvider.signUp(username, password, options)) {
+                is AmplifyResult.Error -> handleSignUpFailure(result.error)
+                is AmplifyResult.Success -> handleSignUpSuccess(username, password, result.data)
             }
         }.join()
     }
 
     private suspend fun confirmSignUp(username: String, password: String, code: String) {
-        val state = getState<SignUpConfirmState>() ?: return
         viewModelScope.launch {
-            state.form.markSubmitting {
-                when (val result = authProvider.confirmSignUp(username, code)) {
-                    is AmplifyResult.Error -> handleSignUpConfirmFailure(result.error)
-                    is AmplifyResult.Success -> handleSignUpSuccess(username, password, result.data)
-                }
+            when (val result = authProvider.confirmSignUp(username, code)) {
+                is AmplifyResult.Error -> handleSignUpConfirmFailure(result.error)
+                is AmplifyResult.Success -> handleSignUpSuccess(username, password, result.data)
             }
         }.join()
     }
@@ -240,38 +230,29 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     //region SignIn
 
     private suspend fun signIn(username: String, password: String) {
-        val state = getState<FormHolderState>() ?: return
         viewModelScope.launch {
-            state.form.markSubmitting {
-                when (val result = authProvider.signIn(username, password)) {
-                    is AmplifyResult.Error -> handleSignInFailure(username, password, result.error)
-                    is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
-                }
+            when (val result = authProvider.signIn(username, password)) {
+                is AmplifyResult.Error -> handleSignInFailure(username, password, result.error)
+                is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
             }
         }.join()
     }
 
     private suspend fun confirmSignIn(username: String, password: String, challengeResponse: String) {
-        val state = getState<FormHolderState>() ?: return
         viewModelScope.launch {
-            state.form.markSubmitting {
-                when (val result = authProvider.confirmSignIn(challengeResponse)) {
-                    is AmplifyResult.Error -> handleSignInFailure(username, password, result.error)
-                    is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
-                }
+            when (val result = authProvider.confirmSignIn(challengeResponse)) {
+                is AmplifyResult.Error -> handleSignInFailure(username, password, result.error)
+                is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
             }
         }.join()
     }
 
     private suspend fun setNewSignInPassword(username: String, password: String) {
-        val state = getState<FormHolderState>() ?: return
         viewModelScope.launch {
-            state.form.markSubmitting {
-                when (val result = authProvider.confirmSignIn(password)) {
-                    // an error here is more similar to a sign up error
-                    is AmplifyResult.Error -> handleSignUpFailure(result.error)
-                    is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
-                }
+            when (val result = authProvider.confirmSignIn(password)) {
+                // an error here is more similar to a sign up error
+                is AmplifyResult.Error -> handleSignUpFailure(result.error)
+                is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
             }
         }.join()
     }
@@ -374,27 +355,21 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     //region Password Reset
 
     private suspend fun resetPassword(username: String) {
-        val state = getState<PasswordResetStateImpl>() ?: return
         viewModelScope.launch {
             logger.debug("Initiating reset password")
-            state.form.markSubmitting {
-                when (val result = authProvider.resetPassword(username)) {
-                    is AmplifyResult.Error -> handleResetPasswordError(result.error)
-                    is AmplifyResult.Success -> handleResetPasswordSuccess(username, result.data)
-                }
+            when (val result = authProvider.resetPassword(username)) {
+                is AmplifyResult.Error -> handleResetPasswordError(result.error)
+                is AmplifyResult.Success -> handleResetPasswordSuccess(username, result.data)
             }
         }.join()
     }
 
     private suspend fun confirmResetPassword(username: String, password: String, code: String) {
-        val state = getState<PasswordResetConfirmStateImpl>() ?: return
         viewModelScope.launch {
             logger.debug("Confirming password reset")
-            state.form.markSubmitting {
-                when (val result = authProvider.confirmResetPassword(username, password, code)) {
-                    is AmplifyResult.Error -> handleResetPasswordError(result.error)
-                    is AmplifyResult.Success -> handlePasswordResetComplete()
-                }
+            when (val result = authProvider.confirmResetPassword(username, password, code)) {
+                is AmplifyResult.Error -> handleResetPasswordError(result.error)
+                is AmplifyResult.Success -> handlePasswordResetComplete()
             }
         }.join()
     }
@@ -443,20 +418,17 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
 // region Verify User
 
     private suspend fun verifyUserAttribute(key: AuthUserAttributeKey) {
-        val state = getState<VerifyUserStateImpl>() ?: return
         viewModelScope.launch {
-            state.form.markSubmitting {
-                when (val result = authProvider.resendUserAttributeConfirmationCode(key)) {
-                    is AmplifyResult.Error -> handleAuthException(result.error)
-                    is AmplifyResult.Success -> {
-                        val newState = stateFactory.newVerifyUserConfirmState(
-                            result.data,
-                            onSubmit = { confirmUserAttribute(key, it) },
-                            onResendCode = { resendUserAttributeCode(key) },
-                            onSkip = { skipUserVerification() }
-                        )
-                        moveTo(newState)
-                    }
+            when (val result = authProvider.resendUserAttributeConfirmationCode(key)) {
+                is AmplifyResult.Error -> handleAuthException(result.error)
+                is AmplifyResult.Success -> {
+                    val newState = stateFactory.newVerifyUserConfirmState(
+                        result.data,
+                        onSubmit = { confirmUserAttribute(key, it) },
+                        onResendCode = { resendUserAttributeCode(key) },
+                        onSkip = { skipUserVerification() }
+                    )
+                    moveTo(newState)
                 }
             }
         }.join()
@@ -469,13 +441,10 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     }
 
     private suspend fun confirmUserAttribute(key: AuthUserAttributeKey, confirmationCode: String) {
-        val state = getState<FormHolderState>() ?: return
         viewModelScope.launch {
-            state.form.markSubmitting {
-                when (val result = authProvider.confirmUserAttribute(key, confirmationCode)) {
-                    is AmplifyResult.Error -> handleAuthException(result.error)
-                    is AmplifyResult.Success -> handleSignedIn()
-                }
+            when (val result = authProvider.confirmUserAttribute(key, confirmationCode)) {
+                is AmplifyResult.Error -> handleAuthException(result.error)
+                is AmplifyResult.Success -> handleSignedIn()
             }
         }.join()
     }

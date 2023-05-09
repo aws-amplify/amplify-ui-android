@@ -49,11 +49,14 @@ fun PasswordReset(
             .padding(horizontal = 16.dp)
     ) {
         headerContent(state)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form,
+            enabled = !state.busy
+        )
         AuthenticatorButton(
             modifier = Modifier.testTag("PasswordResetButton"),
             onClick = { scope.launch { state.submitPasswordReset() } },
-            loading = state.form.submitting
+            loading = state.busy
         )
         footerContent(state)
     }

@@ -18,16 +18,27 @@ package com.amplifyframework.ui.authenticator.states
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.ui.authenticator.VerifyUserConfirmState
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FormStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 internal class VerifyUserConfirmStateImpl(
-    override val form: FormStateImpl,
     override val deliveryDetails: AuthCodeDeliveryDetails?,
+    private val onSubmit: suspend (confirmationCode: String) -> Unit,
     private val onResendCode: suspend () -> Unit,
     private val onSkip: () -> Unit
-) : VerifyUserConfirmState {
+) : BaseStateImpl(), VerifyUserConfirmState {
+
+    init {
+        form.addFields {
+            confirmationCode()
+        }
+    }
+
     override val step = AuthenticatorStep.VerifyUserConfirm
-    override suspend fun confirmVerifyUser() = form.submit()
+    override suspend fun confirmVerifyUser() = doSubmit {
+        val confirmationCode = form.getTrimmed(FieldKey.ConfirmationCode)!!
+        onSubmit(confirmationCode)
+    }
+
     override suspend fun resendCode() = onResendCode()
     override fun skip() = onSkip()
 }

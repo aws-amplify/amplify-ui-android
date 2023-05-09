@@ -48,10 +48,13 @@ fun SignUpConfirm(
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         headerContent(state)
         deliveryNoticeContent(state.deliveryDetails)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form,
+            enabled = !state.busy
+        )
         AuthenticatorButton(
             onClick = { scope.launch { state.confirmSignUp() } },
-            loading = state.form.submitting
+            loading = state.busy
         )
         footerContent(state)
     }

@@ -16,16 +16,30 @@
 package com.amplifyframework.ui.authenticator.states
 
 import com.amplifyframework.auth.AuthUserAttribute
+import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.ui.authenticator.VerifyUserState
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FormStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 internal class VerifyUserStateImpl(
     override val attributes: List<AuthUserAttribute>,
-    override val form: FormStateImpl,
+    private val onSubmit: suspend (attribute: AuthUserAttributeKey) -> Unit,
     private val onSkip: () -> Unit
-) : VerifyUserState {
+) : BaseStateImpl(), VerifyUserState {
+
+    init {
+        form.addFields {
+            verificationAttribute()
+        }
+    }
+
     override val step = AuthenticatorStep.VerifyUser
-    override suspend fun verifyUser() = form.submit()
+
+    override suspend fun verifyUser() = doSubmit {
+        val keyString = form.getTrimmed(FieldKey.VerificationAttribute)!!
+        val key = AuthUserAttributeKey.custom(keyString)
+        onSubmit(key)
+    }
+
     override fun skip() = onSkip()
 }

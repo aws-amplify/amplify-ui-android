@@ -16,15 +16,29 @@
 package com.amplifyframework.ui.authenticator.states
 
 import com.amplifyframework.ui.authenticator.SignInConfirmNewPasswordState
+import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FormStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.forms.FieldValidators
 
 internal class SignInConfirmNewPasswordStateImpl(
-    override val form: FormStateImpl,
+    passwordCriteria: PasswordCriteria,
+    private val onSubmit: suspend (password: String) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
-) : SignInConfirmNewPasswordState {
+) : BaseStateImpl(), SignInConfirmNewPasswordState {
+
+    init {
+        form.addFields {
+            password(validator = FieldValidators.password(passwordCriteria))
+        }
+    }
+
     override val step: AuthenticatorStep = AuthenticatorStep.SignInConfirmNewPassword
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)
-    override suspend fun confirmSignIn() = form.submit()
+
+    override suspend fun confirmSignIn() = doSubmit {
+        val password = form.getTrimmed(FieldKey.Password)!!
+        onSubmit(password)
+    }
 }

@@ -54,5 +54,6 @@ class PasswordResetScreenshots : ScreenshotTestBase() {
             mockFieldData(FieldConfig.Text(FieldKey.Username), state = mockFieldState(error = error))
         )
         override val step = AuthenticatorStep.PasswordReset
+        override val busy = false
     }
 }

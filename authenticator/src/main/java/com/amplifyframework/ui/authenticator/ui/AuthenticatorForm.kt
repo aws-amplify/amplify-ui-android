@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.R
@@ -38,6 +39,7 @@ import com.amplifyframework.ui.authenticator.forms.MutableFormState
 @Composable
 internal fun AuthenticatorForm(
     state: MutableFormState,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -47,10 +49,11 @@ internal fun AuthenticatorForm(
     ) {
         state.fields.values.forEach { field ->
             AuthenticatorField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(field.config.key.toString()),
                 fieldConfig = field.config,
                 fieldState = field.state,
-                formState = state
+                formState = state,
+                enabled = enabled
             )
         }
         Spacer(modifier = Modifier.size(16.dp))

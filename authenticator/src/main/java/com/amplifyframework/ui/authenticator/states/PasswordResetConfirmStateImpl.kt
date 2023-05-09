@@ -17,16 +17,34 @@ package com.amplifyframework.ui.authenticator.states
 
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.ui.authenticator.PasswordResetConfirmState
+import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FormStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.forms.FieldValidators
 
 internal class PasswordResetConfirmStateImpl(
-    override val form: FormStateImpl,
+    passwordCriteria: PasswordCriteria,
     override val deliveryDetails: AuthCodeDeliveryDetails?,
+    private val onSubmit: suspend (newPassword: String, confirmationCode: String) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
-) : PasswordResetConfirmState {
+) : BaseStateImpl(), PasswordResetConfirmState {
+
+    init {
+        form.addFields {
+            confirmationCode()
+            password(validator = FieldValidators.password(passwordCriteria))
+            confirmPassword()
+        }
+    }
+
     override val step: AuthenticatorStep = AuthenticatorStep.PasswordResetConfirm
+
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)
-    override suspend fun submitPasswordResetConfirm() = form.submit()
+
+    override suspend fun submitPasswordResetConfirm() = doSubmit {
+        val newPassword = form.getTrimmed(FieldKey.Password)!!
+        val confirmationCode = form.getTrimmed(FieldKey.ConfirmationCode)!!
+        onSubmit(newPassword, confirmationCode)
+    }
 }

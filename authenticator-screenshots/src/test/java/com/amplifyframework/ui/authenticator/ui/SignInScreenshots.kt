@@ -77,5 +77,6 @@ class SignInScreenshots : ScreenshotTestBase() {
             )
         )
         override val step = AuthenticatorStep.SignIn
+        override val busy = false
     }
 }

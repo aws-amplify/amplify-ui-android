@@ -36,7 +36,6 @@ import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.VerifyUserState
 import com.amplifyframework.ui.authenticator.forms.FieldKey
-import com.amplifyframework.ui.authenticator.forms.FormState
 import com.amplifyframework.ui.authenticator.forms.MutableFieldState
 import kotlinx.coroutines.launch
 
@@ -61,12 +60,12 @@ fun VerifyUser(
         VerifyUserAttributeSelect(
             attributes = state.attributes,
             fieldState = fieldState,
-            formState = state.form,
+            enabled = !state.busy,
             modifier = Modifier.fillMaxWidth()
         )
         AuthenticatorButton(
             onClick = { scope.launch { state.verifyUser() } },
-            loading = state.form.submitting
+            loading = state.busy
         )
         footerContent(state)
     }
@@ -76,7 +75,7 @@ fun VerifyUser(
 internal fun VerifyUserAttributeSelect(
     attributes: List<AuthUserAttribute>,
     fieldState: MutableFieldState,
-    formState: FormState,
+    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -89,7 +88,7 @@ internal fun VerifyUserAttributeSelect(
                 RadioButton(
                     selected = attribute.key.keyString == fieldState.content,
                     onClick = { fieldState.content = attribute.key.keyString },
-                    enabled = !formState.submitting
+                    enabled = enabled
                 )
 
                 val label = when (attribute.key) {

@@ -74,6 +74,7 @@ interface SignedInState : AuthenticatorScreenState {
 @Stable
 interface FormHolderState : AuthenticatorScreenState {
     val form: MutableFormState
+    val busy: Boolean
 }
 
 /**

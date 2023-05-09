@@ -45,10 +45,13 @@ fun SignUp(
     val scope = rememberCoroutineScope()
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         headerContent(state)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form,
+            enabled = !state.busy
+        )
         AuthenticatorButton(
             onClick = { scope.launch { state.signUp() } },
-            loading = state.form.submitting,
+            loading = state.busy,
             label = stringResource(R.string.amplify_ui_authenticator_button_signup),
             modifier = Modifier.testTag("SignUpButton")
         )

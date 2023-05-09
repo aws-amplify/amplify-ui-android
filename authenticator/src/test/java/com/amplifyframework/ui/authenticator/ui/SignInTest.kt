@@ -15,9 +15,7 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.SignInState
-import com.amplifyframework.ui.authenticator.forms.buildForm
-import com.amplifyframework.ui.authenticator.forms.toState
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.states.SignInStateImpl
 import com.amplifyframework.ui.authenticator.ui.robots.signIn
 import com.amplifyframework.ui.testing.ComposeTest
@@ -45,12 +43,9 @@ class SignInTest : ComposeTest() {
         }
     }
 
-    private fun mockSignInState(): SignInState {
-        val form = buildForm {
-            username()
-            password()
-        }.toState()
-
-        return SignInStateImpl(form, {})
-    }
+    private fun mockSignInState() = SignInStateImpl(
+        signInMethod = SignInMethod.Username,
+        onSubmit = { _, _ -> },
+        onMoveTo = { }
+    )
 }

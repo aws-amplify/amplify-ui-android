@@ -16,16 +16,31 @@
 package com.amplifyframework.ui.authenticator.states
 
 import com.amplifyframework.ui.authenticator.SignInState
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
+import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FormStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 internal class SignInStateImpl(
-    override val form: FormStateImpl,
+    private val signInMethod: SignInMethod,
+    private val onSubmit: suspend (username: String, password: String) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
-) : SignInState {
+) : BaseStateImpl(), SignInState {
+
+    init {
+        form.addFields {
+            fieldForSignInMethod(signInMethod)
+            password()
+        }
+    }
+
     override val step = AuthenticatorStep.SignIn
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)
 
-    override suspend fun signIn() = form.submit()
+    override suspend fun signIn() = doSubmit {
+        val username = form.getTrimmed(signInMethod.toFieldKey())!!
+        val password = form.getTrimmed(FieldKey.Password)!!
+        onSubmit(username, password)
+    }
 }

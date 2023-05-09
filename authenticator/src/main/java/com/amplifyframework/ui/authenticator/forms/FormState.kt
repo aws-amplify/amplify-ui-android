@@ -16,9 +16,6 @@
 package com.amplifyframework.ui.authenticator.forms
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.amplifyframework.auth.AuthUserAttribute
 
 /**
@@ -32,11 +29,6 @@ interface FormState {
      * holding configuration options and state for the field.
      */
     val fields: Map<FieldKey, FieldData>
-
-    /**
-     * Flag indicating whether the form is currently being submitted.
-     */
-    val submitting: Boolean
 }
 
 /**
@@ -90,10 +82,6 @@ internal class FormStateImpl : MutableFormState {
     private val _fields = mutableMapOf<FieldKey, FieldDataImpl>()
     override val fields = _fields
 
-    override var submitting by mutableStateOf(false)
-
-    private var onSubmit: suspend () -> Unit = {}
-
     fun add(config: FieldConfig) {
         // Prepend the required validator for any fields that are required
         var fieldValidator = config.validator
@@ -113,23 +101,12 @@ internal class FormStateImpl : MutableFormState {
         )
     }
 
-    fun validate(): Boolean {
-        val validationScope = FieldValidatorScopeImpl(fields.mapValues { it.value.state.content })
-        _fields.values.forEach { field ->
-            validationScope.content = field.state.content
-            field.state.error = validationScope.run(field.validator)
-        }
-        return fields.values.all { it.state.error == null }
+    fun addFields(func: FormBuilderImpl.() -> Unit) {
+        buildForm(func).fields.forEach { add(it) }
     }
 
-    fun getContent(key: FieldKey): String? {
-        return fields[key]?.state?.content
-    }
-
-    suspend fun submit() {
-        if (validate()) {
-            onSubmit()
-        }
+    fun getTrimmed(key: FieldKey): String? {
+        return fields[key]?.state?.content?.trim()
     }
 
     fun getUserAttributes() = fields.mapNotNull { (key, field) ->
@@ -138,10 +115,6 @@ internal class FormStateImpl : MutableFormState {
         } else {
             null
         }
-    }
-
-    fun onSubmit(func: suspend () -> Unit) {
-        onSubmit = func
     }
 }
 
@@ -154,15 +127,6 @@ internal class FieldDataImpl(
 internal fun FormState.setFieldError(fieldKey: FieldKey, error: FieldError) {
     val impl = this as FormStateImpl
     impl.fields[fieldKey]?.state?.error = error
-}
-
-internal inline fun FormState.markSubmitting(
-    body: () -> Unit
-) {
-    val form = this as FormStateImpl
-    form.submitting = true
-    body()
-    form.submitting = false
 }
 
 internal class FieldValidatorScopeImpl(

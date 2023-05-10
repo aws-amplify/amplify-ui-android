@@ -57,6 +57,7 @@ import com.amplifyframework.ui.authenticator.forms.FieldKey.Password
 import com.amplifyframework.ui.authenticator.forms.FormState
 import com.amplifyframework.ui.authenticator.forms.buildForm
 import com.amplifyframework.ui.authenticator.forms.setFieldError
+import com.amplifyframework.ui.authenticator.states.BaseStateImpl
 import com.amplifyframework.ui.authenticator.states.ScreenStateFactory
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
@@ -94,14 +95,14 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     lateinit var configuration: AuthenticatorConfiguration
         private set
 
-    private val _screenState = MutableStateFlow<AuthenticatorScreenState>(LoadingState)
+    private val _screenState = MutableStateFlow<AuthenticatorStepState>(LoadingState)
     val screenState = _screenState.asStateFlow()
 
-    private val currentState: AuthenticatorScreenState
+    private val currentState: AuthenticatorStepState
         get() = screenState.value
 
     // Gets the current state or null if the current state is not the parameter type
-    private inline fun <reified T : AuthenticatorScreenState> getState(): T? = currentState as? T
+    private inline fun <reified T> getState(): T? = currentState as? T
 
     private val _events = MutableSharedFlow<AuthenticatorMessage>(
         extraBufferCapacity = 1,
@@ -162,7 +163,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
         moveTo(state)
     }
 
-    private fun moveTo(state: AuthenticatorScreenState) {
+    private fun moveTo(state: AuthenticatorStepState) {
         logger.debug("Moving to step: ${state.step}")
         _screenState.value = state
     }
@@ -461,7 +462,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
 //endregion
 
     private suspend fun handleAuthException(error: AuthException) {
-        val state = getState<FormHolderState>() ?: return
+        val state = getState<BaseStateImpl>() ?: return
         when (error) {
             is InvalidParameterException -> {
                 // TODO : This happens if a field is invalid format e.g. phone number

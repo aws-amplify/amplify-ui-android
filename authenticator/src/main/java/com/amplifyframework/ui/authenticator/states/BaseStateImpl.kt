@@ -19,17 +19,16 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.amplifyframework.ui.authenticator.FormHolderState
 import com.amplifyframework.ui.authenticator.forms.FieldValidatorScopeImpl
 import com.amplifyframework.ui.authenticator.forms.FormStateImpl
 
 /**
- * Base state for the interactive component states
+ * Base state for the interactive step states
  */
 @Stable
-internal abstract class BaseStateImpl : FormHolderState {
-    override var busy by mutableStateOf(false)
-    override val form: FormStateImpl = FormStateImpl()
+internal abstract class BaseStateImpl {
+    var busy by mutableStateOf(false)
+    val form: FormStateImpl = FormStateImpl()
 
     // Validates the form and marks the state as busy while invoking the
     // submission function

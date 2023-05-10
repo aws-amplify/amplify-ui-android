@@ -39,7 +39,6 @@ import com.amplifyframework.ui.authenticator.forms.MutableFormState
 @Composable
 internal fun AuthenticatorForm(
     state: MutableFormState,
-    enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -52,8 +51,7 @@ internal fun AuthenticatorForm(
                 modifier = Modifier.fillMaxWidth().testTag(field.config.key.toString()),
                 fieldConfig = field.config,
                 fieldState = field.state,
-                formState = state,
-                enabled = enabled
+                formState = state
             )
         }
         Spacer(modifier = Modifier.size(16.dp))

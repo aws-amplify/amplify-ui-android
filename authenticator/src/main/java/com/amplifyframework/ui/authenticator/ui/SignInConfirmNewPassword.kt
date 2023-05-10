@@ -71,13 +71,12 @@ fun SignInConfirmNewPassword(
         headerContent(state)
         CompositionLocalProvider(LocalStringResolver provides NewPasswordStringResolver) {
             AuthenticatorForm(
-                state = state.form,
-                enabled = !state.busy
+                state = state.form
             )
         }
         AuthenticatorButton(
             onClick = { scope.launch { state.confirmSignIn() } },
-            loading = state.busy,
+            loading = !state.form.enabled,
             label = stringResource(R.string.amplify_ui_authenticator_button_change_password)
         )
         footerContent(state)

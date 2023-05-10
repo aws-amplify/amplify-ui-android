@@ -49,12 +49,11 @@ fun SignUpConfirm(
         headerContent(state)
         deliveryNoticeContent(state.deliveryDetails)
         AuthenticatorForm(
-            state = state.form,
-            enabled = !state.busy
+            state = state.form
         )
         AuthenticatorButton(
             onClick = { scope.launch { state.confirmSignUp() } },
-            loading = state.busy
+            loading = !state.form.enabled
         )
         footerContent(state)
     }

@@ -82,11 +82,6 @@ interface SignInState : AuthenticatorStepState {
     val form: MutableFormState
 
     /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
-
-    /**
      * Move the user to a different [AuthenticatorInitialStep].
      */
     fun moveTo(step: AuthenticatorInitialStep)
@@ -107,11 +102,6 @@ interface SignInConfirmMfaState : AuthenticatorStepState {
      * The input form state holder for this step.
      */
     val form: MutableFormState
-
-    /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
 
     /**
      * The [AuthCodeDeliveryDetails] for the confirmation code that was sent to the user when entering this state.
@@ -139,11 +129,6 @@ interface SignInConfirmCustomState : AuthenticatorStepState {
      * The input form state holder for this step.
      */
     val form: MutableFormState
-
-    /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
 
     /**
      * The additional info that is configured with your custom challenge. For more information, please see
@@ -180,11 +165,6 @@ interface SignInConfirmNewPasswordState : AuthenticatorStepState {
     val form: MutableFormState
 
     /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
-
-    /**
      * Move the user to a different [AuthenticatorInitialStep].
      */
     fun moveTo(step: AuthenticatorInitialStep)
@@ -206,11 +186,6 @@ interface SignUpState : AuthenticatorStepState {
     val form: MutableFormState
 
     /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
-
-    /**
      * Move the user to a different [AuthenticatorInitialStep].
      */
     fun moveTo(step: AuthenticatorInitialStep)
@@ -230,11 +205,6 @@ interface SignUpConfirmState : AuthenticatorStepState {
      * The input form state holder for this step.
      */
     val form: MutableFormState
-
-    /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
 
     /**
      * The [AuthCodeDeliveryDetails] for the confirmation code that was sent to the user when entering this state.
@@ -268,11 +238,6 @@ interface PasswordResetState : AuthenticatorStepState {
     val form: MutableFormState
 
     /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
-
-    /**
      * Move the user to a different [AuthenticatorInitialStep].
      */
     fun moveTo(step: AuthenticatorInitialStep)
@@ -293,11 +258,6 @@ interface PasswordResetConfirmState : AuthenticatorStepState {
      * The input form state holder for this step.
      */
     val form: MutableFormState
-
-    /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
 
     /**
      * The [AuthCodeDeliveryDetails] for the confirmation code that was sent to the user when entering this state.
@@ -327,11 +287,6 @@ interface VerifyUserState : AuthenticatorStepState {
     val form: MutableFormState
 
     /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
-
-    /**
      * The list of unverified attributes.
      */
     val attributes: List<AuthUserAttribute>
@@ -357,11 +312,6 @@ interface VerifyUserConfirmState : AuthenticatorStepState {
      * The input form state holder for this step.
      */
     val form: MutableFormState
-
-    /**
-     * Flag indicating an asynchronous operation is in progress.
-     */
-    val busy: Boolean
 
     /**
      * The details of where the verification code was sent.

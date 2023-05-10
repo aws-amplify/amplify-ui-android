@@ -17,7 +17,6 @@ package com.amplifyframework.ui.authenticator.states
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.amplifyframework.ui.authenticator.forms.FieldValidatorScopeImpl
 import com.amplifyframework.ui.authenticator.forms.FormStateImpl
@@ -27,18 +26,21 @@ import com.amplifyframework.ui.authenticator.forms.FormStateImpl
  */
 @Stable
 internal abstract class BaseStateImpl {
-    var busy by mutableStateOf(false)
     val form: FormStateImpl = FormStateImpl()
+
+    private var busy: Boolean = false
 
     // Validates the form and marks the state as busy while invoking the
     // submission function
     protected suspend fun doSubmit(func: suspend () -> Unit) {
         if (!busy) {
-            busy = true
             if (validate()) {
+                busy = true
+                form.enabled = false
                 func()
+                form.enabled = true
+                busy = false
             }
-            busy = false
         }
     }
 

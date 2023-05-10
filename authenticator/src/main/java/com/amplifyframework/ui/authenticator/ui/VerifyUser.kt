@@ -60,12 +60,12 @@ fun VerifyUser(
         VerifyUserAttributeSelect(
             attributes = state.attributes,
             fieldState = fieldState,
-            enabled = !state.busy,
+            enabled = state.form.enabled,
             modifier = Modifier.fillMaxWidth()
         )
         AuthenticatorButton(
             onClick = { scope.launch { state.verifyUser() } },
-            loading = state.busy
+            loading = !state.form.enabled
         )
         footerContent(state)
     }

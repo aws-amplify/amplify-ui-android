@@ -16,6 +16,9 @@
 package com.amplifyframework.ui.authenticator.forms
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.amplifyframework.auth.AuthUserAttribute
 
 /**
@@ -29,6 +32,11 @@ interface FormState {
      * holding configuration options and state for the field.
      */
     val fields: Map<FieldKey, FieldData>
+
+    /**
+     * True if the fields in this form should be enabled.
+     */
+    val enabled: Boolean
 }
 
 /**
@@ -42,6 +50,11 @@ interface MutableFormState : FormState {
      * holding configuration options and mutable state for the field.
      */
     override val fields: Map<FieldKey, MutableFieldData>
+
+    /**
+     * True if the fields in this form should be enabled.
+     */
+    override var enabled: Boolean
 }
 
 /**
@@ -81,6 +94,8 @@ internal class FormStateImpl : MutableFormState {
     // Backing property for the fields map
     private val _fields = mutableMapOf<FieldKey, FieldDataImpl>()
     override val fields = _fields
+
+    override var enabled by mutableStateOf(true)
 
     fun add(config: FieldConfig) {
         // Prepend the required validator for any fields that are required

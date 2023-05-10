@@ -24,7 +24,7 @@ import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
 
-internal class ScreenStateFactory(
+internal class StepStateFactory(
     private val authConfiguration: AmplifyAuthConfiguration,
     private val signUpForm: FormData,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit

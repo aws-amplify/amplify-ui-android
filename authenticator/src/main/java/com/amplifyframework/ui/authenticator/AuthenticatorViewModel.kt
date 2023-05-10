@@ -58,7 +58,7 @@ import com.amplifyframework.ui.authenticator.forms.FormState
 import com.amplifyframework.ui.authenticator.forms.buildForm
 import com.amplifyframework.ui.authenticator.forms.setFieldError
 import com.amplifyframework.ui.authenticator.states.BaseStateImpl
-import com.amplifyframework.ui.authenticator.states.ScreenStateFactory
+import com.amplifyframework.ui.authenticator.states.StepStateFactory
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
@@ -91,15 +91,15 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     private val logger = Amplify.Logging.forNamespace("Authenticator")
 
     private lateinit var authConfiguration: AmplifyAuthConfiguration
-    private lateinit var stateFactory: ScreenStateFactory
+    private lateinit var stateFactory: StepStateFactory
     lateinit var configuration: AuthenticatorConfiguration
         private set
 
-    private val _screenState = MutableStateFlow<AuthenticatorStepState>(LoadingState)
-    val screenState = _screenState.asStateFlow()
+    private val _stepState = MutableStateFlow<AuthenticatorStepState>(LoadingState)
+    val stepState = _stepState.asStateFlow()
 
     private val currentState: AuthenticatorStepState
-        get() = screenState.value
+        get() = stepState.value
 
     // Gets the current state or null if the current state is not the parameter type
     private inline fun <reified T> getState(): T? = currentState as? T
@@ -127,7 +127,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
 
             authConfiguration = authConfig
 
-            stateFactory = ScreenStateFactory(
+            stateFactory = StepStateFactory(
                 authConfiguration,
                 buildForm(configuration.signUpForm),
                 ::moveTo
@@ -165,7 +165,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
 
     private fun moveTo(state: AuthenticatorStepState) {
         logger.debug("Moving to step: ${state.step}")
-        _screenState.value = state
+        _stepState.value = state
     }
 
     //region SignUp

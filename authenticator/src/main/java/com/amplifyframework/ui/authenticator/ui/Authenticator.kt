@@ -103,14 +103,14 @@ fun Authenticator(
     val snackbarState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    val screenState = state.stepState
+    val stepState = state.stepState
 
-    if (screenState is SignedInState) {
-        content(screenState)
+    if (stepState is SignedInState) {
+        content(stepState)
     } else {
         Box(modifier = modifier) {
             AnimatedContent(
-                targetState = screenState,
+                targetState = stepState,
                 transitionSpec = { defaultTransition() }
             ) { targetState ->
                 Column(

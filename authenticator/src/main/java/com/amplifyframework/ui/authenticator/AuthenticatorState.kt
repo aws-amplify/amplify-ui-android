@@ -85,7 +85,7 @@ internal class AuthenticatorStateImpl constructor(
 
     init {
         viewModel.viewModelScope.launch {
-            viewModel.screenState.collect {
+            viewModel.stepState.collect {
                 stepState = it
             }
         }

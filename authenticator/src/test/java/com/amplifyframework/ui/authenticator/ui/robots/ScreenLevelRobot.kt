@@ -19,6 +19,6 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import com.amplifyframework.ui.testing.ComposeRobot
 
 abstract class ScreenLevelRobot(rule: ComposeTestRule) : ComposeRobot(rule) {
-    // Check that the screen has the expected title
+    // Check that the composable has the expected title
     fun hasTitle(expected: String) = assertExists("AuthenticatorTitle", expected)
 }

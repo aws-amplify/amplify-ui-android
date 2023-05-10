@@ -15,12 +15,11 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.hasText
 import com.amplifyframework.ui.authenticator.SignUpState
 import com.amplifyframework.ui.authenticator.forms.buildForm
 import com.amplifyframework.ui.authenticator.forms.toState
 import com.amplifyframework.ui.authenticator.states.SignUpStateImpl
+import com.amplifyframework.ui.authenticator.ui.robots.signUp
 import com.amplifyframework.ui.testing.ComposeTest
 import org.junit.Test
 
@@ -31,7 +30,9 @@ class SignUpTest : ComposeTest() {
         setContent {
             SignUp(state = mockSignUpState())
         }
-        composeTestRule.onNode(hasTestTag("AuthenticatorTitle") and hasText("Create Account")).assertExists()
+        signUp {
+            hasTitle("Create Account")
+        }
     }
 
     @Test
@@ -39,7 +40,9 @@ class SignUpTest : ComposeTest() {
         setContent {
             SignUp(state = mockSignUpState())
         }
-        composeTestRule.onNode(hasTestTag("SignUpButton") and hasText("Create Account")).assertExists()
+        signUp {
+            hasSubmitButton("Create Account")
+        }
     }
 
     private fun mockSignUpState(): SignUpState {

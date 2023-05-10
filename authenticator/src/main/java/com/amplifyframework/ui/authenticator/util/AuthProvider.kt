@@ -15,7 +15,6 @@
 
 package com.amplifyframework.ui.authenticator.util
 
-import com.amplifyframework.annotations.InternalAmplifyApi
 import com.amplifyframework.auth.AWSCognitoAuthMetadataType
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
@@ -108,7 +107,6 @@ internal interface AuthProvider {
 /**
  * The [AuthProvider] implementation that calls through to [Amplify.Auth]
  */
-@OptIn(InternalAmplifyApi::class)
 internal class RealAuthProvider : AuthProvider {
 
     init {
@@ -248,7 +246,6 @@ internal class RealAuthProvider : AuthProvider {
         awaitClose { Amplify.Hub.unsubscribe(token) }
     }
 
-    @OptIn(InternalAmplifyApi::class)
     override suspend fun getConfiguration(): AmplifyAuthConfiguration? {
         val authConfigJSON = getCognitoPlugin()?.getPluginConfiguration() ?: return null
         try {

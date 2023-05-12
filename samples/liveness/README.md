@@ -46,13 +46,26 @@ amplify add auth
 ```
 Provide the responses shown after each of the following prompts.
 ```
-? Do you want to use the default authentication and security configuration?
+? Do you want to use the default authentication and security configuration? 
     `Default configuration with Social Provider (Federation)`
-? How do you want users to be able to sign in?
+? How do you want users to be able to sign in? 
     `Username`
-? Do you want to configure advanced settings?
+? Do you want to configure advanced settings? 
     `No, I am done.`
+? What domain name prefix you want us to create for you? 
+    `(default)`
+? Enter your redirect signin URI: 
+    `myapp://callback/`
+? Do you want to add another redirect signin URI 
+    `No`
+? Enter your redirect signout URI: 
+    `myapp://signout/`
+? Do you want to add another redirect signout URI 
+    `No`
+? Select the social providers you want to configure for your user pool: 
+    `<hit enter>`
 ```
+and update the `AndroidManifest.xml` file in your project according to the steps [here](https://docs.amplify.aws/lib/auth/signin_web_ui/q/platform/android/#update-androidmanifestxml).
 5. Once finished, run `amplify push` to publish your changes.
    Upon completion, `amplifyconfiguration.json` should be updated to reference these provisioned backend resources.
 6. Follow the steps below to create an inline policy to enable authenticated app users to access Rekognition, which powers the FaceLivenessDetector.

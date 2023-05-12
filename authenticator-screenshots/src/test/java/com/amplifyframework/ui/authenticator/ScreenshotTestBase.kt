@@ -15,8 +15,12 @@
 
 package com.amplifyframework.ui.authenticator
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.Paparazzi
 import com.amplifyframework.ui.authenticator.theme.AmplifyTheme
 import org.junit.Rule
@@ -30,7 +34,9 @@ abstract class ScreenshotTestBase {
         screenshotRule.snapshot(name) {
             AmplifyTheme {
                 Surface {
-                    content()
+                    Box(modifier = Modifier.padding(top = 16.dp)) {
+                        content()
+                    }
                 }
             }
         }

@@ -47,7 +47,7 @@ amplify add auth
 Provide the responses shown after each of the following prompts.
 ```
 ? Do you want to use the default authentication and security configuration?
-    `Default configuration`
+    `Default configuration with Social Provider (Federation)`
 ? How do you want users to be able to sign in?
     `Username`
 ? Do you want to configure advanced settings?

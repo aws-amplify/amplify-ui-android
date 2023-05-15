@@ -29,13 +29,16 @@ import org.junit.Rule
 abstract class ScreenshotTestBase {
 
     @get:Rule
-    val screenshotRule = Paparazzi(deviceConfig = DeviceConfig.PIXEL_6, showSystemUi = false)
+    val screenshotRule = Paparazzi(
+        deviceConfig = DeviceConfig.PIXEL_6,
+        showSystemUi = false
+    )
 
     protected open fun screenshot(name: String? = null, content: @Composable () -> Unit) =
         screenshotRule.snapshot(name) {
             AmplifyTheme {
                 Surface {
-                    Box(modifier = Modifier.padding(top = 16.dp)) {
+                    Box(modifier = Modifier.padding(top = 56.dp)) {
                         content()
                     }
                 }

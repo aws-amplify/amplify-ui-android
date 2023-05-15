@@ -15,8 +15,13 @@
 
 package com.amplifyframework.ui.authenticator
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.amplifyframework.ui.authenticator.theme.AmplifyTheme
 import org.junit.Rule
@@ -24,13 +29,18 @@ import org.junit.Rule
 abstract class ScreenshotTestBase {
 
     @get:Rule
-    val screenshotRule = Paparazzi()
+    val screenshotRule = Paparazzi(
+        deviceConfig = DeviceConfig.PIXEL_6,
+        showSystemUi = false
+    )
 
     protected open fun screenshot(name: String? = null, content: @Composable () -> Unit) =
         screenshotRule.snapshot(name) {
             AmplifyTheme {
                 Surface {
-                    content()
+                    Box(modifier = Modifier.padding(top = 56.dp)) {
+                        content()
+                    }
                 }
             }
         }

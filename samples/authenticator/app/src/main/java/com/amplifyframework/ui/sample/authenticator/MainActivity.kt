@@ -15,9 +15,6 @@
 
 package com.amplifyframework.ui.sample.authenticator
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

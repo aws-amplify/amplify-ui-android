@@ -18,7 +18,6 @@ package com.amplifyframework.ui.authenticator.ui
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -37,7 +36,6 @@ import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.MutablePasswordFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PasswordInputField(
     fieldConfig: FieldConfig.Password,

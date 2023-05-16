@@ -19,14 +19,26 @@ import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FormStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 internal class SignInConfirmMfaStateImpl(
     override val deliveryDetails: AuthCodeDeliveryDetails?,
-    override val form: FormStateImpl,
+    private val onSubmit: suspend (confirmationCode: String) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
-) : SignInConfirmMfaState {
+) : BaseStateImpl(), SignInConfirmMfaState {
+
+    init {
+        form.addFields {
+            confirmationCode()
+        }
+    }
+
     override val step = AuthenticatorStep.SignInConfirmMfa
+
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)
-    override suspend fun confirmSignIn() = form.submit()
+
+    override suspend fun confirmSignIn() = doSubmit {
+        val confirmationCode = form.getTrimmed(FieldKey.ConfirmationCode)!!
+        onSubmit(confirmationCode)
+    }
 }

@@ -51,10 +51,12 @@ fun SignInConfirmCustom(
     ) {
         headerContent(state)
         deliveryDetailsContent(state.deliveryDetails)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form
+        )
         AuthenticatorButton(
             onClick = { scope.launch { state.confirmSignIn() } },
-            loading = state.form.submitting
+            loading = !state.form.enabled
         )
         footerContent(state)
     }

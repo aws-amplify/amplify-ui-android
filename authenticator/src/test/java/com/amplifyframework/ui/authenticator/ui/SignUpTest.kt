@@ -15,9 +15,9 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.SignUpState
-import com.amplifyframework.ui.authenticator.forms.buildForm
-import com.amplifyframework.ui.authenticator.forms.toState
+import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
+import com.amplifyframework.ui.authenticator.forms.FormData
 import com.amplifyframework.ui.authenticator.states.SignUpStateImpl
 import com.amplifyframework.ui.authenticator.ui.robots.signUp
 import com.amplifyframework.ui.testing.ComposeTest
@@ -45,13 +45,12 @@ class SignUpTest : ComposeTest() {
         }
     }
 
-    private fun mockSignUpState(): SignUpState {
-        val form = buildForm {
-            username()
-            password()
-            confirmPassword()
-            email(required = true)
-        }.toState()
-        return SignUpStateImpl(form, {})
-    }
+    private fun mockSignUpState() = SignUpStateImpl(
+        signInMethod = SignInMethod.Username,
+        signUpAttributes = emptyList(),
+        passwordCriteria = PasswordCriteria(8, false, false, false, false),
+        signUpForm = FormData(emptyList()),
+        onSubmit = { _, _, _ -> },
+        onMoveTo = { }
+    )
 }

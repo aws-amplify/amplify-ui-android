@@ -16,15 +16,29 @@
 package com.amplifyframework.ui.authenticator.states
 
 import com.amplifyframework.ui.authenticator.PasswordResetState
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
+import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FormStateImpl
 
 internal class PasswordResetStateImpl(
-    override val form: FormStateImpl,
+    private val signInMethod: SignInMethod,
+    private val onSubmit: suspend (username: String) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
-) : PasswordResetState {
+) : BaseStateImpl(), PasswordResetState {
+
+    init {
+        form.addFields {
+            fieldForSignInMethod(signInMethod)
+        }
+    }
+
     override val step = AuthenticatorStep.PasswordReset
+
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)
-    override suspend fun submitPasswordReset() = form.submit()
+
+    override suspend fun submitPasswordReset() = doSubmit {
+        val username = form.getTrimmed(signInMethod.toFieldKey())!!
+        onSubmit(username)
+    }
 }

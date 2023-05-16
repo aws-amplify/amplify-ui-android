@@ -373,6 +373,12 @@ internal class FormBuilderImpl : SignUpFormBuilder {
         )
     }
 
+    fun fieldForSignInMethod(method: SignInMethod) = when (method) {
+        SignInMethod.Username -> username()
+        SignInMethod.Email -> email(required = true)
+        SignInMethod.PhoneNumber -> phoneNumber(required = true)
+    }
+
     private operator fun plusAssign(config: FieldConfig) {
         fields[config.key] = config
     }
@@ -400,12 +406,6 @@ internal class FormBuilderImpl : SignUpFormBuilder {
     }
 
     fun build() = FormData(fields = fields.values.toList())
-}
-
-internal fun FormData.toState(): FormStateImpl {
-    val state = FormStateImpl()
-    fields.forEach { state.add(it) }
-    return state
 }
 
 private fun FieldConfig.required() = when (this) {

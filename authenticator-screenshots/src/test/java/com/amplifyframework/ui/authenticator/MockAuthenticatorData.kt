@@ -25,10 +25,10 @@ import com.amplifyframework.ui.authenticator.forms.MutablePasswordFieldState
 
 fun mockForm(
     vararg fields: MutableFieldData,
-    submitting: Boolean = false
+    enabled: Boolean = true
 ) = object : MutableFormState {
     override val fields = fields.associateBy { it.config.key }
-    override val submitting = submitting
+    override var enabled = enabled
 }
 
 fun mockFieldData(
@@ -46,7 +46,7 @@ fun mockFieldState(
     error: FieldError? = null
 ) = object : MutableFieldState {
     override var content = content
-    override val error = error
+    override var error = error
 }
 
 fun mockPasswordFieldState(
@@ -56,5 +56,5 @@ fun mockPasswordFieldState(
 ) = object : MutablePasswordFieldState {
     override var fieldContentVisible = visible
     override var content = content
-    override val error: FieldError? = error
+    override var error: FieldError? = error
 }

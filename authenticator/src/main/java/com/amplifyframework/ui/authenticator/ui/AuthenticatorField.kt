@@ -46,25 +46,25 @@ internal fun AuthenticatorField(
             modifier = modifier,
             fieldConfig = fieldConfig,
             fieldState = fieldState,
-            enabled = !formState.submitting
+            enabled = formState.enabled
         )
         is FieldConfig.Password -> PasswordInputField(
             modifier = modifier,
             fieldConfig = fieldConfig,
             fieldState = fieldState as MutablePasswordFieldState,
-            enabled = !formState.submitting
+            enabled = formState.enabled
         )
         is FieldConfig.Date -> DateInputField(
             modifier = modifier,
             fieldConfig = fieldConfig,
             fieldState = fieldState,
-            enabled = !formState.submitting
+            enabled = formState.enabled
         )
         is FieldConfig.PhoneNumber -> PhoneInputField(
             modifier = modifier,
             fieldConfig = fieldConfig,
             fieldState = fieldState,
-            enabled = !formState.submitting
+            enabled = formState.enabled
         )
         is FieldConfig.Custom -> {
             val context = FieldScopeImpl(fieldState, formState)

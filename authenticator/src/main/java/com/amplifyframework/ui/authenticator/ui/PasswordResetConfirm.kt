@@ -50,10 +50,12 @@ fun PasswordResetConfirm(
     ) {
         headerContent(state)
         deliveryNoticeContent(details = state.deliveryDetails)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form
+        )
         AuthenticatorButton(
             onClick = { scope.launch { state.submitPasswordResetConfirm() } },
-            loading = state.form.submitting
+            loading = !state.form.enabled
         )
         footerContent(state)
     }

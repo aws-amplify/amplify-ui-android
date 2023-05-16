@@ -51,10 +51,12 @@ fun SignInConfirmMfa(
     ) {
         headerContent(state)
         deliveryNoticeContent(state.deliveryDetails)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form
+        )
         AuthenticatorButton(
             onClick = { scope.launch { state.confirmSignIn() } },
-            loading = state.form.submitting
+            loading = !state.form.enabled
         )
         footerContent(state)
     }

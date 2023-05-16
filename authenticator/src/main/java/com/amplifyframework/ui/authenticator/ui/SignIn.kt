@@ -47,10 +47,12 @@ fun SignIn(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ) {
         headerContent(state)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form
+        )
         AuthenticatorButton(
             onClick = { scope.launch { state.signIn() } },
-            loading = state.form.submitting,
+            loading = !state.form.enabled,
             label = stringResource(R.string.amplify_ui_authenticator_button_signin),
             modifier = Modifier.testTag("SignInButton")
         )

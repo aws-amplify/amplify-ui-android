@@ -53,10 +53,12 @@ fun VerifyUserConfirm(
     ) {
         headerContent(state)
         deliveryNoticeContent(state.deliveryDetails)
-        AuthenticatorForm(state = state.form)
+        AuthenticatorForm(
+            state = state.form
+        )
         AuthenticatorButton(
             onClick = { scope.launch { state.confirmVerifyUser() } },
-            loading = state.form.submitting
+            loading = !state.form.enabled
         )
         footerContent(state)
     }

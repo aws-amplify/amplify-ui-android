@@ -62,9 +62,9 @@ fun rememberAuthenticatorState(
 @Stable
 interface AuthenticatorState {
     /**
-     * The state holder instance for the current content visible to the user.
+     * The state holder instance for the current [AuthenticatorStep] being shown to the user.
      */
-    val screenState: AuthenticatorScreenState
+    val stepState: AuthenticatorStepState
 
     /**
      * A flow of [AuthenticatorMessage] that may be presented to the user, such as messages indicating a
@@ -78,15 +78,15 @@ interface AuthenticatorState {
 internal class AuthenticatorStateImpl constructor(
     private val viewModel: AuthenticatorViewModel
 ) : AuthenticatorState {
-    override var screenState by mutableStateOf<AuthenticatorScreenState>(LoadingState)
+    override var stepState by mutableStateOf<AuthenticatorStepState>(LoadingState)
 
     override val messages: Flow<AuthenticatorMessage>
         get() = viewModel.events
 
     init {
         viewModel.viewModelScope.launch {
-            viewModel.screenState.collect {
-                screenState = it
+            viewModel.stepState.collect {
+                stepState = it
             }
         }
     }

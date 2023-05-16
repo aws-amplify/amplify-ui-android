@@ -37,8 +37,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.amplifyframework.ui.authenticator.AuthenticatorScreenState
 import com.amplifyframework.ui.authenticator.AuthenticatorState
+import com.amplifyframework.ui.authenticator.AuthenticatorStepState
 import com.amplifyframework.ui.authenticator.ErrorState
 import com.amplifyframework.ui.authenticator.LoadingState
 import com.amplifyframework.ui.authenticator.PasswordResetConfirmState
@@ -103,14 +103,14 @@ fun Authenticator(
     val snackbarState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    val screenState = state.screenState
+    val stepState = state.stepState
 
-    if (screenState is SignedInState) {
-        content(screenState)
+    if (stepState is SignedInState) {
+        content(stepState)
     } else {
         Box(modifier = modifier) {
             AnimatedContent(
-                targetState = screenState,
+                targetState = stepState,
                 transitionSpec = { defaultTransition() }
             ) { targetState ->
                 Column(
@@ -153,7 +153,7 @@ fun Authenticator(
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-internal fun AnimatedContentScope<AuthenticatorScreenState>.defaultTransition(): ContentTransform {
+internal fun AnimatedContentScope<AuthenticatorStepState>.defaultTransition(): ContentTransform {
     // Show reverse transition when going back to signIn
     if (targetState is SignInState && initialState != LoadingState) {
         return fadeIn(animationSpec = tween(220, delayMillis = 90)) with

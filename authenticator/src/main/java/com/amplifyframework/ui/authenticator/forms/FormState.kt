@@ -34,9 +34,9 @@ interface FormState {
     val fields: Map<FieldKey, FieldData>
 
     /**
-     * Flag indicating whether the form is currently being submitted.
+     * True if the fields in this form should be enabled.
      */
-    val submitting: Boolean
+    val enabled: Boolean
 }
 
 /**
@@ -50,6 +50,11 @@ interface MutableFormState : FormState {
      * holding configuration options and mutable state for the field.
      */
     override val fields: Map<FieldKey, MutableFieldData>
+
+    /**
+     * True if the fields in this form should be enabled.
+     */
+    override var enabled: Boolean
 }
 
 /**
@@ -90,9 +95,7 @@ internal class FormStateImpl : MutableFormState {
     private val _fields = mutableMapOf<FieldKey, FieldDataImpl>()
     override val fields = _fields
 
-    override var submitting by mutableStateOf(false)
-
-    private var onSubmit: suspend () -> Unit = {}
+    override var enabled by mutableStateOf(true)
 
     fun add(config: FieldConfig) {
         // Prepend the required validator for any fields that are required
@@ -113,23 +116,12 @@ internal class FormStateImpl : MutableFormState {
         )
     }
 
-    fun validate(): Boolean {
-        val validationScope = FieldValidatorScopeImpl(fields.mapValues { it.value.state.content })
-        _fields.values.forEach { field ->
-            validationScope.content = field.state.content
-            field.state.error = validationScope.run(field.validator)
-        }
-        return fields.values.all { it.state.error == null }
+    fun addFields(func: FormBuilderImpl.() -> Unit) {
+        buildForm(func).fields.forEach { add(it) }
     }
 
-    fun getContent(key: FieldKey): String? {
-        return fields[key]?.state?.content
-    }
-
-    suspend fun submit() {
-        if (validate()) {
-            onSubmit()
-        }
+    fun getTrimmed(key: FieldKey): String? {
+        return fields[key]?.state?.content?.trim()
     }
 
     fun getUserAttributes() = fields.mapNotNull { (key, field) ->
@@ -138,10 +130,6 @@ internal class FormStateImpl : MutableFormState {
         } else {
             null
         }
-    }
-
-    fun onSubmit(func: suspend () -> Unit) {
-        onSubmit = func
     }
 }
 
@@ -154,15 +142,6 @@ internal class FieldDataImpl(
 internal fun FormState.setFieldError(fieldKey: FieldKey, error: FieldError) {
     val impl = this as FormStateImpl
     impl.fields[fieldKey]?.state?.error = error
-}
-
-internal inline fun FormState.markSubmitting(
-    body: () -> Unit
-) {
-    val form = this as FormStateImpl
-    form.submitting = true
-    body()
-    form.submitting = false
 }
 
 internal class FieldValidatorScopeImpl(

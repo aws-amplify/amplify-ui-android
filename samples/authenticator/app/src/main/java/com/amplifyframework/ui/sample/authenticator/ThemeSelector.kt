@@ -18,7 +18,6 @@ package com.amplifyframework.ui.sample.authenticator
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -34,7 +33,6 @@ enum class SupportedTheme {
     Amplify
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ThemeSelector(
     modifier: Modifier = Modifier,

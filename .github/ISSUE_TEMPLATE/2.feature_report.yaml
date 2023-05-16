@@ -17,22 +17,11 @@ body:
 
   - type: dropdown
     attributes:
-      label: Language and Async Model
-      description: What programming language is being used?
-      multiple: true
-      options:
-        - Kotlin
-        - Java
-        - RxJava
-        - Not applicable
-    validations:
-      required: true
-  - type: dropdown
-    attributes:
       label: Which UI component is this feature-request for?
       description: We are continuously adding new features on existing cloud connected UI components. Please select one below!
       multiple: false
       options:
+        - Authenticator
         - Liveness
         - Other
     validations:

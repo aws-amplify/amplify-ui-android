@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Thank you for taking the time to fill out this bug report! Try to include as much information as you can.
-  
+
   - type: checkboxes
     attributes:
       label: |
@@ -23,22 +23,11 @@ body:
         ## Environment
   - type: dropdown
     attributes:
-      label: Language and Async Model
-      description: What programming language is being used?
-      multiple: true
-      options:
-        - Kotlin
-        - Java
-        - RxJava
-        - Not applicable
-    validations:
-      required: true
-  - type: dropdown
-    attributes:
       label: Which UI component?
       description: Select one of our UI components below.
       multiple: true
       options:
+        - Authenticator
         - Liveness
         - Other
     validations:

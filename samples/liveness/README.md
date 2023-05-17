@@ -91,7 +91,7 @@ Provide the responses shown after each of the following prompts.
    6. Choose **Create Policy**
 
 ### Provision Backend API
-Set up a backend API using Amplify API category to create the liveness session and retrieve the liveness session results. The liveness sample app is set up to use API Gateway endpoints for creating and retrieving the liveness session. 
+Set up a backend API using [Amplify API category](https://docs.amplify.aws/lib/restapi/getting-started/q/platform/android/) to create the liveness session and retrieve the liveness session results. The liveness sample app is set up to use API Gateway endpoints for creating and retrieving the liveness session. 
 
 1. Run the following command to create a new REST API:
 ```

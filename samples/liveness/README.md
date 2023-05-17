@@ -100,57 +100,57 @@ amplify add api
 Provide the responses shown after each of the following prompts.
 ```
 ? Please select from one of the below mentioned services
-`REST`
+    `REST`
 ? Would you like to add a new path to an existing REST API:
-`N`
+    `N`
 ? Provide a friendly name for your resource to be used as a label for this category in the project: 
-`livenessBackendAPI`
+    `livenessBackendAPI`
 ? Provide a path (e.g., /book/{isbn}): 
-`/liveness/create`
+    `/liveness/create`
 ? Choose a Lambda source
 `Create a new Lambda function`
 ?  Provide an AWS Lambda function name:
 `createSession`
 ? Choose the runtime that you want to use: 
-`NodeJS`
+    `NodeJS`
 ? Choose the function template that you want to use: 
-`Serverless ExpressJS function (Integration with API Gateway)`
+    `Serverless ExpressJS function (Integration with API Gateway)`
 ? Do you want to configure advanced settings? 
-`N`
+    `N`
 ? Do you want to edit the local lambda function now? 
-`Y`
+    `Y`
 ** Note the path that is created with the function code : Edit the file in your editor: /Users/mzraghib/Desktop/amplify-ui-android/samples/liveness/amplify/backend/function/aa/src/app.js
 **
 ? Restrict API access?
-`Y`
+    `Y`
 ? Who should have access? 
-`N`
+    `N`
 ? Do you want to configure advanced settings? 
-`Authenticated users only`
+    `Authenticated users only`
 ? What permissions do you want to grant to Authenticated users? 
-`create,read,update`
+    `create,read,update`
 ? Do you want to add another path?  
-`Y`
+    `Y`
 ? Provide a path (e.g., /book/{isbn}): 
-`/liveness/{sessionId}`
+    `/liveness/{sessionId}`
 ? Choose a Lambda source
-`Create a new Lambda function`
+    `Create a new Lambda function`
 ?  Provide an AWS Lambda function name:
-`getResults`
+    `getResults`
 ? Choose the runtime that you want to use: 
-`NodeJS`
+    `NodeJS`
 ? Choose the function template that you want to use: 
-`Serverless ExpressJS function (Integration with API Gateway)`
+    `Serverless ExpressJS function (Integration with API Gateway)`
 ? Do you want to configure advanced settings? 
-`N`
+    `N`
 ? Do you want to edit the local lambda function now? 
-`Y`
+    `Y`
 ** Note the path that is created with the function code : Edit the file in your editor: /Users/mzraghib/Desktop/amplify-ui-android/samples/liveness/amplify/backend/function/aa/src/app.js
 **
 ? Restrict API access?
-`Y`
+    `Y`
 ? Who should have access? 
-`N`
+    `N`
 ```
 2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provided
 3. Once finished, run `amplify push` to publish your changes. 

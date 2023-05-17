@@ -58,7 +58,7 @@
 
     <!-- Phone field specific strings -->
     <string name="amplify_ui_authenticator_field_phone_search">Search region</string>
-    <string name="amplify_ui_authenticator_field_phone_search_clear">Clear</string>
+    <string name="amplify_ui_authenticator_field_phone_search_clear">Clear search term</string>
 
     <!-- Confirm Password field specific strings -->
     <string name="amplify_ui_authenticator_field_hint_password_confirm">Re-enter your password</string>

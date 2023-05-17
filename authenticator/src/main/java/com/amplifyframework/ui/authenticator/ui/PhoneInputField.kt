@@ -54,6 +54,8 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -237,7 +239,12 @@ private fun LazyItemScope.RegionItem(
             .padding(vertical = 12.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("${region.flagEmoji} ${region.name}")
+        Text(
+            text = "${region.flagEmoji} ${region.name}",
+            modifier = Modifier.semantics {
+                contentDescription = region.name // Don't read the flag emoji when using talkback
+            }
+        )
         Text(region.dialCode)
     }
 

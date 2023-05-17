@@ -152,6 +152,45 @@ Provide the responses shown after each of the following prompts.
 ```
 2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provided
 3. Once finished, run `amplify push` to publish your changes. 
-### Run the App
+4. Follow the steps below to create an inline policy to enable the **createSession** lambda function to access Rekognition.
+   1. Go to AWS Lambda console -> **CreateSession**  -> Configuration -> Permissions
+   2. Click the role name under 'Execution role'
+   3. Choose **Add Permissions**, then select **Create Inline Policy**, then choose **JSON** and paste the following:
 
+    ```
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": "rekognition:CreateFaceLivenessSession",
+                "Resource": "*"
+            }
+        ]
+    }
+    ```
+   4. Choose **Review Policy**
+   5. Name the policy
+   6. Choose **Create Policy**
+5. Follow the steps below to create an inline policy to enable the **getResults** lambda function to access Rekognition.
+   1. Go to AWS Lambda console -> **getResults**  -> Configuration -> Permissions
+   2. Click the role name under 'Execution role'
+   3. Choose **Add Permissions**, then select **Create Inline Policy**, then choose **JSON** and paste the following:
+
+    ```
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": "rekognition:GetFaceLivenessSessionResults",
+                "Resource": "*"
+            }
+        ]
+    }   
+    ```
+   4. Choose **Review Policy**
+   5. Name the policy
+   6. Choose **Create Policy**
+### Run the App
 Build and run the project on an Android device in Android Studio. The project requires Android SDK API level 24 (Android 7.0) or higher.

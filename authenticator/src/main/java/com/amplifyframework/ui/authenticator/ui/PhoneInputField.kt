@@ -188,12 +188,6 @@ private fun DialCodeSelector(
                     }
                 }
             }
-            LaunchedEffect(key1 = filterTerm) {
-                if (filterTerm.isNotBlank()) {
-                    // When the list filter changes scroll back to the top
-                    listState.scrollToItem(0)
-                }
-            }
         }
     }
 }

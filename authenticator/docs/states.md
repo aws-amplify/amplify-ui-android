@@ -42,16 +42,27 @@ stateDiagram-v2
     SignInNextStep --> SignInConfirmNewPassword : [nextStep == NewPassword]
     SignInNextStep --> CheckAttributes : [nextStep == Done]
 
+    SignInConfirmMfa : SignInConfirmMfa
+    SignInConfirmMfa : confirmSignIn(confirmationCode)
     SignInConfirmMfa --> SignInNextStep : Success
+
+    SignInConfirmNewPassword : SignInConfirmNewPassword
+    SignInConfirmNewPassword : confirmSignIn(newPassword)
     SignInConfirmNewPassword --> SignInNextStep : Success
+
+    SignInConfirmCustom : SignInConfirmCustom
+    SignInConfirmCustom : confirmSignIn(challengeResponse)
     SignInConfirmCustom --> SignInNextStep : Success
 
     SignUp : SignUp
+    SignUp : signUp(username, password, attributes)
     SignUp --> SignUpNextStep : Success
 
     SignUpNextStep --> AutoSignIn : [nextStep == DONE]
     SignUpNextStep --> SignUpConfirm : [nextStep == CONFIRM_SIGN_UP_STEP]
     
+    SignUpConfirm : SignUpConfirm
+    SignUpConfirm : confirmSignUp(username, confirmationCode)
     SignUpConfirm --> SignUpNextStep : Success
 
     PasswordReset : PasswordReset

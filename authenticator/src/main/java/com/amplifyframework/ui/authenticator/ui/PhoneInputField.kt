@@ -166,7 +166,7 @@ private fun DialCodeSelector(
             Surface(modifier = Modifier.fillMaxSize()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     RegionSearchBox(
-                        modifier = Modifier.padding(bottom = 16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).padding(horizontal = 16.dp),
                         value = filterTerm,
                         onValueChange = { filterTerm = it }
                     )

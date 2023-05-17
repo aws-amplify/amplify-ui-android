@@ -26,15 +26,15 @@ amplify init
 Provide the responses shown after each of the following prompts.
 ```
 ? Enter a name for the environment
-`dev`
+    `dev`
 ? Choose your default editor:
-`Android Studio`
+    `Android Studio`
 ? Where is your Res directory:
-`app/src/main/res`
+    `app/src/main/res`
 ? Select the authentication method you want to use:
-`AWS profile`
+    `AWS profile`
 ? Please choose the profile you want to use
-`default`
+    `default`
 ```
 Wait until provisioning is finished. Upon successfully running `amplify init`, you will see a configuration file created in `./app/src/main/res/raw/` called `amplifyconfiguration.json`. This file will be bundled into your application so that the Amplify libraries know how to reach your provisioned backend resources at runtime.
 
@@ -108,9 +108,9 @@ Provide the responses shown after each of the following prompts.
 ? Provide a path (e.g., /book/{isbn}): 
     `/liveness/create`
 ? Choose a Lambda source
-`Create a new Lambda function`
+    `Create a new Lambda function`
 ?  Provide an AWS Lambda function name:
-`createSession`
+    `createSession`
 ? Choose the runtime that you want to use: 
     `NodeJS`
 ? Choose the function template that you want to use: 

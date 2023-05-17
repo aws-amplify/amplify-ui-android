@@ -90,8 +90,72 @@ Provide the responses shown after each of the following prompts.
    5. Name the policy
    6. Choose **Create Policy**
 
-7. Set up a backend to create the liveness session and retrieve the liveness session results. The liveness sample app is set up to use API Gateway endpoints for creating and retrieving the liveness session. Follow the [Amazon Rekognition Liveness guide](https://docs.aws.amazon.com/rekognition/latest/dg/face-liveness-programming-api.html) to set up your backend and edit the [LivenessSampleBackend class](https://github.com/aws-amplify/amplify-ui-android/blob/main/samples/liveness/app/src/main/java/com/amplifyframework/ui/sample/liveness/LivenessSampleBackend.kt) in your project as necessary to work with your backend.
+### Provision Backend API
+Set up a backend API using Amplify API category to create the liveness session and retrieve the liveness session results. The liveness sample app is set up to use API Gateway endpoints for creating and retrieving the liveness session. 
 
+1. Run the following command to create a new REST API:
+```
+amplify add api
+```
+Provide the responses shown after each of the following prompts.
+```
+? Please select from one of the below mentioned services
+`REST`
+? Would you like to add a new path to an existing REST API:
+`N`
+? Provide a friendly name for your resource to be used as a label for this category in the project: 
+`livenessBackendAPI`
+? Provide a path (e.g., /book/{isbn}): 
+`/liveness/create`
+? Choose a Lambda source
+`Create a new Lambda function`
+?  Provide an AWS Lambda function name:
+`createSession`
+? Choose the runtime that you want to use: 
+`NodeJS`
+? Choose the function template that you want to use: 
+`Serverless ExpressJS function (Integration with API Gateway)`
+? Do you want to configure advanced settings? 
+`N`
+? Do you want to edit the local lambda function now? 
+`Y`
+** Note the path that is created with the function code : Edit the file in your editor: /Users/mzraghib/Desktop/amplify-ui-android/samples/liveness/amplify/backend/function/aa/src/app.js
+**
+? Restrict API access?
+`Y`
+? Who should have access? 
+`N`
+? Do you want to configure advanced settings? 
+`Authenticated users only`
+? What permissions do you want to grant to Authenticated users? 
+`create,read,update`
+? Do you want to add another path?  
+`Y`
+? Provide a path (e.g., /book/{isbn}): 
+`/liveness/{sessionId}`
+? Choose a Lambda source
+`Create a new Lambda function`
+?  Provide an AWS Lambda function name:
+`getResults`
+? Choose the runtime that you want to use: 
+`NodeJS`
+? Choose the function template that you want to use: 
+`Serverless ExpressJS function (Integration with API Gateway)`
+? Do you want to configure advanced settings? 
+`N`
+? Do you want to edit the local lambda function now? 
+`Y`
+** Note the path that is created with the function code : Edit the file in your editor: /Users/mzraghib/Desktop/amplify-ui-android/samples/liveness/amplify/backend/function/aa/src/app.js
+**
+? Restrict API access?
+`Y`
+? Who should have access? 
+`N`
+```
+2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provi
+4. ```
+amplify push
+```
 ### Run the App
 
 Build and run the project on an Android device in Android Studio. The project requires Android SDK API level 24 (Android 7.0) or higher.

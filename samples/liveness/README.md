@@ -152,10 +152,8 @@ Provide the responses shown after each of the following prompts.
 ? Who should have access? 
 `N`
 ```
-2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provi
-4. ```
-amplify push
-```
+2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provided
+3. Once finished, run `amplify push` to publish your changes. 
 ### Run the App
 
 Build and run the project on an Android device in Android Studio. The project requires Android SDK API level 24 (Android 7.0) or higher.

@@ -56,6 +56,10 @@
         <item quantity="other">* at least %d characters</item>
     </plurals>
 
+    <!-- Phone field specific strings -->
+    <string name="amplify_ui_authenticator_field_phone_search">Search region</string>
+    <string name="amplify_ui_authenticator_field_phone_search_clear">Clear search term</string>
+  
     <!-- Date field specific strings -->
     <string name="amplify_ui_authenticator_field_a11y_date_picker">Select date</string>
 

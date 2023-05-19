@@ -5,7 +5,7 @@
 - **authenticator:** Add a material3 datepicker to date fields. ([#34](https://github.com/aws-amplify/amplify-ui-android/issues/34))
 - **authenticator:** Upgrade to Material 3 1.1.0 ([#31](https://github.com/aws-amplify/amplify-ui-android/issues/31))
 
-[See all changes between 1.0.0-dev-preview.0 and 1.0.0-dev-preview.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.0-dev-preview.0...release_authenticator_v1.0.0-dev-preview.1)
+[See all changes between 1.0.0-dev-preview.0 and 1.0.0-dev-preview.1]([https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.0-dev-preview.0...release_authenticator_v1.0.0-dev-preview.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.0.0-dev-preview.0...release_authenticator_v1.0.0-dev-preview.1))
 
 ## [Release 1.0.0-dev-preview.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.0-dev-preview.0)
 

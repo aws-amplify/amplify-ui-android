@@ -1,3 +1,10 @@
+## [Release 1.0.0-dev-preview.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.0-dev-preview.2)
+
+### Fixes
+- **authenticator:** Log auth exception ([#39](https://github.com/aws-amplify/amplify-ui-android/issues/39))
+
+[See all changes between 1.0.0-dev-preview.1 and 1.0.0-dev-preview.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.0.0-dev-preview.1...release_authenticator_v1.0.0-dev-preview.2)
+
 ## [Release 1.0.0-dev-preview.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.0-dev-preview.1)
 
 ### Features

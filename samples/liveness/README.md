@@ -193,4 +193,6 @@ Provide the responses shown after each of the following prompts.
    5. Name the policy
    6. Choose **Create Policy**
 ### Run the App
-Build and run the project on an Android device in Android Studio. The project requires Android SDK API level 24 (Android 7.0) or higher.
+Build and run the project on an Android device in Android Studio. You may need to go to File -> Sync Project with Gradle Files if you get an error "SDK location not found".
+
+The project requires Android SDK API level 24 (Android 7.0) or higher.

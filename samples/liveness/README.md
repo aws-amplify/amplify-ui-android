@@ -193,6 +193,12 @@ Provide the responses shown after each of the following prompts.
    5. Name the policy
    6. Choose **Create Policy**
 ### Run the App
-Build and run the project on an Android device in Android Studio. You may need to go to File -> Sync Project with Gradle Files if you get an error "SDK location not found".
+
+Delete the generated API files app/src/main/java/[YOUR_API_NAME]
+
+You may need to go to File -> Sync Project with Gradle Files if you get an error "SDK location not found".
+
+Build and run the project on an Android device in Android Studio. 
+
 
 The project requires Android SDK API level 24 (Android 7.0) or higher.

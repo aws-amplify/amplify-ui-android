@@ -462,6 +462,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
 //endregion
 
     private suspend fun handleAuthException(error: AuthException) {
+        logger.warn("Encountered AuthException: $error")
         val state = getState<BaseStateImpl>() ?: return
         when (error) {
             is InvalidParameterException -> {

@@ -39,7 +39,7 @@ interface AuthenticatorMessage {
     /**
      * Indicates an informational update for the user, such as the successful completion of an async process.
      */
-    interface Information : AuthenticatorMessage
+    interface Info : AuthenticatorMessage
 
     /**
      * Indicates an error occurred. You may inspect the [cause] for more information.
@@ -71,14 +71,14 @@ internal abstract class AuthenticatorMessageImpl(
  */
 internal object PasswordResetMessage :
     AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_message_password_reset),
-    AuthenticatorMessage.Information
+    AuthenticatorMessage.Info
 
 /**
  * A confirmation code was sent to the user.
  */
 internal object CodeSentMessage :
     AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_message_code_sent),
-    AuthenticatorMessage.Information
+    AuthenticatorMessage.Info
 
 /**
  * The user cannot reset their password because their account is in an invalid state.

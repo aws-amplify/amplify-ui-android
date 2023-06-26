@@ -118,7 +118,6 @@ Provide the responses shown after each of the following prompts.
     `N`
 ? Do you want to edit the local lambda function now? 
     `Y`
-** Note the path that is created with the function code in your app directory: /amplify-ui-android/samples/liveness/amplify/backend/function/<your_lambda_name>/src/app.js **
 ? Restrict API access?
     `Y`
 ? Who should have access? 
@@ -143,7 +142,6 @@ Provide the responses shown after each of the following prompts.
     `N`
 ? Do you want to edit the local lambda function now? 
     `Y`
-** Note the path that is created with the function code in your app directory: /amplify-ui-android/samples/liveness/amplify/backend/<your_lambda_name>/src/app.js **
 ? Restrict API access?
     `Y`
 ? Who should have access? 

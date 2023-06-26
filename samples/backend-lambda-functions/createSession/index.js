@@ -1,4 +1,3 @@
-
 import {
   RekognitionClient,
   CreateFaceLivenessSessionCommand,

@@ -65,10 +65,9 @@ Provide the responses shown after each of the following prompts.
 ? Select the social providers you want to configure for your user pool: 
     `<hit enter>`
 ```
-4. Update the `AndroidManifest.xml` file in your project according to the steps [here](https://docs.amplify.aws/lib/auth/signin_web_ui/q/platform/android/#update-androidmanifestxml).
-5. Once finished, run `amplify push` to publish your changes.
+4. Once finished, run `amplify push` to publish your changes.
    Upon completion, `amplifyconfiguration.json` should be updated to reference these provisioned backend resources.
-6. Follow the steps below to create an inline policy to enable authenticated app users to access Rekognition, which powers the FaceLivenessDetector.
+5. Follow the steps below to create an inline policy to enable authenticated app users to access Rekognition, which powers the FaceLivenessDetector.
    1. Go to AWS IAM console, then Roles
    2. Select the newly created `unauthRole` for the project (`amplify-<project_name>-<env_name>-<id>-authRole`).
    3. Choose **Add Permissions**, then select **Create Inline Policy**, then choose **JSON** and paste the following:

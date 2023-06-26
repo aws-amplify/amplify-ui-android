@@ -97,7 +97,7 @@ fun Authenticator(
     errorContent: @Composable (state: ErrorState) -> Unit = { AuthenticatorError(it) },
     headerContent: @Composable () -> Unit = {},
     footerContent: @Composable () -> Unit = {},
-    onDisplayMessage: (suspend (AuthenticatorMessage) -> Unit)? = null,
+    onDisplayMessage: ((AuthenticatorMessage) -> Unit)? = null,
     content: @Composable (state: SignedInState) -> Unit
 ) {
     val snackbarState = remember { SnackbarHostState() }

@@ -17,7 +17,12 @@ import com.amplifyframework.core.Action
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.core.Consumer
 import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
+import com.amplifyframework.predictions.aws.models.ColorChallenge
+import com.amplifyframework.predictions.aws.models.ColorChallengeType
+import com.amplifyframework.predictions.aws.models.ColorDisplayInformation
 import com.amplifyframework.predictions.aws.models.FaceTargetChallenge
+import com.amplifyframework.predictions.aws.models.FaceTargetMatchingParameters
+import com.amplifyframework.predictions.aws.models.RgbColor
 import com.amplifyframework.predictions.models.FaceLivenessSession
 import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.options.FaceLivenessSessionOptions
@@ -291,8 +296,43 @@ class LivenessFlowInstrumentationTest {
         }
 
         @OptIn(InternalAmplifyApi::class)
-        val faceTargetChallenge = FaceTargetChallenge()
-        onSessionStarted.captured.accept(FaceLivenessSession(listOf(FaceTargetChallenge, ColorChallenge)))
+        val faceTargetChallenge = FaceTargetChallenge(
+            422f, 683f, 230f, 292f,
+            FaceTargetMatchingParameters(
+                0.7f,
+                0.25f,
+                0.25f,
+                0.15f,
+                0.15f
+            )
+        )
+        val colorChallenge = ColorChallenge(
+            "id",
+            ColorChallengeType.SEQUENTIAL,
+            listOf(
+                ColorDisplayInformation(RgbColor(0,0,0), 75f, false),
+                ColorDisplayInformation(RgbColor(0,255,255), 475f, false),
+                ColorDisplayInformation(RgbColor(255,0,0), 475f, false),
+                ColorDisplayInformation(RgbColor(0,255,0), 475f, false),
+                ColorDisplayInformation(RgbColor(0,0,255), 475f, false),
+                ColorDisplayInformation(RgbColor(255,255,0), 475f, false),
+                ColorDisplayInformation(RgbColor(0,255,0), 475f, false),
+                ColorDisplayInformation(RgbColor(255,0,0), 475f, false),
+            )
+        )
+        onSessionStarted.captured.accept(
+            FaceLivenessSession(
+                listOf(faceTargetChallenge, colorChallenge),
+                {}, // onVideoEvent
+                {}, // onChallengeResponseEvent
+                {}  // stopLivenessSession
+            )
+        )
+
+        composeTestRule.waitUntil(5000) {
+            composeTestRule.onAllNodesWithText("asdlkfjasdf")
+                .fetchSemanticsNodes().size == 1
+        }
 
         composeTestRule.waitForIdle()
 

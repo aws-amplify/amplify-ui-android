@@ -185,9 +185,11 @@ internal fun ChallengeView(
         val videoViewportSize = livenessState.videoViewportSize
 
         if (videoViewportSize != null) {
-            Box(modifier = Modifier
-                .size(videoViewportSize.viewportDpSize)
-                .align(Alignment.Center)) {
+            Box(
+                modifier = Modifier
+                    .size(videoViewportSize.viewportDpSize)
+                    .align(Alignment.Center)
+            ) {
                 AndroidView(
                     { livenessCoordinator.previewTextureView },
                     Modifier

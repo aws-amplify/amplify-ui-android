@@ -98,6 +98,17 @@ fun FaceLivenessDetector(
         return
     }
 
+    // fails challenge if session ID is empty
+    if (sessionId.isBlank()) {
+        LaunchedEffect(key) {
+            isFinished = true
+            currentOnError.accept(
+                FaceLivenessDetectionException.SessionNotFoundException("Session ID cannot be empty.")
+            )
+        }
+        return
+    }
+
     // Locks portrait orientation for duration of challenge and resets on complete
     LockPortraitOrientation()
 

@@ -69,7 +69,7 @@ Provide the responses shown after each of the following prompts.
    Upon completion, `amplifyconfiguration.json` should be updated to reference these provisioned backend resources.
 5. Follow the steps below to create an inline policy to enable authenticated app users to access Rekognition, which powers the FaceLivenessDetector.
    1. Go to AWS IAM console, then Roles
-   2. Select the newly created `unauthRole` for the project (`amplify-<project_name>-<env_name>-<id>-authRole`).
+   2. Select the newly created `authRole` for the project (`amplify-<project_name>-<env_name>-<id>-authRole`).
    3. Choose **Add Permissions**, then select **Create Inline Policy**, then choose **JSON** and paste the following:
 
     ```

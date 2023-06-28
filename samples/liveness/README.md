@@ -145,7 +145,7 @@ Provide the responses shown after each of the following prompts.
 ? Restrict API access?
     `Y`
 ? Who should have access? 
-    `N`
+    `Authenticated users only`
 ```
 2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provided
 3. Once finished, run `amplify push` to publish your changes. 

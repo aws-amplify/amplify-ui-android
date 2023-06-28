@@ -146,6 +146,8 @@ Provide the responses shown after each of the following prompts.
     `Y`
 ? Who should have access? 
     `Authenticated users only`
+? What permissions do you want to grant to Authenticated users? 
+    `create,read,update`
 ```
 2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provided
 3. Once finished, run `amplify push` to publish your changes. 

@@ -10,7 +10,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import com.amplifyframework.annotations.InternalAmplifyApi
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.core.Action
@@ -36,6 +35,7 @@ import io.mockk.OfTypeMatcher
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
@@ -234,7 +234,7 @@ class LivenessFlowInstrumentationTest {
         var completesSuccessfully = false
         composeTestRule.setContent {
             FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", onComplete = {
-                                                                                           completesSuccessfully = true
+                completesSuccessfully = true
             }, onError = { assertTrue(false) })
         }
 
@@ -295,38 +295,59 @@ class LivenessFlowInstrumentationTest {
                 .fetchSemanticsNodes().size == 1
         }
 
-        @OptIn(InternalAmplifyApi::class)
-        val faceTargetChallenge = FaceTargetChallenge(
-            422f, 683f, 230f, 292f,
-            FaceTargetMatchingParameters(
-                0.7f,
-                0.25f,
-                0.25f,
-                0.15f,
-                0.15f
-            )
+        val faceTargetMatchingParameters = mockk<FaceTargetMatchingParameters>()
+        every { faceTargetMatchingParameters.targetIouThreshold }.returns(0.7f)
+        every { faceTargetMatchingParameters.targetIouWidthThreshold }.returns(0.25f)
+        every { faceTargetMatchingParameters.targetIouHeightThreshold }.returns(0.25f)
+        every { faceTargetMatchingParameters.faceIouWidthThreshold }.returns(0.15f)
+        every { faceTargetMatchingParameters.faceIouHeightThreshold }.returns(0.15f)
+
+        val faceTargetChallenge = mockk<FaceTargetChallenge>()
+        every { faceTargetChallenge.targetWidth }.returns(422f)
+        every { faceTargetChallenge.targetHeight }.returns(683f)
+        every { faceTargetChallenge.targetCenterX }.returns(230f)
+        every { faceTargetChallenge.targetCenterY }.returns(292f)
+        every { faceTargetChallenge.faceTargetMatching }.returns(faceTargetMatchingParameters)
+
+        val colors = listOf(
+            RgbColor(0, 0, 0),
+            RgbColor(0, 255, 255),
+            RgbColor(255, 0, 0),
+            RgbColor(0, 255, 0),
+            RgbColor(0, 0, 255),
+            RgbColor(255, 255, 0),
+            RgbColor(0, 255, 0),
+            RgbColor(255, 0, 0),
         )
-        val colorChallenge = ColorChallenge(
-            "id",
-            ColorChallengeType.SEQUENTIAL,
-            listOf(
-                ColorDisplayInformation(RgbColor(0,0,0), 75f, false),
-                ColorDisplayInformation(RgbColor(0,255,255), 475f, false),
-                ColorDisplayInformation(RgbColor(255,0,0), 475f, false),
-                ColorDisplayInformation(RgbColor(0,255,0), 475f, false),
-                ColorDisplayInformation(RgbColor(0,0,255), 475f, false),
-                ColorDisplayInformation(RgbColor(255,255,0), 475f, false),
-                ColorDisplayInformation(RgbColor(0,255,0), 475f, false),
-                ColorDisplayInformation(RgbColor(255,0,0), 475f, false),
-            )
+        val durations = listOf(
+            75f,
+            475f,
+            475f,
+            475f,
+            475f,
+            475f,
+            475f,
+            475f,
         )
+        val challengeColors = List(colors.size) {
+            val colorDisplayInformation = mockk<ColorDisplayInformation>()
+            every { colorDisplayInformation.color }.returns(colors[it])
+            every { colorDisplayInformation.duration }.returns(durations[it])
+            every { colorDisplayInformation.shouldScroll }.returns(false)
+            colorDisplayInformation
+        }
+        val colorChallenge = mockk<ColorChallenge>()
+        every { colorChallenge.challengeId }.returns("id")
+        every { colorChallenge.challengeType }.returns(ColorChallengeType.SEQUENTIAL)
+        every { colorChallenge.challengeColors }.returns(challengeColors)
+
         onSessionStarted.captured.accept(
             FaceLivenessSession(
                 listOf(faceTargetChallenge, colorChallenge),
                 {}, // onVideoEvent
                 {}, // onChallengeResponseEvent
-                {}  // stopLivenessSession
-            )
+                {}, // stopLivenessSession
+            ),
         )
 
         composeTestRule.waitUntil(5000) {

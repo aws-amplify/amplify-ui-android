@@ -1,3 +1,10 @@
+## [Release 1.0.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.0.3)
+
+### Bug Fixes
+- **liveness:** check for empty session ID ([#50](https://github.com/aws-amplify/amplify-ui-android/issues/53))
+
+[See all changes between 1.0.2 and 1.0.3](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.0.2...release_liveness_v1.0.3)
+
 ## [Release 1.0.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.0.2)
 
 ### Bug Fixes

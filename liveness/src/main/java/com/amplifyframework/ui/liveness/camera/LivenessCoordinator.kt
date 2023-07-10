@@ -217,10 +217,6 @@ internal class LivenessCoordinator(
         onChallengeFailed.accept(faceLivenessException)
     }
 
-    fun processCountdownComplete() {
-        livenessState.onCountdownComplete()
-    }
-
     fun processColorDisplayed(
         currentColor: RgbColor,
         previousColor: RgbColor,

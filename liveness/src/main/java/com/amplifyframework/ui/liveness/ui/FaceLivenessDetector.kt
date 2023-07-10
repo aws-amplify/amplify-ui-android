@@ -56,7 +56,6 @@ import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
-import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
 import com.amplifyframework.ui.liveness.util.hasCameraPermission
 import kotlinx.coroutines.launch
@@ -309,16 +308,6 @@ internal fun ChallengeView(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             InstructionMessage(livenessState.livenessCheckState.value)
-                            if (livenessState.livenessCheckState.value is
-                                LivenessCheckState.Initial && livenessState.countdownRunning
-                            ) {
-                                CountdownView(
-                                    key = key,
-                                    durationInSeconds = 3f
-                                ) {
-                                    livenessCoordinator.processCountdownComplete()
-                                }
-                            }
                         }
                     }
                 }

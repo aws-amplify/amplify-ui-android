@@ -426,7 +426,6 @@ internal class FaceDetector(private val livenessState: LivenessState) {
          */
         const val NUM_COORDS = 16
         const val INITIAL_FACE_DISTANCE_THRESHOLD = 0.32f
-        const val FACE_DISTANCE_THRESHOLD_COUNTDOWN = 0.37f
 
         fun loadModel(context: Context): Interpreter {
             val modelFileDescriptor =

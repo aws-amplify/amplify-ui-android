@@ -50,12 +50,11 @@ internal data class LivenessState(
 ) {
     var videoViewportSize: VideoViewportSize? by mutableStateOf(null)
     var livenessCheckState = mutableStateOf<LivenessCheckState>(
-        LivenessCheckState.Initial.withHoldFaceMessage()
+        LivenessCheckState.Initial()
     )
     var runningFreshness by mutableStateOf(false)
     var faceGuideRect: RectF? by mutableStateOf(null)
     var faceMatchPercentage: Float by mutableStateOf(0.25f)
-    var countdownRunning by mutableStateOf(false)
     var initialFaceDistanceCheckPassed by mutableStateOf(false)
     var initialLocalFaceFound by mutableStateOf(false)
 
@@ -84,12 +83,6 @@ internal data class LivenessState(
         }
     }
 
-    fun onCountdownComplete() {
-        livenessCheckState.value = LivenessCheckState.Running()
-        countdownRunning = false
-        readyForOval = true
-    }
-
     fun onError(stopLivenessSession: Boolean) {
         livenessCheckState.value = LivenessCheckState.Error
         readyForOval = false
@@ -101,13 +94,13 @@ internal data class LivenessState(
     }
 
     fun onLivenessSessionReady(faceLivenessSession: FaceLivenessSession) {
-        livenessCheckState.value = LivenessCheckState.Initial.withHoldFaceMessage()
         livenessSessionInfo = faceLivenessSession
         faceTargetChallenge = faceLivenessSession.challenges
             .filterIsInstance<FaceTargetChallenge>().firstOrNull()
         colorChallenge = faceLivenessSession.challenges
             .filterIsInstance<ColorChallenge>().firstOrNull()
-        countdownRunning = true
+        livenessCheckState.value = LivenessCheckState.Running()
+        readyForOval = true
     }
 
     fun onFullChallengeComplete() {
@@ -164,18 +157,8 @@ internal data class LivenessState(
         }
         when (faceCount) {
             0 -> {
-                if (!initialLocalFaceFound ||
-                    (!countdownRunning && livenessCheckState.value is LivenessCheckState.Initial)
-                ) {
+                if (!initialLocalFaceFound || livenessCheckState.value is LivenessCheckState.Initial) {
                     livenessCheckState.value = LivenessCheckState.Initial.withMoveFaceMessage()
-                } else if (
-                    countdownRunning && livenessCheckState.value is LivenessCheckState.Initial
-                ) {
-                    val error = FaceLivenessDetectionException(
-                        message = "Check failed during countdown.",
-                        recoverySuggestion = "No face detected during the countdown."
-                    )
-                    onSessionError(error, true)
                 } else if (livenessCheckState.value is LivenessCheckState.Running) {
                     livenessCheckState.value = LivenessCheckState.Running.withMoveFaceMessage()
                 }
@@ -186,18 +169,8 @@ internal data class LivenessState(
                 }
             }
             else -> {
-                if (!initialLocalFaceFound ||
-                    (!countdownRunning && livenessCheckState.value is LivenessCheckState.Initial)
-                ) {
+                if (!initialLocalFaceFound || livenessCheckState.value is LivenessCheckState.Initial) {
                     livenessCheckState.value = LivenessCheckState.Initial.withMultipleFaceMessage()
-                } else if (countdownRunning &&
-                    livenessCheckState.value is LivenessCheckState.Initial
-                ) {
-                    val error = FaceLivenessDetectionException(
-                        message = "Check failed during countdown.",
-                        recoverySuggestion = "Multiple faces detected during the countdown."
-                    )
-                    onSessionError(error, true)
                 } else if (livenessCheckState.value is LivenessCheckState.Running) {
                     livenessCheckState.value = LivenessCheckState.Running.withMultipleFaceMessage()
                 }
@@ -211,7 +184,7 @@ internal data class LivenessState(
         rightEye: FaceDetector.Landmark,
         mouth: FaceDetector.Landmark
     ) {
-        if (!countdownRunning && !initialFaceDistanceCheckPassed) {
+        if (!initialFaceDistanceCheckPassed) {
             val faceDistance = FaceDetector.calculateFaceDistance(
                 leftEye, rightEye, mouth,
                 LivenessCoordinator.TARGET_WIDTH, LivenessCoordinator.TARGET_HEIGHT
@@ -222,20 +195,6 @@ internal data class LivenessState(
             } else {
                 initialFaceDistanceCheckPassed = true
                 onFaceDistanceCheckPassed()
-            }
-        }
-
-        if (countdownRunning && livenessCheckState.value is LivenessCheckState.Initial) {
-            val faceDistance = FaceDetector.calculateFaceDistance(
-                leftEye, rightEye, mouth,
-                LivenessCoordinator.TARGET_WIDTH, LivenessCoordinator.TARGET_HEIGHT
-            )
-            if (faceDistance >= FaceDetector.FACE_DISTANCE_THRESHOLD_COUNTDOWN) {
-                val error = FaceLivenessDetectionException(
-                    message = "Check failed during countdown.",
-                    recoverySuggestion = "User should not move closer during the countdown."
-                )
-                onSessionError(error, true)
             }
         }
 

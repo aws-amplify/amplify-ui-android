@@ -56,7 +56,6 @@ import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
-import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
 import com.amplifyframework.ui.liveness.util.hasCameraPermission
 import kotlinx.coroutines.launch
@@ -94,6 +93,17 @@ fun FaceLivenessDetector(
         LaunchedEffect(key) {
             isFinished = true
             currentOnError.accept(FaceLivenessDetectionException.CameraPermissionDeniedException())
+        }
+        return
+    }
+
+    // fails challenge if session ID is empty
+    if (sessionId.isBlank()) {
+        LaunchedEffect(key) {
+            isFinished = true
+            currentOnError.accept(
+                FaceLivenessDetectionException.SessionNotFoundException("Session ID cannot be empty.")
+            )
         }
         return
     }
@@ -185,12 +195,18 @@ internal fun ChallengeView(
         val videoViewportSize = livenessState.videoViewportSize
 
         if (videoViewportSize != null) {
-            AndroidView(
-                { livenessCoordinator.previewTextureView },
-                Modifier
+            Box(
+                modifier = Modifier
                     .size(videoViewportSize.viewportDpSize)
                     .align(Alignment.Center)
-            )
+            ) {
+                AndroidView(
+                    { livenessCoordinator.previewTextureView },
+                    Modifier
+                        .size(videoViewportSize.viewportDpSize)
+                        .align(Alignment.Center)
+                )
+            }
 
             livenessState.faceGuideRect?.let {
                 FaceGuide(
@@ -292,16 +308,6 @@ internal fun ChallengeView(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             InstructionMessage(livenessState.livenessCheckState.value)
-                            if (livenessState.livenessCheckState.value is
-                                LivenessCheckState.Initial && livenessState.countdownRunning
-                            ) {
-                                CountdownView(
-                                    key = key,
-                                    durationInSeconds = 3f
-                                ) {
-                                    livenessCoordinator.processCountdownComplete()
-                                }
-                            }
                         }
                     }
                 }

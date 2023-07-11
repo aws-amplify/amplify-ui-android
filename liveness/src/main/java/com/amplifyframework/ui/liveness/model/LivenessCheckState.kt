@@ -20,15 +20,12 @@ import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 
 internal sealed class LivenessCheckState(val instructionId: Int? = null) {
-    class Initial(instructionId: Int) : LivenessCheckState(instructionId) {
+    class Initial(instructionId: Int? = null) : LivenessCheckState(instructionId) {
         companion object {
             fun withMoveFaceMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_move_face)
             fun withMultipleFaceMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_multiple_faces_detected)
-            fun withHoldFaceMessage() = Initial(
-                R.string.amplify_ui_liveness_challenge_instruction_hold_face_during_countdown
-            )
             fun withMoveFaceFurtherAwayMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_move_face_further)
             fun withConnectingMessage() =

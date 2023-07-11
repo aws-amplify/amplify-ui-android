@@ -34,7 +34,6 @@
     <string name="amplify_ui_liveness_get_ready_step_3">Move to a well-lit place that is not in direct sunlight.</string>
     <string name="amplify_ui_liveness_get_ready_begin_check">Begin check</string>
     <string name="amplify_ui_liveness_challenge_recording_indicator_label">REC</string>
-    <string name="amplify_ui_liveness_challenge_instruction_hold_face_during_countdown">Hold face position during countdown</string>
     <string name="amplify_ui_liveness_challenge_instruction_hold_face_during_freshness">Hold still</string>
     <string name="amplify_ui_liveness_challenge_instruction_move_face_further">Move back</string>
     <string name="amplify_ui_liveness_challenge_instruction_move_face_closer">Move closer</string>

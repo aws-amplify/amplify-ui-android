@@ -23,7 +23,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.AMPLIFY_UI_ANDROID_CI_TESTS_ROLE }}
+          role-to-assume: ${{ vars.AMPLIFY_UI_ANDROID_CI_TESTS_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
       - name: Run Unit Tests
         uses: aws-actions/aws-codebuild-run-build@v1

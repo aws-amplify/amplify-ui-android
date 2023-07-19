@@ -23,8 +23,8 @@ class ComponentConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("amplify.android.library")
+            pluginManager.apply("amplify.android.publishing")
             pluginManager.apply("amplify.android.dokka")
-            pluginManager.apply("amplify.android.ktlint")
         }
     }
 }

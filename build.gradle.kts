@@ -21,31 +21,6 @@ plugins {
     alias(libs.plugins.ktlint) apply false
 }
 
-val optInAnnotations = listOf(
-    "com.amplifyframework.annotations.InternalApiWarning",
-    "com.amplifyframework.annotations.InternalAmplifyApi"
-)
-
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType<JavaCompile>().configureEach {
-            options.compilerArgs.apply {
-                add("-Xlint:all")
-                add("-Werror")
-            }
-        }
-        tasks.withType<Test>().configureEach {
-            minHeapSize = "128m"
-            maxHeapSize = "4g"
-        }
-        tasks.withType<KotlinCompile> {
-            compilerOptions {
-                freeCompilerArgs.addAll(optInAnnotations.map { "-opt-in=$it" })
-            }
-        }
-    }
-}
-
 tasks.withType<DokkaTask>().configureEach {
     outputDirectory.set(rootProject.buildDir)
 }

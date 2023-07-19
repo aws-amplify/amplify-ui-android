@@ -17,9 +17,18 @@ import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+val optInAnnotations = listOf(
+    "com.amplifyframework.annotations.InternalApiWarning",
+    "com.amplifyframework.annotations.InternalAmplifyApi"
+)
 
 /**
  * This convention plugin configures an Android library module
@@ -39,6 +48,24 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             group = POM_GROUP
             extensions.configure<LibraryExtension> {
                 configureAndroid(this)
+            }
+
+            tasks.withType<JavaCompile>().configureEach {
+                options.compilerArgs.apply {
+                    add("-Xlint:all")
+                    add("-Werror")
+                }
+            }
+
+            tasks.withType<Test>().configureEach {
+                minHeapSize = "128m"
+                maxHeapSize = "4g"
+            }
+
+            tasks.withType<KotlinCompile> {
+                compilerOptions {
+                    freeCompilerArgs.addAll(optInAnnotations.map { "-opt-in=$it" })
+                }
             }
         }
     }

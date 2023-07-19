@@ -14,12 +14,12 @@ android {
 }
 
 dependencies {
-    api(dependency.amplify.auth)
+    api(libs.amplify.auth)
 
-    implementation(dependency.bundles.compose)
-    implementation(dependency.androidx.lifecycle)
-    implementation(dependency.androidx.compose.viewmodel)
-    coreLibraryDesugaring(dependency.android.desugar)
+    implementation(libs.bundles.compose)
+    implementation(libs.androidx.lifecycle)
+    implementation(libs.androidx.compose.viewmodel)
+    coreLibraryDesugaring(libs.android.desugar)
 
     testImplementation(projects.testing)
 }

@@ -13,13 +13,12 @@ buildscript {
 // Plugin aliases are a warning in Gradle < 8.1, this suppress can be removed after updating
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    alias(dependency.plugins.android.application) apply false
-    alias(dependency.plugins.android.library) apply false
-    id("org.jetbrains.kotlin.android") version "1.8.10" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10" apply false
-    id("org.jetbrains.kotlin.jvm") version "1.7.21" apply false
-    alias(dependency.plugins.dokka)
-    alias(dependency.plugins.ktlint) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.ktlint) apply false
 }
 
 val optInAnnotations = listOf(

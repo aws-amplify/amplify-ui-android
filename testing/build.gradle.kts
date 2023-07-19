@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-    api(dependency.bundles.test)
+    api(libs.bundles.test)
 }

@@ -13,8 +13,10 @@
  * permissions and limitations under the License.
  */
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.ktlint)
 }
 
 java {
@@ -22,11 +24,15 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+ktlint {
+    android.set(true)
+}
+
 dependencies {
-    compileOnly(dependency.plugin.android.gradle)
-    compileOnly(dependency.plugin.kotlin.gradle)
-    compileOnly(dependency.plugin.dokka)
-    compileOnly(dependency.plugin.ktlint)
+    compileOnly(libs.plugin.android.gradle)
+    compileOnly(libs.plugin.kotlin.gradle)
+    compileOnly(libs.plugin.dokka)
+    compileOnly(libs.plugin.ktlint)
 }
 
 gradlePlugin {

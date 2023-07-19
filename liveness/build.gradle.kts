@@ -37,19 +37,19 @@ android {
 
 dependencies {
 
-    api(dependency.amplify.api)
-    api(dependency.amplify.predictions)
+    api(libs.amplify.api)
+    api(libs.amplify.predictions)
 
-    implementation(dependency.bundles.camera)
-    implementation(dependency.bundles.compose)
+    implementation(libs.bundles.camera)
+    implementation(libs.bundles.compose)
 
-    implementation(dependency.androidx.futures)
-    implementation(dependency.androidx.lifecycle)
+    implementation(libs.androidx.futures)
+    implementation(libs.androidx.lifecycle)
 
-    implementation(dependency.kotlin.serialization.json)
+    implementation(libs.kotlin.serialization.json)
 
-    implementation(dependency.tensorflow)
-    implementation(dependency.tensorflow.support)
+    implementation(libs.tensorflow)
+    implementation(libs.tensorflow.support)
 
     testImplementation(projects.testing)
 }

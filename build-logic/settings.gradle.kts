@@ -20,7 +20,7 @@ dependencyResolutionManagement {
         maven("https://plugins.gradle.org/m2/")
     }
     versionCatalogs {
-        create("dependency") {
+        create("libs") {
             from(files("../gradle/libs.versions.toml"))
         }
     }

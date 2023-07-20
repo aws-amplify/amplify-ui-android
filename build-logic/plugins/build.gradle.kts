@@ -30,7 +30,7 @@ ktlint {
 
 dependencies {
     compileOnly(libs.plugin.android.gradle)
-    compileOnly(libs.plugin.kotlin.gradle)
+    compileOnly(libs.plugin.kotlin.android)
     compileOnly(libs.plugin.dokka)
     compileOnly(libs.plugin.ktlint)
 }

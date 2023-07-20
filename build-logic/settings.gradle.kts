@@ -13,14 +13,18 @@
  * permissions and limitations under the License.
  */
 
-plugins {
-    id("amplify.android.library")
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://plugins.gradle.org/m2/")
+    }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
 }
 
-android {
-    namespace = "com.amplifyframework.ui.testing"
-}
-
-dependencies {
-    api(libs.bundles.test)
-}
+rootProject.name = "build-logic"
+include(":plugins")

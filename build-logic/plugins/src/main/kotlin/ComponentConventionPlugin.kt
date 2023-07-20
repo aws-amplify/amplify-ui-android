@@ -13,14 +13,18 @@
  * permissions and limitations under the License.
  */
 
-plugins {
-    id("amplify.android.library")
-}
+import org.gradle.api.Plugin
+import org.gradle.api.Project
 
-android {
-    namespace = "com.amplifyframework.ui.testing"
-}
-
-dependencies {
-    api(libs.bundles.test)
+/**
+ * Shared plugin for UI component libraries
+ */
+class ComponentConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            pluginManager.apply("amplify.android.library")
+            pluginManager.apply("amplify.android.publishing")
+            pluginManager.apply("amplify.android.dokka")
+        }
+    }
 }

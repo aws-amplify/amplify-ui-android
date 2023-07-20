@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -13,14 +14,19 @@
  * permissions and limitations under the License.
  */
 
-plugins {
-    id("amplify.android.library")
-}
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
-android {
-    namespace = "com.amplifyframework.ui.testing"
-}
-
-dependencies {
-    api(libs.bundles.test)
+/**
+ * Applies and configures the KtLint plugin
+ */
+class KtLintConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        target.pluginManager.apply("org.jlleitschuh.gradle.ktlint")
+        target.extensions.configure<KtlintExtension> {
+            android.set(true)
+        }
+    }
 }

@@ -27,10 +27,7 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val optInAnnotations = listOf(
-    "com.amplifyframework.annotations.InternalApiWarning",
-    "com.amplifyframework.annotations.InternalAmplifyApi"
-)
+
 
 /**
  * This convention plugin configures an Android library module
@@ -67,7 +64,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             tasks.withType<KotlinCompile>().configureEach {
                 kotlinOptions {
                     jvmTarget = JavaVersion.VERSION_11.toString()
-                    freeCompilerArgs = freeCompilerArgs + optInAnnotations.map { "-opt-in=$it" }
                 }
             }
         }

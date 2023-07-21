@@ -13,8 +13,16 @@
  * permissions and limitations under the License.
  */
 
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+val optInAnnotations = listOf(
+    "com.amplifyframework.annotations.InternalApiWarning",
+    "com.amplifyframework.annotations.InternalAmplifyApi"
+)
 
 /**
  * Shared plugin for UI component libraries
@@ -25,6 +33,12 @@ class ComponentConventionPlugin : Plugin<Project> {
             pluginManager.apply("amplify.android.library")
             pluginManager.apply("amplify.android.publishing")
             pluginManager.apply("amplify.android.dokka")
+
+            tasks.withType<KotlinCompile>().configureEach {
+                kotlinOptions {
+                    freeCompilerArgs = freeCompilerArgs + optInAnnotations.map { "-opt-in=$it" }
+                }
+            }
         }
     }
 }

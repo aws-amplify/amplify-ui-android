@@ -21,14 +21,13 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.gradleKotlinDsl
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val optInAnnotations = listOf(
-    "com.amplifyframework.annotations.InternalApiWarning",
-    "com.amplifyframework.annotations.InternalAmplifyApi"
-)
+
 
 /**
  * This convention plugin configures an Android library module
@@ -62,9 +61,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 maxHeapSize = "4g"
             }
 
-            tasks.withType<KotlinCompile> {
-                compilerOptions {
-                    freeCompilerArgs.addAll(optInAnnotations.map { "-opt-in=$it" })
+            tasks.withType<KotlinCompile>().configureEach {
+                kotlinOptions {
+                    jvmTarget = JavaVersion.VERSION_11.toString()
                 }
             }
         }
@@ -83,9 +82,12 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         extension.apply {
             compileSdk = 33
 
+            buildFeatures {
+                buildConfig = true
+            }
+
             defaultConfig {
                 minSdk = 24
-                targetSdk = 33
                 testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                 testInstrumentationRunnerArguments += "clearPackageData" to "true"
                 consumerProguardFiles += rootProject.file("configuration/consumer-rules.pro")
@@ -107,14 +109,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_1_8
-                targetCompatibility = JavaVersion.VERSION_1_8
+                sourceCompatibility = JavaVersion.VERSION_11
+                targetCompatibility = JavaVersion.VERSION_11
             }
 
             // Needed when running integration tests. The oauth2 library uses relies on two
             // dependencies (Apache's httpcore and httpclient), both of which include
             // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
-            packagingOptions {
+            packaging {
                 resources.excludes.add("META-INF/DEPENDENCIES")
             }
 

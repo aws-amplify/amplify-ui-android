@@ -32,6 +32,7 @@ dependencies {
     compileOnly(libs.plugin.android.gradle)
     compileOnly(libs.plugin.kotlin.android)
     compileOnly(libs.plugin.dokka)
+    compileOnly(libs.plugin.kover)
     compileOnly(libs.plugin.ktlint)
 }
 
@@ -56,6 +57,10 @@ gradlePlugin {
         register("component") {
             id = "amplify.android.ui.component"
             implementationClass = "ComponentConventionPlugin"
+        }
+        register("kover") {
+            id = "amplify.android.kover"
+            implementationClass = "KoverConventionPlugin"
         }
     }
 }

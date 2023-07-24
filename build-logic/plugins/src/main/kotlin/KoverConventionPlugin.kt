@@ -13,30 +13,23 @@
  * permissions and limitations under the License.
  */
 
+import kotlinx.kover.gradle.plugin.dsl.KoverReportExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-val optInAnnotations = listOf(
-    "com.amplifyframework.annotations.InternalApiWarning",
-    "com.amplifyframework.annotations.InternalAmplifyApi"
-)
+import org.gradle.kotlin.dsl.configure
 
 /**
- * Shared plugin for UI component libraries
+ * Applies and configures the Kover plugin
  */
-class ComponentConventionPlugin : Plugin<Project> {
+class KoverConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("amplify.android.library")
-            pluginManager.apply("amplify.android.publishing")
-            pluginManager.apply("amplify.android.dokka")
-            pluginManager.apply("amplify.android.kover")
+            pluginManager.apply("org.jetbrains.kotlinx.kover")
 
-            tasks.withType<KotlinCompile>().configureEach {
-                kotlinOptions {
-                    freeCompilerArgs = freeCompilerArgs + optInAnnotations.map { "-opt-in=$it" }
+            extensions.configure<KoverReportExtension> {
+                defaults {
+                    // Use the release variant for the default coverage report
+                    mergeWith("release")
                 }
             }
         }

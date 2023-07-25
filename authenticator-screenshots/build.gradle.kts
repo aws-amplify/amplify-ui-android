@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    alias(dependency.plugins.paparazzi)
+    id("amplify.android.library")
+    alias(libs.plugins.paparazzi)
 }
 
 android {
@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    implementation(dependency.bundles.compose)
-    implementation(dependency.test.mockk)
+    implementation(libs.bundles.compose)
+    implementation(libs.test.mockk)
     implementation(projects.authenticator)
 }

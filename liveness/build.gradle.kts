@@ -1,11 +1,7 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+    id("amplify.android.ui.component")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
-apply(from = rootProject.file("configuration/publishing.gradle"))
-
-project.group = properties["POM_GROUP"].toString()
 
 android {
     namespace = "com.amplifyframework.ui.liveness"
@@ -37,29 +33,23 @@ android {
     androidResources {
         noCompress += "tflite"
     }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
 }
 
 dependencies {
 
-    api(dependency.amplify.api)
-    api(dependency.amplify.predictions)
+    api(libs.amplify.api)
+    api(libs.amplify.predictions)
 
-    implementation(dependency.bundles.camera)
-    implementation(dependency.bundles.compose)
+    implementation(libs.bundles.camera)
+    implementation(libs.bundles.compose)
 
-    implementation(dependency.androidx.futures)
-    implementation(dependency.androidx.lifecycle)
+    implementation(libs.androidx.futures)
+    implementation(libs.androidx.lifecycle)
 
-    implementation(dependency.kotlin.serialization.json)
+    implementation(libs.kotlin.serialization.json)
 
-    implementation(dependency.tensorflow)
-    implementation(dependency.tensorflow.support)
+    implementation(libs.tensorflow)
+    implementation(libs.tensorflow.support)
 
     testImplementation(projects.testing)
 }

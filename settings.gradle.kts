@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         gradlePluginPortal()
         google()
@@ -12,9 +13,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
-
-    // Set the prefix used for dependencies declared in gradle/libs.versions.toml
-    defaultLibrariesExtensionName.set("dependency")
 }
 
 rootProject.name = "amplify-ui-android"

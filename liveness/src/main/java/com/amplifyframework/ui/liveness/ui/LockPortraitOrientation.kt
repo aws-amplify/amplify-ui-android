@@ -18,19 +18,23 @@ package com.amplifyframework.ui.liveness.ui
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import com.amplifyframework.ui.liveness.util.findActivity
 
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
-internal fun LockPortraitOrientation() {
+internal fun LockPortraitOrientation(content: @Composable (() -> Unit) -> Unit) {
     val context = LocalContext.current
-    DisposableEffect(Unit) {
-        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
-        val originalOrientation = activity.requestedOrientation
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        onDispose {
+    val activity = context.findActivity() ?: return content {}
+    val originalOrientation by rememberSaveable { mutableStateOf(activity.requestedOrientation) }
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+    // wait until screen is rotated correctly
+    if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+        content {
             activity.requestedOrientation = originalOrientation
         }
     }

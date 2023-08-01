@@ -137,7 +137,7 @@ internal class LivenessCoordinator(
     init {
         MainScope().launch {
             getCameraProvider(context).apply {
-                if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                if (lifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
                     unbindAll()
                     if (this.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
                         bindToLifecycle(

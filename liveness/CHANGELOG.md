@@ -1,3 +1,10 @@
+## [Release 1.1.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.1)
+
+### Features
+- **liveness:** Amplify version bump to 2.11.1 ([#66](https://github.com/aws-amplify/amplify-ui-android/pull/66))
+
+[See all changes between 1.1.0 and 1.1.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.0...release_liveness_v1.1.1)
+
 ## [Release 1.1.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.0)
 
 ### Features

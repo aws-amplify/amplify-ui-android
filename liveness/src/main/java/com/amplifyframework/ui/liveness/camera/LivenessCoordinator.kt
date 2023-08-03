@@ -26,6 +26,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
@@ -136,20 +137,22 @@ internal class LivenessCoordinator(
     init {
         MainScope().launch {
             getCameraProvider(context).apply {
-                unbindAll()
-                if (this.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
-                    bindToLifecycle(
-                        lifecycleOwner,
-                        CameraSelector.DEFAULT_FRONT_CAMERA,
-                        preview,
-                        analysis
-                    )
-                } else {
-                    val faceLivenessException = FaceLivenessDetectionException(
-                        "A front facing camera is required but no front facing camera detected.",
-                        "Enable a front facing camera."
-                    )
-                    processSessionError(faceLivenessException, true)
+                if (lifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
+                    unbindAll()
+                    if (this.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
+                        bindToLifecycle(
+                            lifecycleOwner,
+                            CameraSelector.DEFAULT_FRONT_CAMERA,
+                            preview,
+                            analysis
+                        )
+                    } else {
+                        val faceLivenessException = FaceLivenessDetectionException(
+                            "A front facing camera is required but no front facing camera detected.",
+                            "Enable a front facing camera."
+                        )
+                        processSessionError(faceLivenessException, true)
+                    }
                 }
             }
         }

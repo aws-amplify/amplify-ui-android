@@ -109,33 +109,35 @@ fun FaceLivenessDetector(
     }
 
     // Locks portrait orientation for duration of challenge and resets on complete
-    LockPortraitOrientation()
-
-    Surface(color = MaterialTheme.colorScheme.background) {
-        if (showReadyView) {
-            GetReadyView {
-                showReadyView = false
-            }
-        } else {
-            AlwaysOnMaxBrightnessScreen()
-            ChallengeView(
-                key = key,
-                sessionId = sessionId,
-                region,
-                credentialsProvider = credentialsProvider,
-                onChallengeComplete = {
-                    scope.launch {
-                        isFinished = true
-                        currentOnComplete.call()
-                    }
-                },
-                onChallengeFailed = {
-                    scope.launch {
-                        isFinished = true
-                        currentOnError.accept(it)
-                    }
+    LockPortraitOrientation { resetOrientation ->
+        Surface(color = MaterialTheme.colorScheme.background) {
+            if (showReadyView) {
+                GetReadyView {
+                    showReadyView = false
                 }
-            )
+            } else {
+                AlwaysOnMaxBrightnessScreen()
+                ChallengeView(
+                    key = key,
+                    sessionId = sessionId,
+                    region,
+                    credentialsProvider = credentialsProvider,
+                    onChallengeComplete = {
+                        scope.launch {
+                            isFinished = true
+                            resetOrientation()
+                            currentOnComplete.call()
+                        }
+                    },
+                    onChallengeFailed = {
+                        scope.launch {
+                            isFinished = true
+                            resetOrientation()
+                            currentOnError.accept(it)
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -191,7 +193,6 @@ internal fun ChallengeView(
                 )
             }
     ) {
-
         val videoViewportSize = livenessState.videoViewportSize
 
         if (videoViewportSize != null) {

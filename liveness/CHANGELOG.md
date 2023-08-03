@@ -5,6 +5,8 @@
 * fix(liveness): Added Rekognition backend for Android app and updated README in https://github.com/aws-amplify/amplify-ui-android/pull/59
 * fix(liveness): Screen rotation saves/loads correctly; lifecycle not destroyed at time of use in https://github.com/aws-amplify/amplify-ui-android/pull/65
 
+[See all changes between 1.1.1 and 1.1.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.1...release_liveness_v1.1.2)
+
 ## [Release 1.1.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.1)
 
 ### Features

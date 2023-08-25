@@ -30,6 +30,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Consumer
+import com.amplifyframework.predictions.AWSPredictionsMetadataType
 import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
 import com.amplifyframework.predictions.aws.exceptions.AccessDeniedException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionNotFoundException
@@ -39,6 +40,7 @@ import com.amplifyframework.predictions.aws.models.RgbColor
 import com.amplifyframework.predictions.aws.options.AWSFaceLivenessSessionOptions
 import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.models.VideoEvent
+import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.LivenessState
@@ -168,6 +170,8 @@ internal class LivenessCoordinator(
         val faceLivenessSessionOptions = AWSFaceLivenessSessionOptions.builder().apply {
             this@LivenessCoordinator.credentialsProvider?.let { credentialsProvider(it) }
         }.build()
+
+        AWSPredictionsPlugin.addToUserAgent(AWSPredictionsMetadataType.Liveness, BuildConfig.VERSION_NAME)
 
         AWSPredictionsPlugin.startFaceLivenessSession(
             sessionId,

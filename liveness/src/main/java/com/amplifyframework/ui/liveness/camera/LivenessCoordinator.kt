@@ -31,7 +31,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Consumer
-import com.amplifyframework.predictions.AWSPredictionsMetadataType
 import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
 import com.amplifyframework.predictions.aws.exceptions.AccessDeniedException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionNotFoundException
@@ -174,12 +173,11 @@ internal class LivenessCoordinator(
             this@LivenessCoordinator.credentialsProvider?.let { credentialsProvider(it) }
         }.build()
 
-        AWSPredictionsPlugin.addToUserAgent(AWSPredictionsMetadataType.Liveness, BuildConfig.VERSION_NAME)
-
         AWSPredictionsPlugin.startFaceLivenessSession(
             sessionId,
             faceLivenessSessionInformation,
             faceLivenessSessionOptions,
+            BuildConfig.VERSION_NAME,
             { livenessState.onLivenessSessionReady(it) },
             {
                 disconnectEventReceived = true

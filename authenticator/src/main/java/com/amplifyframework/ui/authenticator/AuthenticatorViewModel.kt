@@ -85,8 +85,12 @@ import org.jetbrains.annotations.VisibleForTesting
 
 internal class AuthenticatorViewModel(
     application: Application,
-    private val authProvider: AuthProvider = RealAuthProvider()
+    private val authProvider: AuthProvider
 ) : AndroidViewModel(application) {
+
+    // Constructor for compose viewModels provider
+    constructor(application: Application) : this(application, RealAuthProvider())
+
     private val logger = Amplify.Logging.forNamespace("Authenticator")
 
     private lateinit var authConfiguration: AmplifyAuthConfiguration

@@ -29,7 +29,7 @@
     <string name="amplify_ui_liveness_get_ready_a11y_wrong_face_fit_icon_content_description">Face does not fill the oval</string>
     <string name="amplify_ui_liveness_get_ready_good_fit">Good fit</string>
     <string name="amplify_ui_liveness_get_ready_too_far">Too far</string>
-    <string name="amplify_ui_liveness_get_ready_step_1">When an oval appears, fill the oval with your face within 7 seconds.</string>
+    <string name="amplify_ui_liveness_get_ready_step_1">When an oval appears, follow the instructions to fit your face in it.</string>
     <string name="amplify_ui_liveness_get_ready_step_2">Make sure your face is not covered with sunglasses or a mask.</string>
     <string name="amplify_ui_liveness_get_ready_step_3">Move to a well-lit place that is not in direct sunlight.</string>
     <string name="amplify_ui_liveness_get_ready_begin_check">Begin check</string>

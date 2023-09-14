@@ -294,7 +294,6 @@ internal class LivenessCoordinator(
         const val TARGET_ENCODE_BITRATE = (1024 * 1024 * .6).toInt()
         const val TARGET_ENCODE_KEYFRAME_INTERVAL = 1 // webm muxer only flushes to file on keyframe
         val TARGET_RESOLUTION_SIZE = Size(TARGET_WIDTH, TARGET_HEIGHT)
-        const val FACE_OVAL_MATCH_TIMEOUT_MS: Long = 7000
         const val DISCONNECT_EVENT_TIMEOUT_MS: Long = 8000
     }
 }

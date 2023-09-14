@@ -263,7 +263,7 @@ internal data class LivenessState(
             // the oval after a period of time
             if (!detectedFaceMatchedOval && !faceOvalMatchTimerStarted) {
                 faceOvalMatchTimerStarted = true
-                Timer().schedule(LivenessCoordinator.FACE_OVAL_MATCH_TIMEOUT_MS) {
+                Timer().schedule(faceTargetChallenge!!.faceTargetMatching.ovalFitTimeout.toLong()) {
                     if (!detectedFaceMatchedOval && faceGuideRect != null) {
                         readyForOval = false
                         val timeoutError =

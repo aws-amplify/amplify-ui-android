@@ -1,3 +1,10 @@
+## [Release 1.0.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.1)
+
+### Fixes
+- **authenticator:** Add error messages when a TOTP next step is received ([#76](https://github.com/aws-amplify/amplify-ui-android/issues/76))
+
+[See all changes between 1.0.0 and 1.0.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.0.0...release_authenticator_v1.0.1)
+
 ## [Release 1.0.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.0)
 
 ### Fixes

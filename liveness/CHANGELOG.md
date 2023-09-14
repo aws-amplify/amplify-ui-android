@@ -1,3 +1,14 @@
+## [Release 1.1.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.3)
+
+## Bug Fixes
+* fix(liveness): Add version to liveness websocket user agent https://github.com/aws-amplify/amplify-ui-android/pull/73
+* fix(liveness): Use server facematch timeout https://github.com/aws-amplify/amplify-ui-android/pull/74
+
+## Miscellaneous
+* Amplify version bump https://github.com/aws-amplify/amplify-ui-android/pull/75
+
+[See all changes between 1.1.2 and 1.1.3](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.2...release_liveness_v1.1.3)
+
 ## [Release 1.1.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.2)
 ## Bug Fixes
 * Update Amplify min version for Liveness in https://github.com/aws-amplify/amplify-ui-android/pull/68

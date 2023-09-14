@@ -40,6 +40,7 @@ import com.amplifyframework.predictions.aws.models.RgbColor
 import com.amplifyframework.predictions.aws.options.AWSFaceLivenessSessionOptions
 import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.models.VideoEvent
+import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.LivenessState
@@ -176,6 +177,7 @@ internal class LivenessCoordinator(
             sessionId,
             faceLivenessSessionInformation,
             faceLivenessSessionOptions,
+            BuildConfig.VERSION_NAME,
             { livenessState.onLivenessSessionReady(it) },
             {
                 disconnectEventReceived = true

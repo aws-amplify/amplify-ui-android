@@ -81,12 +81,15 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.annotations.VisibleForTesting
 
-internal class AuthenticatorViewModel(application: Application) : AndroidViewModel(application) {
+internal class AuthenticatorViewModel(
+    application: Application,
+    private val authProvider: AuthProvider
+) : AndroidViewModel(application) {
 
-    companion object {
-        var authProvider: AuthProvider = RealAuthProvider()
-    }
+    // Constructor for compose viewModels provider
+    constructor(application: Application) : this(application, RealAuthProvider())
 
     private val logger = Amplify.Logging.forNamespace("Authenticator")
 
@@ -102,7 +105,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
         get() = stepState.value
 
     // Gets the current state or null if the current state is not the parameter type
-    private inline fun <reified T> getState(): T? = currentState as? T
+    private inline fun <reified T> currentStateAs(): T? = currentState as? T
 
     private val _events = MutableSharedFlow<AuthenticatorMessage>(
         extraBufferCapacity = 1,
@@ -230,7 +233,8 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     //endregion
     //region SignIn
 
-    private suspend fun signIn(username: String, password: String) {
+    @VisibleForTesting
+    suspend fun signIn(username: String, password: String) {
         viewModelScope.launch {
             when (val result = authProvider.signIn(username, password)) {
                 is AmplifyResult.Error -> handleSignInFailure(username, password, result.error)
@@ -292,7 +296,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
     }
 
     private suspend fun handleSignInSuccess(username: String, password: String, result: AuthSignInResult) {
-        when (result.nextStep.signInStep) {
+        when (val nextStep = result.nextStep.signInStep) {
             AuthSignInStep.DONE -> checkVerificationMechanisms()
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE -> moveTo(
                 stateFactory.newSignInMfaState(
@@ -316,6 +320,26 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
             // This step isn't actually returned, it comes back as a UserNotConfirmedException.
             // Handling here for future correctness
             AuthSignInStep.CONFIRM_SIGN_UP -> handleUnconfirmedSignIn(username, password)
+            // Show an error for TOTP next step
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP,
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> {
+                val exception = AuthException(
+                    "Authenticator does not yet support TOTP workflows.",
+                    "Disable TOTP to use Authenticator."
+                )
+                logger.error("Unsupported next step $nextStep", exception)
+                sendMessage(UnknownErrorMessage(exception))
+            }
+            else -> {
+                // Generic error for any other next steps that may be added in the future
+                val exception = AuthException(
+                    "Unsupported next step $nextStep.",
+                    "Authenticator does not support this Authentication flow, disable it to use Authenticator."
+                )
+                logger.error("Unsupported next step $nextStep", exception)
+                sendMessage(UnknownErrorMessage(exception))
+            }
         }
     }
 
@@ -463,7 +487,7 @@ internal class AuthenticatorViewModel(application: Application) : AndroidViewMod
 
     private suspend fun handleAuthException(error: AuthException) {
         logger.warn("Encountered AuthException: $error")
-        val state = getState<BaseStateImpl>() ?: return
+        val state = currentStateAs<BaseStateImpl>() ?: return
         when (error) {
             is InvalidParameterException -> {
                 // TODO : This happens if a field is invalid format e.g. phone number

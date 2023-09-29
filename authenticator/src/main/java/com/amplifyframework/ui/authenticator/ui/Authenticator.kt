@@ -16,15 +16,14 @@
 package com.amplifyframework.ui.authenticator.ui
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
@@ -76,7 +75,6 @@ import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
  * @param onDisplayMessage Override the default handling for displaying an [AuthenticatorMessage].
  * @param content The content shown when the Authenticator reaches the [SignedInState].
  */
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Authenticator(
     modifier: Modifier = Modifier,
@@ -111,7 +109,8 @@ fun Authenticator(
         Box(modifier = modifier) {
             AnimatedContent(
                 targetState = stepState,
-                transitionSpec = { defaultTransition() }
+                transitionSpec = { defaultTransition() },
+                label = "AuthenticatorContentTransition"
             ) { targetState ->
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState())
@@ -152,16 +151,14 @@ fun Authenticator(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
-internal fun AnimatedContentScope<AuthenticatorStepState>.defaultTransition(): ContentTransform {
+internal fun AnimatedContentTransitionScope<AuthenticatorStepState>.defaultTransition(): ContentTransform {
     // Show reverse transition when going back to signIn
     if (targetState is SignInState && initialState != LoadingState) {
-        return fadeIn(animationSpec = tween(220, delayMillis = 90)) with
-            scaleOut(targetScale = 0.92f, animationSpec = tween(90)) +
-                fadeOut(animationSpec = tween(90))
+        return fadeIn(animationSpec = tween(220, delayMillis = 90)) togetherWith
+            scaleOut(targetScale = 0.92f, animationSpec = tween(90)) + fadeOut(animationSpec = tween(90))
     }
     // Show forward transition for all others
     return fadeIn(animationSpec = tween(220, delayMillis = 90)) +
-        scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
+        scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) togetherWith
         fadeOut(animationSpec = tween(90))
 }

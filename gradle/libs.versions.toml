@@ -1,5 +1,5 @@
 [versions]
-agp = "8.0.0"
+agp = "8.1.2"
 amplify = "2.13.1"
 cameraX = "1.2.0"
 compose = "1.3.2"

@@ -17,4 +17,6 @@
     <!-- Confirmation Code Screen -->
     <string name="amplify_ui_authenticator_confirmation_code_sent">A confirmation code has been sent to <b>%s</b>.</string>
     <string name="amplify_ui_authenticator_confirmation_code_sent_unknown">A confirmation code has been sent.</string>
+    <!-- TOTP Code Screen -->
+    <string name="amplify_ui_authenticator_enter_totp_code">Please enter the code from your registered Authenticator app</string>
 </resources>

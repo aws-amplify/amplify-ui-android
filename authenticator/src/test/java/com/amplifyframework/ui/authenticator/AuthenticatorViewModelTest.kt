@@ -141,7 +141,7 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
-    fun `TOTP Code next step is unsupported`() = runTest {
+    fun `TOTP Code next step shows the SignInConfirmTotpCode screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE)
@@ -149,10 +149,8 @@ class AuthenticatorViewModelTest {
 
         viewModel.start(mockAuthConfiguration(initialStep = AuthenticatorStep.SignIn))
 
-        viewModel.events.test {
-            viewModel.signIn("username", "password")
-            awaitItem().shouldBeError(causeMessage = "Authenticator does not yet support TOTP workflows.")
-        }
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmTotpCode
     }
 
     @Test

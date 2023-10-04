@@ -22,4 +22,5 @@
     <string name="amplify_ui_authenticator_title_password_reset">Reset Password</string>
     <string name="amplify_ui_authenticator_title_signup_confirm">Enter your confirmation code</string>
     <string name="amplify_ui_authenticator_title_verify_user">Account recovery requires verified contact information</string>
+    <string name="amplify_ui_authenticator_title_signin_confirm_totp">Enter your one-time passcode</string>
 </resources>

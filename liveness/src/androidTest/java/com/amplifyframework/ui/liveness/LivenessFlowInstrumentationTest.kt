@@ -27,6 +27,7 @@ import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.options.FaceLivenessSessionOptions
 import com.amplifyframework.ui.liveness.camera.FrameAnalyzer
 import com.amplifyframework.ui.liveness.ml.FaceDetector
+import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.ui.FaceLivenessDetector
 import io.mockk.CapturingSlot
@@ -66,7 +67,8 @@ class LivenessFlowInstrumentationTest {
     private lateinit var noFaceString: String
     private lateinit var multipleFaceString: String
     private lateinit var connectingString: String
-    private lateinit var countdownString: String
+    private lateinit var moveCloserString: String
+    private lateinit var holdStillString: String
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -102,8 +104,9 @@ class LivenessFlowInstrumentationTest {
             R.string.amplify_ui_liveness_challenge_instruction_multiple_faces_detected,
         )
         connectingString = context.getString(R.string.amplify_ui_liveness_challenge_connecting)
-        countdownString = context.getString(
-            R.string.amplify_ui_liveness_challenge_instruction_hold_face_during_countdown,
+        moveCloserString = context.getString(R.string.amplify_ui_liveness_challenge_instruction_move_face_closer)
+        holdStillString = context.getString(
+            R.string.amplify_ui_liveness_challenge_instruction_hold_face_during_freshness,
         )
     }
 
@@ -303,10 +306,11 @@ class LivenessFlowInstrumentationTest {
         every { faceTargetMatchingParameters.faceIouHeightThreshold }.returns(0.15f)
 
         val faceTargetChallenge = mockk<FaceTargetChallenge>()
-        every { faceTargetChallenge.targetWidth }.returns(422f)
-        every { faceTargetChallenge.targetHeight }.returns(683f)
-        every { faceTargetChallenge.targetCenterX }.returns(230f)
-        every { faceTargetChallenge.targetCenterY }.returns(292f)
+        val faceRect = RectF(19f, -49f, 441f, 633f)
+        every { faceTargetChallenge.targetWidth }.returns(faceRect.right - faceRect.left)
+        every { faceTargetChallenge.targetHeight }.returns(faceRect.bottom - faceRect.top)
+        every { faceTargetChallenge.targetCenterX }.returns((faceRect.left + faceRect.right) / 2)
+        every { faceTargetChallenge.targetCenterY }.returns((faceRect.top + faceRect.bottom) / 2)
         every { faceTargetChallenge.faceTargetMatching }.returns(faceTargetMatchingParameters)
 
         val colors = listOf(
@@ -350,22 +354,43 @@ class LivenessFlowInstrumentationTest {
             ),
         )
 
-        composeTestRule.waitUntil(5000) {
-            composeTestRule.onAllNodesWithText("asdlkfjasdf")
+        // update face location to show oval
+        livenessState?.onFrameFaceUpdate(
+            RectF(0f, 0f, 400f, 400f),
+            FaceDetector.Landmark(60f, 60f),
+            FaceDetector.Landmark(140f, 60f),
+            FaceDetector.Landmark(100f, 160f),
+        )
+
+        // in the same spot as it was originally, the face is too far
+        composeTestRule.waitUntil(1000) {
+            composeTestRule.onAllNodesWithText(moveCloserString)
                 .fetchSemanticsNodes().size == 1
         }
 
         composeTestRule.waitForIdle()
+
+        // update face to be inside the oval position
+        livenessState?.onFrameFaceUpdate(
+            faceRect,
+            FaceDetector.Landmark(60f, 60f),
+            FaceDetector.Landmark(140f, 60f),
+            FaceDetector.Landmark(100f, 160f),
+        )
+
+        // now, the face is inside the oval.  wait for the colors to finish
+        composeTestRule.waitForIdle()
+
+        assertTrue(livenessState?.readyToSendFinalEvents == true)
+        val state = livenessState?.livenessCheckState?.value
+        assertTrue(state is LivenessCheckState.Success)
+        assertTrue((state as LivenessCheckState.Success).faceGuideRect == faceRect)
 
         onLivenessComplete.captured.call()
         assertTrue(completesSuccessfully)
 
         unmockkConstructor(FrameAnalyzer::class)
     }
-
-    // TODO: this gets to the camera page!  next up:
-    //      1. figure out how to trigger the next step
-    //      2. test on virtual device, might be fine...
 
     companion object {
         @BeforeClass

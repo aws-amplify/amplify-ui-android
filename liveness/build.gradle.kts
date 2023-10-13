@@ -57,11 +57,11 @@ dependencies {
     implementation(libs.tensorflow.support)
 
     testImplementation(projects.testing)
-    androidTestImplementation(dependency.amplify.auth)
-    androidTestImplementation(dependency.test.compose.junit)
-    androidTestImplementation(dependency.test.androidx.monitor)
-    androidTestImplementation(dependency.test.androidx.rules)
-    androidTestImplementation(dependency.test.junit)
-    androidTestImplementation(dependency.test.mockk.android)
-    debugImplementation(dependency.debug.ui.test.manifest)
+    androidTestImplementation(libs.amplify.auth)
+    androidTestImplementation(libs.test.compose.junit)
+    androidTestImplementation(libs.test.androidx.monitor)
+    androidTestImplementation(libs.test.androidx.rules)
+    androidTestImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.mockk.android)
+    debugImplementation(libs.debug.ui.test.manifest)
 }

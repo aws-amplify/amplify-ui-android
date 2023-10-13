@@ -42,21 +42,13 @@ import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkConstructor
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
-// mock calls to Rekognition service, just make sure the flow functions as normal
-// steps:
-// 1. start the flow
-// 2. click the button to start the liveness session
-// 3. verify that the flow was started and shows correct face distance UI
-// 4. trigger fake response that the face is at the right distance
-// 5. verify that the flow displays colored rectangles
-// 6. verify that the component is sending the video feed through the fake websocket
-// 7. send fake correct/incorrect response
 class LivenessFlowInstrumentationTest {
     private lateinit var livenessSessionInformation: CapturingSlot<FaceLivenessSessionInformation>
     private lateinit var livenessSessionOptions: CapturingSlot<FaceLivenessSessionOptions>
@@ -69,6 +61,7 @@ class LivenessFlowInstrumentationTest {
     private lateinit var connectingString: String
     private lateinit var moveCloserString: String
     private lateinit var holdStillString: String
+    private var framesSent = 0
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -95,6 +88,11 @@ class LivenessFlowInstrumentationTest {
                 any(), // onError
             )
         } just Runs
+
+        mockkConstructor(FaceLivenessSession::class)
+        every { anyConstructed<FaceLivenessSession>().sendVideoEvent(any()) }.answers {
+            framesSent++
+        }
 
         // string resources
         beginCheckString = context.getString(R.string.amplify_ui_liveness_get_ready_begin_check)
@@ -353,6 +351,7 @@ class LivenessFlowInstrumentationTest {
                 {}, // stopLivenessSession
             ),
         )
+        var faceUpdates = 0
 
         // update face location to show oval
         livenessState?.onFrameFaceUpdate(
@@ -361,6 +360,7 @@ class LivenessFlowInstrumentationTest {
             FaceDetector.Landmark(140f, 60f),
             FaceDetector.Landmark(100f, 160f),
         )
+        faceUpdates += 1
 
         // in the same spot as it was originally, the face is too far
         composeTestRule.waitUntil(1000) {
@@ -377,14 +377,17 @@ class LivenessFlowInstrumentationTest {
             FaceDetector.Landmark(140f, 60f),
             FaceDetector.Landmark(100f, 160f),
         )
+        faceUpdates += 1
 
         // now, the face is inside the oval.  wait for the colors to finish
         composeTestRule.waitForIdle()
 
-        assertTrue(livenessState?.readyToSendFinalEvents == true)
+        assertEquals(livenessState?.readyToSendFinalEvents, true)
         val state = livenessState?.livenessCheckState?.value
         assertTrue(state is LivenessCheckState.Success)
         assertTrue((state as LivenessCheckState.Success).faceGuideRect == faceRect)
+        // inconsistent number of frames sent
+        assertTrue(framesSent >= faceUpdates)
 
         onLivenessComplete.captured.call()
         assertTrue(completesSuccessfully)

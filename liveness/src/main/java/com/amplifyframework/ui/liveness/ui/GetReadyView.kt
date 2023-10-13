@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.liveness.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -69,7 +70,8 @@ import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.liveness.R
 
 @Composable
-internal fun GetReadyView(readyButtonOnClick: () -> Unit) {
+@VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
+fun GetReadyView(readyButtonOnClick: () -> Unit) {
     val showPhotosensitivityAlert = remember { mutableStateOf(false) }
 
     Column(

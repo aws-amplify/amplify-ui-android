@@ -20,6 +20,7 @@ include(":liveness")
 include(":authenticator")
 include(":testing")
 include(":authenticator-screenshots")
+include(":liveness-screenshots")
 
 // Enable typesafe accessor generation for cross-project references
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

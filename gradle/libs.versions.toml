@@ -4,7 +4,6 @@ amplify = "2.13.1"
 cameraX = "1.2.0"
 compose = "1.3.2"
 coroutines = "1.7.3"
-dokka = "1.8.10"
 lifecycle = "2.4.0"
 kotlin = "1.8.10"
 ktlint = "11.0.0"
@@ -55,7 +54,6 @@ test-turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 # Dependencies for convention plugins
 plugin-android-gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 plugin-kotlin-android = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 plugin-kover = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
 plugin-ktlint = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint" }
 
@@ -78,7 +76,6 @@ test = [
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

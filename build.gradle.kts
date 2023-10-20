@@ -1,7 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-import org.jetbrains.dokka.gradle.DokkaTask
-
 buildscript {
     repositories {
         google()
@@ -14,15 +12,10 @@ buildscript {
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
-    alias(libs.plugins.dokka)
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint) apply false
-}
-
-tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(rootProject.buildDir)
 }
 
 tasks.register<Delete>("clean").configure {

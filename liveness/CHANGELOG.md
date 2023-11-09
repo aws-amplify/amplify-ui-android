@@ -1,7 +1,7 @@
 ## [Release 1.1.4](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.4)
 
 ## Miscellaneous
-* Amplify version bump https://github.com/aws-amplify/amplify-ui-android/pull/89
+* Amplify version bump to fix DST time issue on some devices https://github.com/aws-amplify/amplify-ui-android/pull/89
 
 [See all changes between 1.1.3 and 1.1.4](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.3...release_liveness_v1.1.4)
 

@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace 'com.amplifyframework.ui.sample.liveness'
-    compileSdk 33
+    compileSdk 34
 
     buildFeatures {
         buildConfig true

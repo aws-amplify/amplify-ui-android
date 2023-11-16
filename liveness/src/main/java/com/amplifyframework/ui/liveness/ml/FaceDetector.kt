@@ -197,11 +197,11 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         }
 
         val faceBottom = faceHeight + faceTop
-        val tp = faceBottom - oh
+        val top = faceBottom - oh
         val left = min(cx - ow / 2, rightEar.x)
-        val right = min(cx + ow / 2, leftEar.x)
+        val right = max(cx + ow / 2, leftEar.x)
 
-        return RectF(left, faceTop, right, faceBottom)
+        return RectF(left, top, right, faceBottom)
     }
 
     private fun generateAnchors(): List<Anchor> {

@@ -16,10 +16,12 @@
 package com.amplifyframework.ui.liveness.model
 
 import android.graphics.RectF
+import androidx.annotation.VisibleForTesting
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 
-internal sealed class LivenessCheckState(val instructionId: Int? = null) {
+@VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
+sealed class LivenessCheckState(val instructionId: Int? = null) {
     class Initial(instructionId: Int? = null) : LivenessCheckState(instructionId) {
         companion object {
             fun withMoveFaceMessage() =

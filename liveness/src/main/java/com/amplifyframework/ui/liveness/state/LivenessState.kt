@@ -40,7 +40,8 @@ import kotlin.concurrent.schedule
 
 internal data class InitialStreamFace(val faceRect: RectF, val timestamp: Long)
 
-internal data class LivenessState(
+@VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
+data class LivenessState(
     val sessionId: String,
     val context: Context,
     val onCaptureReady: () -> Unit,

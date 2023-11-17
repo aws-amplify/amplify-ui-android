@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.liveness.ui.helper
 
 import android.graphics.RectF
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
@@ -26,7 +27,8 @@ import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
  * @param viewportPixelSize The size (in pixels) of the video, once scaled to "fitCenter" within the container
  * @param viewportDpSize The size (in dp) of the video, once scaled to "fitCenter" within the container.
  */
-internal data class VideoViewportSize(
+@VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
+data class VideoViewportSize(
     val containerSize: IntSize,
     val viewportPixelSize: IntSize,
     val viewportDpSize: DpSize

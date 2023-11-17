@@ -123,7 +123,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         val renormalizedDetections = mutableListOf<Detection>()
         weightedDetections.forEach { detection ->
             // Change landmark coordinates to be for actual image size instead of model input size
-            val scaledTop = (detection.location.top / Y_SCALE) * TARGET_HEIGHT
+            val scaledBottom = (detection.location.bottom / Y_SCALE) * TARGET_HEIGHT
 
             val scaledLeftEyeX = (detection.leftEye.x / X_SCALE) * TARGET_WIDTH
             val scaledLeftEyeY = (detection.leftEye.y / Y_SCALE) * TARGET_HEIGHT
@@ -148,7 +148,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             // Generate the face bounding box from the landmarks
             val renormalizedBoundingBox =
                 generateBoundingBoxFromLandmarks(
-                    scaledTop,
+                    scaledBottom,
                     scaledLeftEye,
                     scaledRightEye,
                     scaledNose,
@@ -173,7 +173,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
     }
 
     private fun generateBoundingBoxFromLandmarks(
-        faceTop: Float,
+        faceBottom: Float,
         leftEye: Landmark,
         rightEye: Landmark,
         nose: Landmark,
@@ -196,7 +196,6 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             cx = (eyeCenterX + nose.x) / 2
         }
 
-        val faceBottom = faceHeight + faceTop
         val top = faceBottom - oh
         val left = min(cx - ow / 2, rightEar.x)
         val right = max(cx + ow / 2, leftEar.x)

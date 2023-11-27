@@ -57,8 +57,8 @@ object LivenessColorScheme {
             onSurface = Color(0xFF0D1926),
             error = Color(0xFF950404),
             onError = Color.White,
-            errorContainer = Color(0xFFF5D9BC),
-            onErrorContainer = Color(0xFF663300)
+            errorContainer = Color(0xFFB8CEF9),
+            onErrorContainer = Color(0xFF002266)
         )
 
         /** Liveness Dark [ColorScheme] overrides Material3 defaults as necessary */
@@ -71,8 +71,8 @@ object LivenessColorScheme {
             onSurface = Color.White,
             error = Color(0xFFEF8F8F),
             onError = Color(0xFF0D1926),
-            errorContainer = Color(0xFF663300),
-            onErrorContainer = Color(0xFFEFBF8F),
+            errorContainer = Color(0xFF043495),
+            onErrorContainer = Color(0xFFE6EEFE),
         )
     }
 }

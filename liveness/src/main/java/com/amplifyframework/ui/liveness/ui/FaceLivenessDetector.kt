@@ -274,7 +274,7 @@ internal fun ChallengeView(
                             verticalArrangement = Arrangement.spacedBy(5.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            InstructionMessage(livenessState.livenessCheckState.value, true)
+                            InstructionMessage(livenessState.livenessCheckState.value)
                             if (livenessState.livenessCheckState.value.instructionId ==
                                 FaceDetector.FaceOvalPosition.TOO_FAR.instructionStringRes
                             ) {
@@ -299,10 +299,10 @@ internal fun ChallengeView(
                 } else {
                     Box(
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
+                            .align(Alignment.TopCenter)
                             .fillMaxWidth()
                             .padding(16.dp),
-                        contentAlignment = Alignment.BottomCenter
+                        contentAlignment = Alignment.TopCenter
                     ) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(16.dp),

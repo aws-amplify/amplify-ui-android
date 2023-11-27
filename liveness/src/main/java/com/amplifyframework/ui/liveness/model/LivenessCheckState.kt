@@ -19,8 +19,10 @@ import android.graphics.RectF
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 
-internal sealed class LivenessCheckState(val instructionId: Int? = null) {
-    class Initial(instructionId: Int? = null) : LivenessCheckState(instructionId) {
+internal sealed class LivenessCheckState(val instructionId: Int? = null, val isActionable: Boolean = true) {
+    class Initial(
+        instructionId: Int? = null,
+        isActionable: Boolean = true) : LivenessCheckState(instructionId, isActionable) {
         companion object {
             fun withMoveFaceMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_move_face)
@@ -29,10 +31,10 @@ internal sealed class LivenessCheckState(val instructionId: Int? = null) {
             fun withMoveFaceFurtherAwayMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_move_face_further)
             fun withConnectingMessage() =
-                Initial(R.string.amplify_ui_liveness_challenge_connecting)
+                Initial(R.string.amplify_ui_liveness_challenge_connecting, false)
         }
     }
-    class Running(instructionId: Int? = null) : LivenessCheckState(instructionId) {
+    class Running(instructionId: Int? = null) : LivenessCheckState(instructionId, true) {
         companion object {
             fun withMoveFaceMessage() = Running(
                 R.string.amplify_ui_liveness_challenge_instruction_move_face_closer
@@ -44,7 +46,7 @@ internal sealed class LivenessCheckState(val instructionId: Int? = null) {
                 Running(faceOvalPosition.instructionStringRes)
         }
     }
-    object Error : LivenessCheckState()
+    object Error : LivenessCheckState(isActionable = false)
     class Success(val faceGuideRect: RectF) :
-        LivenessCheckState(R.string.amplify_ui_liveness_challenge_verifying)
+        LivenessCheckState(R.string.amplify_ui_liveness_challenge_verifying, false)
 }

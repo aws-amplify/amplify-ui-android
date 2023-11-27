@@ -91,14 +91,6 @@ internal fun GetReadyView(readyButtonOnClick: () -> Unit) {
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            Spacer(modifier = Modifier.size(8.dp))
-
-            Text(
-                text = stringResource(R.string.amplify_ui_liveness_get_ready_page_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -145,41 +137,7 @@ internal fun GetReadyView(readyButtonOnClick: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.amplify_ui_liveness_get_ready_steps_title),
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            BoxWithConstraints {
-                if (maxWidth < 316.dp) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        FaceOvalInstructions()
-                    }
-                } else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
-                    ) {
-                        FaceOvalInstructions()
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Step(1, stringResource(R.string.amplify_ui_liveness_get_ready_step_1))
-            Step(2, stringResource(R.string.amplify_ui_liveness_get_ready_step_2))
-            Step(3, stringResource(R.string.amplify_ui_liveness_get_ready_step_3))
         }
-
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = readyButtonOnClick
@@ -216,124 +174,6 @@ internal fun GetReadyView(readyButtonOnClick: () -> Unit) {
                     )
                 }
             }
-        )
-    }
-}
-
-@Composable
-private fun FaceOvalInstructions() {
-    val successColor = Color(0xFF365E3D)
-    val successBackgroundTextColor = Color(0xFFD6F5DB)
-    val errorColor = Color(0xFF660000)
-    val errorBackgroundTextColor = Color(0xFFF5BCBC)
-    FaceInstructionBox(
-        imageResource = R.drawable.amplify_ui_liveness_face_oval_good_fit,
-        icon = Icons.Filled.Check,
-        iconContentDescriptionResource =
-        R.string.amplify_ui_liveness_get_ready_a11y_good_face_fit_icon_content_description,
-        color = successColor,
-        textResource = R.string.amplify_ui_liveness_get_ready_good_fit,
-        textBackgroundColor = successBackgroundTextColor
-    )
-    FaceInstructionBox(
-        imageResource = R.drawable.amplify_ui_liveness_face_oval_too_far,
-        icon = Icons.Filled.Close,
-        iconContentDescriptionResource =
-        R.string.amplify_ui_liveness_get_ready_a11y_wrong_face_fit_icon_content_description,
-        color = errorColor,
-        textResource = R.string.amplify_ui_liveness_get_ready_too_far,
-        textBackgroundColor = errorBackgroundTextColor
-    )
-}
-
-@Composable
-private fun FaceInstructionBox(
-    imageResource: Int,
-    icon: ImageVector,
-    iconContentDescriptionResource: Int,
-    color: Color,
-    textResource: Int,
-    textBackgroundColor: Color
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-    ) {
-        Box(
-            modifier = Modifier
-                .border(1.dp, color)
-                .size(150.dp)
-                .background(Color.White)
-        ) {
-            Image(
-                painter = painterResource(id = imageResource),
-                contentDescription =
-                stringResource(
-                    R.string.amplify_ui_liveness_get_ready_a11y_illustration_content_description
-                ),
-                contentScale = ContentScale.Fit,
-                alignment = Alignment.Center,
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
-            Icon(
-                imageVector = icon,
-                contentDescription = stringResource(iconContentDescriptionResource),
-                tint = Color.White,
-                modifier = Modifier.background(color)
-            )
-        }
-        Text(
-            text = stringResource(textResource),
-            modifier = Modifier
-                .background(textBackgroundColor)
-                .width(150.dp)
-                .padding(4.dp)
-                .fillMaxHeight(),
-            color = color
-        )
-    }
-}
-
-private class Oval : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        val path = Path().apply {
-            addOval(
-                Rect(
-                    left = size.width * 0.19f,
-                    top = 0f,
-                    right = size.width * 0.81f,
-                    bottom = size.height
-                )
-            )
-        }
-        return Outline.Generic(path = path)
-    }
-}
-
-@Composable
-private fun Step(stepNumber: Int, body: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
-    ) {
-        Text(
-            text = "$stepNumber.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = body,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

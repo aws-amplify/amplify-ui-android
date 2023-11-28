@@ -28,8 +28,8 @@
     <string name="amplify_ui_liveness_challenge_instruction_move_face_further">Move back</string>
     <string name="amplify_ui_liveness_challenge_instruction_move_face_closer">Move closer</string>
     <string name="amplify_ui_liveness_challenge_instruction_move_face">Move face in front of camera</string>
-    <string name="amplify_ui_liveness_challenge_instruction_multiple_faces_detected">Ensure only one face is in front of camera</string>
-    <string name="amplify_ui_liveness_challenge_connecting">Connecting…</string>
+    <string name="amplify_ui_liveness_challenge_instruction_multiple_faces_detected">Only one face per check</string>
+    <string name="amplify_ui_liveness_challenge_connecting">Connecting</string>
     <string name="amplify_ui_liveness_challenge_verifying">Verifying</string>
     <string name="amplify_ui_liveness_challenge_a11y_cancel_content_description">Cancel Challenge</string>
 </resources>

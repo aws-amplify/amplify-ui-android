@@ -20,15 +20,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -56,6 +59,7 @@ import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
+import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
 import com.amplifyframework.ui.liveness.util.hasCameraPermission
 import kotlinx.coroutines.launch
@@ -79,7 +83,6 @@ fun FaceLivenessDetector(
 ) {
     val scope = rememberCoroutineScope()
     val key = Triple(sessionId, region, credentialsProvider)
-    var showReadyView by remember(key) { mutableStateOf(!disableStartView) }
     var isFinished by remember(key) { mutableStateOf(false) }
     val currentOnComplete by rememberUpdatedState(onComplete)
     val currentOnError by rememberUpdatedState(onError)
@@ -111,33 +114,28 @@ fun FaceLivenessDetector(
     // Locks portrait orientation for duration of challenge and resets on complete
     LockPortraitOrientation { resetOrientation ->
         Surface(color = MaterialTheme.colorScheme.background) {
-            if (showReadyView) {
-                GetReadyView {
-                    showReadyView = false
-                }
-            } else {
-                AlwaysOnMaxBrightnessScreen()
-                ChallengeView(
-                    key = key,
-                    sessionId = sessionId,
-                    region,
-                    credentialsProvider = credentialsProvider,
-                    onChallengeComplete = {
-                        scope.launch {
-                            isFinished = true
-                            resetOrientation()
-                            currentOnComplete.call()
-                        }
-                    },
-                    onChallengeFailed = {
-                        scope.launch {
-                            isFinished = true
-                            resetOrientation()
-                            currentOnError.accept(it)
-                        }
+            AlwaysOnMaxBrightnessScreen()
+            ChallengeView(
+                key = key,
+                sessionId = sessionId,
+                region,
+                credentialsProvider = credentialsProvider,
+                disableStartView,
+                onChallengeComplete = {
+                    scope.launch {
+                        isFinished = true
+                        resetOrientation()
+                        currentOnComplete.call()
                     }
-                )
-            }
+                },
+                onChallengeFailed = {
+                    scope.launch {
+                        isFinished = true
+                        resetOrientation()
+                        currentOnError.accept(it)
+                    }
+                }
+            )
         }
     }
 }
@@ -148,6 +146,7 @@ internal fun ChallengeView(
     sessionId: String,
     region: String,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
+    disableStartView: Boolean,
     onChallengeComplete: OnChallengeComplete,
     onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -157,6 +156,7 @@ internal fun ChallengeView(
     var coordinator by remember { mutableStateOf<LivenessCoordinator?>(null) }
     val currentOnChallengeComplete by rememberUpdatedState(onChallengeComplete)
     val currentOnChallengeFailed by rememberUpdatedState(onChallengeFailed)
+    val showPhotosensitivityAlert = remember { mutableStateOf(false) }
 
     DisposableEffect(key) {
         coordinator = LivenessCoordinator(
@@ -165,6 +165,7 @@ internal fun ChallengeView(
             sessionId,
             region,
             credentialsProvider,
+            disableStartView,
             onChallengeComplete = { currentOnChallengeComplete() },
             onChallengeFailed = { currentOnChallengeFailed.accept(it) }
         )
@@ -178,7 +179,9 @@ internal fun ChallengeView(
     val livenessState = livenessCoordinator.livenessState
 
     val localDensity = LocalDensity.current
-    val backgroundColor = if (livenessState.faceGuideRect != null) {
+    val backgroundColor = if (livenessState.showingStartView) {
+        MaterialTheme.colorScheme.background
+    } else if (livenessState.faceGuideRect != null) {
         Color.White
     } else {
         Color.Black
@@ -209,60 +212,34 @@ internal fun ChallengeView(
                 )
             }
 
-            livenessState.faceGuideRect?.let {
+            if (livenessState.showingStartView) {
+
                 FaceGuide(
                     modifier = Modifier
                         .fillMaxSize()
                         .align(Alignment.Center),
-                    faceGuideRect = it,
-                    videoViewportSize = videoViewportSize
+                    // positioned based on 480x640 preview and sized as specified by science
+                    faceGuideRect = RectF(120f, 126f, 360f, 514f),
+                    videoViewportSize = videoViewportSize,
+                    backgroundColor = MaterialTheme.colorScheme.background
                 )
-            }
 
-            if (livenessState.runningFreshness) {
-                FreshnessChallenge(
-                    key,
-                    modifier = Modifier.fillMaxSize(),
-                    colors = livenessState.colorChallenge!!.challengeColors,
-                    onColorDisplayed = { currentColor, previousColor, sequenceNumber, colorStart ->
-                        livenessCoordinator.processColorDisplayed(
-                            currentColor,
-                            previousColor,
-                            sequenceNumber,
-                            colorStart
-                        )
-                    },
-                    onComplete = {
-                        livenessCoordinator.processFreshnessChallengeComplete()
-                    }
-                )
-            }
-
-            livenessState.faceGuideRect?.let {
-                RecordingIndicator(
+                CancelChallengeButton(
                     modifier = Modifier
-                        .align(Alignment.TopStart)
+                        .align(Alignment.TopEnd)
                         .padding(16.dp)
-                )
-            }
+                ) {
+                    livenessCoordinator.processSessionError(
+                        FaceLivenessDetectionException.UserCancelledException(),
+                        true
+                    )
+                }
 
-            CancelChallengeButton(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
-            ) {
-                livenessCoordinator.processSessionError(
-                    FaceLivenessDetectionException.UserCancelledException(),
-                    true
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .size(videoViewportSize.viewportDpSize)
-                    .align(Alignment.Center)
-            ) {
-                if (livenessState.faceGuideRect != null) {
+                Box(
+                    modifier = Modifier
+                        .size(videoViewportSize.viewportDpSize)
+                        .align(Alignment.Center)
+                ) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopCenter)
@@ -270,45 +247,142 @@ internal fun ChallengeView(
                             .padding(24.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(5.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            InstructionMessage(livenessState.livenessCheckState.value)
-                            if (livenessState.livenessCheckState.value.instructionId ==
-                                FaceDetector.FaceOvalPosition.TOO_FAR.instructionStringRes
-                            ) {
-                                val scaledOvalRect = livenessState.faceGuideRect?.let {
-                                    videoViewportSize.getScaledBoundingRect(it)
-                                } ?: RectF()
-                                val progressWidth = with(LocalDensity.current) {
-                                    ((scaledOvalRect.right - scaledOvalRect.left) * 0.6f).toDp()
-                                }
-                                LinearProgressIndicator(
-                                    progress = livenessState.faceMatchPercentage,
-                                    modifier = Modifier
-                                        .clip(MaterialTheme.shapes.small)
-                                        .width(progressWidth)
-                                        .height(12.dp),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    trackColor = MaterialTheme.colorScheme.surface
-                                )
-                            }
+                        InstructionMessage(LivenessCheckState.Initial.withStartViewMessage())
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Column {
+                        PhotosensitivityView {
+                            showPhotosensitivityAlert.value = true
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                livenessState.onStartViewComplete()
+                            }) {
+                            Text("Begin Check")
                         }
                     }
-                } else {
-                    Box(
+                }
+
+                if (showPhotosensitivityAlert.value) {
+                    PhotosensitivityAlert {
+                        showPhotosensitivityAlert.value = false
+                    }
+                }
+            } else {
+
+                livenessState.faceGuideRect?.let {
+                    FaceGuide(
                         modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                        faceGuideRect = it,
+                        videoViewportSize = videoViewportSize
+                    )
+                }
+
+                if (livenessState.runningFreshness) {
+                    FreshnessChallenge(
+                        key,
+                        modifier = Modifier.fillMaxSize(),
+                        colors = livenessState.colorChallenge!!.challengeColors,
+                        onColorDisplayed = { currentColor, previousColor, sequenceNumber, colorStart ->
+                            livenessCoordinator.processColorDisplayed(
+                                currentColor,
+                                previousColor,
+                                sequenceNumber,
+                                colorStart
+                            )
+                        },
+                        onComplete = {
+                            livenessCoordinator.processFreshnessChallengeComplete()
+                        }
+                    )
+                }
+
+                livenessState.faceGuideRect?.let {
+                    RecordingIndicator(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(16.dp)
+                    )
+                }
+
+                CancelChallengeButton(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                ) {
+                    livenessCoordinator.processSessionError(
+                        FaceLivenessDetectionException.UserCancelledException(),
+                        true
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(videoViewportSize.viewportDpSize)
+                        .align(Alignment.Center)
+                ) {
+                    if (livenessState.faceGuideRect != null) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.TopCenter
                         ) {
-                            InstructionMessage(livenessState.livenessCheckState.value)
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(5.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                InstructionMessage(livenessState.livenessCheckState.value)
+                                if (livenessState.livenessCheckState.value.instructionId ==
+                                    FaceDetector.FaceOvalPosition.TOO_FAR.instructionStringRes
+                                ) {
+                                    val scaledOvalRect = livenessState.faceGuideRect?.let {
+                                        videoViewportSize.getScaledBoundingRect(it)
+                                    } ?: RectF()
+                                    val progressWidth = with(LocalDensity.current) {
+                                        ((scaledOvalRect.right - scaledOvalRect.left) * 0.6f).toDp()
+                                    }
+                                    LinearProgressIndicator(
+                                        progress = livenessState.faceMatchPercentage,
+                                        modifier = Modifier
+                                            .clip(MaterialTheme.shapes.small)
+                                            .width(progressWidth)
+                                            .height(12.dp),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        trackColor = MaterialTheme.colorScheme.surface
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                InstructionMessage(livenessState.livenessCheckState.value)
+                            }
                         }
                     }
                 }

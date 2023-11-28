@@ -89,18 +89,23 @@ private fun InstructionMessage(
 private fun FaceOvalInstructionMessage(
     message: String
 ) {
-    val backgroundColor = if (
-        message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
-    ) {
+
+    val isTooClose = message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
+    val isInitialCenterFace =
+        LivenessCheckState.Initial.withStartViewMessage().instructionId?.let { stringResource(it) == message } == true
+
+    val backgroundColor = if (isTooClose) {
         MaterialTheme.colorScheme.error
-    } else {
+    } else if (isInitialCenterFace) {
+        MaterialTheme.colorScheme.background
+    }else {
         MaterialTheme.colorScheme.primary
     }
 
-    val textColor = if (
-        message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
-    ) {
+    val textColor = if (isTooClose) {
         MaterialTheme.colorScheme.onError
+    } else if (isInitialCenterFace) {
+        MaterialTheme.colorScheme.onBackground
     } else {
         MaterialTheme.colorScheme.onPrimary
     }

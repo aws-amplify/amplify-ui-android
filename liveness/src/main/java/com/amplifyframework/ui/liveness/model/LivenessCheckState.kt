@@ -32,6 +32,8 @@ internal sealed class LivenessCheckState(val instructionId: Int? = null, val isA
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_move_face_further)
             fun withConnectingMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_connecting, false)
+            fun withStartViewMessage() =
+                Initial(R.string.amplify_ui_liveness_get_ready_center_face_label)
         }
     }
     class Running(instructionId: Int? = null) : LivenessCheckState(instructionId, true) {

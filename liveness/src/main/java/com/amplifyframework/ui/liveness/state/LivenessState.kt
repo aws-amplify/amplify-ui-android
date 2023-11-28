@@ -43,10 +43,11 @@ internal data class InitialStreamFace(val faceRect: RectF, val timestamp: Long)
 internal data class LivenessState(
     val sessionId: String,
     val context: Context,
+    val disableStartView: Boolean,
     val onCaptureReady: () -> Unit,
     val onFaceDistanceCheckPassed: () -> Unit,
     val onSessionError: (FaceLivenessDetectionException, Boolean) -> Unit,
-    val onFinalEventsSent: () -> Unit
+    val onFinalEventsSent: () -> Unit,
 ) {
     var videoViewportSize: VideoViewportSize? by mutableStateOf(null)
     var livenessCheckState = mutableStateOf<LivenessCheckState>(
@@ -57,6 +58,8 @@ internal data class LivenessState(
     var faceMatchPercentage: Float by mutableStateOf(0.25f)
     var initialFaceDistanceCheckPassed by mutableStateOf(false)
     var initialLocalFaceFound by mutableStateOf(false)
+
+    var showingStartView by mutableStateOf(!disableStartView)
 
     private var initialStreamFace: InitialStreamFace? = null
     @VisibleForTesting
@@ -127,6 +130,7 @@ internal data class LivenessState(
      * @return true if FrameAnalyzer should continue processing the frame
      */
     fun onFrameAvailable(): Boolean {
+        if (showingStartView) return false
         val livenessCheckState = livenessCheckState.value
         if (livenessCheckState == LivenessCheckState.Error) return false
         if (livenessCheckState !is LivenessCheckState.Success) return true
@@ -184,6 +188,10 @@ internal data class LivenessState(
         rightEye: FaceDetector.Landmark,
         mouth: FaceDetector.Landmark
     ) {
+        if(showingStartView) {
+            return
+        }
+
         if (!initialFaceDistanceCheckPassed) {
             val faceDistance = FaceDetector.calculateFaceDistance(
                 leftEye, rightEye, mouth,
@@ -285,5 +293,9 @@ internal data class LivenessState(
                 runningFreshness = true
             }
         }
+    }
+
+    fun onStartViewComplete() {
+        showingStartView = false
     }
 }

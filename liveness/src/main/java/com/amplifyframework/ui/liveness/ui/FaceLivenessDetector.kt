@@ -20,7 +20,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,12 +48,14 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
 import com.amplifyframework.core.Consumer
+import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
 import com.amplifyframework.ui.liveness.ml.FaceDetector
@@ -224,31 +225,18 @@ internal fun ChallengeView(
                     backgroundColor = MaterialTheme.colorScheme.background
                 )
 
-                CancelChallengeButton(
+                Column(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
                         .padding(16.dp)
+                        .align(Alignment.TopCenter),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    livenessCoordinator.processSessionError(
-                        FaceLivenessDetectionException.UserCancelledException(),
-                        true
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .size(videoViewportSize.viewportDpSize)
-                        .align(Alignment.Center)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        InstructionMessage(LivenessCheckState.Initial.withStartViewMessage())
+                    PhotosensitivityView {
+                        showPhotosensitivityAlert.value = true
                     }
+
+                    InstructionMessage(LivenessCheckState.Initial.withStartViewMessage())
                 }
 
                 Box(
@@ -258,20 +246,12 @@ internal fun ChallengeView(
                         .padding(16.dp),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    Column {
-                        PhotosensitivityView {
-                            showPhotosensitivityAlert.value = true
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Button(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                livenessState.onStartViewComplete()
-                            }) {
-                            Text("Begin Check")
-                        }
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            livenessState.onStartViewComplete()
+                        }) {
+                        Text(stringResource(R.string.amplify_ui_liveness_get_ready_begin_check))
                     }
                 }
 

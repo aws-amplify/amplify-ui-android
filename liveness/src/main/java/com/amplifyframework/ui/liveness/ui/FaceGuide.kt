@@ -15,6 +15,7 @@
 
 package com.amplifyframework.ui.liveness.ui
 
+import android.annotation.SuppressLint
 import android.graphics.RectF
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -43,6 +44,7 @@ internal fun FaceGuide(
     videoViewportSize: VideoViewportSize
 ) {
 
+    @SuppressLint("VisibleForTests")
     val scaledBoundingRect = faceGuideRect?.let {
         videoViewportSize.getScaledBoundingRect(it)
     } ?: return

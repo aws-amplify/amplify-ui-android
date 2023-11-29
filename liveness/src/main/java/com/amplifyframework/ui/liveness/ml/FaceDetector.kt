@@ -188,7 +188,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         val faceHeight = calculateFaceHeight(leftEye, rightEye, mouth)
 
         val ow = (ALPHA * pupilDistance + GAMMA * faceHeight) / 2
-        val oh = 1.68f * ow
+        val oh = GOLDEN_RATIO * ow
 
         val eyeCenterX = (leftEye.x + rightEye.x) / 2
         val eyeCenterY = (leftEye.y + rightEye.y) / 2

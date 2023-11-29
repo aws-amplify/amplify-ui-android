@@ -15,7 +15,6 @@
 
 package com.amplifyframework.ui.liveness.camera
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Size
@@ -31,7 +30,6 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.image.ops.Rot90Op
 
-@SuppressLint("VisibleForTests")
 internal class FrameAnalyzer(
     context: Context,
     private val livenessState: LivenessState

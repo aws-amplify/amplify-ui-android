@@ -62,7 +62,7 @@ internal typealias OnFreshnessColorDisplayed = (
     colorStartTime: Long
 ) -> Unit
 
-@SuppressLint("VisibleForTests", "UnsafeOptInUsageError")
+@SuppressLint("UnsafeOptInUsageError")
 internal class LivenessCoordinator(
     val context: Context,
     lifecycleOwner: LifecycleOwner,

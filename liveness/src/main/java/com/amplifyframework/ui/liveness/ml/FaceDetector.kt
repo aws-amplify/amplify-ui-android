@@ -34,8 +34,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import org.tensorflow.lite.Interpreter
 
-@VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
-class FaceDetector(private val livenessState: LivenessState) {
+internal class FaceDetector(private val livenessState: LivenessState) {
     private val anchors = generateAnchors()
 
     fun getBoundingBoxes(

@@ -99,7 +99,7 @@ internal fun PhotosensitivityView(infoClicked: () -> Unit) {
             )
         }
         IconButton(
-            onClick = { infoClicked()}
+            onClick = { infoClicked() }
         ) {
             Icon(
                 imageVector = Icons.Outlined.Info,

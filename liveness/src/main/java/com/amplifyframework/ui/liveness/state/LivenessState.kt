@@ -191,7 +191,7 @@ internal data class LivenessState(
         rightEye: FaceDetector.Landmark,
         mouth: FaceDetector.Landmark
     ): Boolean {
-        if(showingStartView) {
+        if (showingStartView) {
             return false
         }
 

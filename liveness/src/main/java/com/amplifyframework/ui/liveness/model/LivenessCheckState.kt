@@ -22,7 +22,8 @@ import com.amplifyframework.ui.liveness.ml.FaceDetector
 internal sealed class LivenessCheckState(val instructionId: Int? = null, val isActionable: Boolean = true) {
     class Initial(
         instructionId: Int? = null,
-        isActionable: Boolean = true) : LivenessCheckState(instructionId, isActionable) {
+        isActionable: Boolean = true
+    ) : LivenessCheckState(instructionId, isActionable) {
         companion object {
             fun withMoveFaceMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_move_face)

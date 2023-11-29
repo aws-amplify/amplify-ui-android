@@ -250,7 +250,8 @@ internal fun ChallengeView(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             livenessState.onStartViewComplete()
-                        }) {
+                        }
+                    ) {
                         Text(stringResource(R.string.amplify_ui_liveness_get_ready_begin_check))
                     }
                 }

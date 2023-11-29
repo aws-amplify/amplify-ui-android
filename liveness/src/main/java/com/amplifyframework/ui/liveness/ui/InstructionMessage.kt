@@ -98,7 +98,7 @@ private fun FaceOvalInstructionMessage(
         MaterialTheme.colorScheme.error
     } else if (isInitialCenterFace) {
         MaterialTheme.colorScheme.background
-    }else {
+    } else {
         MaterialTheme.colorScheme.primary
     }
 

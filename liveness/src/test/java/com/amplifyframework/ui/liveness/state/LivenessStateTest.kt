@@ -81,7 +81,8 @@ internal class LivenessStateTest {
             RectF(0f, 0f, 1f, 1f),
             FaceDetector.Landmark(0f, 0f),
             FaceDetector.Landmark(1f, 0f),
-            FaceDetector.Landmark(1f, 1f))
+            FaceDetector.Landmark(1f, 1f)
+        )
 
         // when
         stateWithStartView.onStartViewComplete()

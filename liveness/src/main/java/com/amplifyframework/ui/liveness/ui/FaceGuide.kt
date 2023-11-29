@@ -92,6 +92,7 @@ internal fun FaceGuide(
     }
 }
 
+@SuppressLint("VisibleForTests")
 @Preview
 @Composable
 internal fun FaceGuidePreview() {
@@ -99,6 +100,7 @@ internal fun FaceGuidePreview() {
         FaceGuide(
             modifier = Modifier.fillMaxSize(),
             faceGuideRect = RectF(50f, 50f, 200f, 400f),
+
             videoViewportSize = VideoViewportSize(
                 IntSize(1080, 2100),
                 IntSize(1080, 1920),

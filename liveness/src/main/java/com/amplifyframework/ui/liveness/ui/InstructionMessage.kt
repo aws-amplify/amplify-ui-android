@@ -15,6 +15,7 @@
 
 package com.amplifyframework.ui.liveness.ui
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -86,6 +87,7 @@ private fun InstructionMessage(
     }
 }
 
+@SuppressLint("VisibleForTests")
 @Composable
 private fun FaceOvalInstructionMessage(
     message: String

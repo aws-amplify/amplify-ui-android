@@ -53,11 +53,13 @@ internal class LivenessStateTest {
         livenessState = LivenessState(
             "1234",
             ApplicationProvider.getApplicationContext(),
+            false,
             onCaptureReady,
             onFaceDistanceCheckPassed,
             onSessionError,
             onFinalEventsSent
         )
+        livenessState.onStartViewComplete()
     }
 
     @Test

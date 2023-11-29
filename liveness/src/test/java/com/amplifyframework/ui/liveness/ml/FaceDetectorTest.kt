@@ -15,16 +15,16 @@
 
 package com.amplifyframework.ui.liveness.ml
 
-import android.graphics.RectF
 import com.amplifyframework.ui.liveness.ml.FaceDetector.Landmark
 import com.amplifyframework.ui.liveness.state.LivenessState
-import io.mockk.InvokeMatcher
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkConstructor
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 internal class FaceDetectorTest {
     private lateinit var detector: FaceDetector
     @Before
@@ -46,29 +46,8 @@ internal class FaceDetectorTest {
         val leftEar = Landmark(0.78989476f, 0.5973732f)
         val rightEar = Landmark(0.16585289f, 0.5668279f)
 
-        var rectLeft = 0f
-        var rectTop = 0f
-        var rectRight = 0f
-        var rectBottom = 0f
-
-        // RectF is stubbed in unit tests, so we need to access what it was called with in a different way
-        mockkConstructor(RectF::class)
-        every {
-            constructedWith<RectF>(
-                InvokeMatcher<Float> { rectLeft = it },
-                InvokeMatcher<Float> { rectTop = it },
-                InvokeMatcher<Float> { rectRight = it },
-                InvokeMatcher<Float> { rectBottom = it },
-            ).isEmpty
-        } answers {
-            assertClose(rectLeft, 0.16585289f)
-            assertClose(rectTop, 0.04175697f)
-            assertClose(rectRight, 0.16585289f + 0.62404186f)
-            assertClose(rectBottom, 0.04175697f + 0.84570926f)
-            true
-        }
-
-        detector.generateBoundingBoxFromLandmarks(
+        // when
+        val boundingBox = detector.generateBoundingBoxFromLandmarks(
             faceBottom,
             leftEye,
             rightEye,
@@ -76,7 +55,13 @@ internal class FaceDetectorTest {
             mouth,
             leftEar,
             rightEar
-        ).isEmpty
+        )
+
+        // then
+        assertClose(0.16585289f, boundingBox.left)
+        assertClose(0.04175697f, boundingBox.top)
+        assertClose(0.16585289f + 0.62404186f, boundingBox.right)
+        assertClose(0.04175697f + 0.84570926f, boundingBox.bottom)
     }
 
     private fun assertClose(actual: Float, expected: Float, difference: Float = 0.000001f) {

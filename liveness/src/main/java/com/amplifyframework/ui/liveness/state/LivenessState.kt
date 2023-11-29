@@ -67,6 +67,10 @@ internal data class LivenessState(
     private var faceOvalMatchTimerStarted = false
     private var detectedFaceMatchedOval = false
 
+    private var holdStillTimeoutLength = 1000L
+    private var holdStillTimeoutStart: Long? = null
+    private var holdStillTimeoutFinished = false
+
     @VisibleForTesting
     var readyForOval = false
 
@@ -242,6 +246,9 @@ internal data class LivenessState(
                 faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
 
             if (detectedFaceMatchedOval) {
+                if (holdStillTimeoutStart == null) {
+                    holdStillTimeoutStart = Date().time
+                }
                 livenessCheckState.value = LivenessCheckState.Running.withFaceOvalPosition(
                     FaceDetector.FaceOvalPosition.MATCHED
                 )
@@ -249,14 +256,6 @@ internal data class LivenessState(
                 livenessCheckState.value = LivenessCheckState.Running.withFaceOvalPosition(
                     faceOvalPosition
                 )
-            }
-
-            if (detectedFaceMatchedOval && faceMatchOvalStart == null) {
-                faceMatchOvalStart = Date().time
-            } else if (!detectedFaceMatchedOval && faceMatchOvalStart != null &&
-                faceMatchOvalEnd == null
-            ) {
-                faceMatchOvalEnd = Date().time
             }
 
             // Start timer and then timeout if the detected face doesn't match
@@ -277,10 +276,27 @@ internal data class LivenessState(
                 }
             }
 
+            holdStillTimeoutStart?.let {
+                if (Date().time - it > holdStillTimeoutLength) {
+                    holdStillTimeoutFinished = true
+                }
+            }
+
+            if (holdStillTimeoutFinished) {
+                if (detectedFaceMatchedOval && faceMatchOvalStart == null) {
+                    faceMatchOvalStart = Date().time
+                } else if (!detectedFaceMatchedOval && faceMatchOvalStart != null &&
+                    faceMatchOvalEnd == null
+                ) {
+                    faceMatchOvalEnd = Date().time
+                }
+            }
+
             // Start freshness check if it's not already started and face is in oval
             if (!runningFreshness && colorChallenge?.challengeType ==
                 ColorChallengeType.SEQUENTIAL &&
-                faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
+                faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED &&
+                holdStillTimeoutFinished
             ) {
                 runningFreshness = true
             }

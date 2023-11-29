@@ -288,7 +288,7 @@ internal data class LivenessState(
             // Start freshness check if it's not already started and face is in oval
             if (!runningFreshness && colorChallenge?.challengeType ==
                 ColorChallengeType.SEQUENTIAL &&
-                faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
+                faceMatchOvalStart?.let { (Date().time - it) > 1000 } == true
             ) {
                 runningFreshness = true
             }

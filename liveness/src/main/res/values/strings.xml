@@ -22,7 +22,7 @@
     <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_title">Photosensitivity warning</string>
     <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_description">Some people may experience epileptic seizures when exposed to colored lights. Use caution if you, or anyone in your family, have an epileptic condition.</string>
     <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_dismiss">Got it</string>
-    <string name="amplify_ui_liveness_get_ready_begin_check">Begin check</string>
+    <string name="amplify_ui_liveness_get_ready_begin_check">Start video check</string>
     <string name="amplify_ui_liveness_challenge_recording_indicator_label">REC</string>
     <string name="amplify_ui_liveness_challenge_instruction_hold_face_during_freshness">Hold still</string>
     <string name="amplify_ui_liveness_challenge_instruction_move_face_further">Move back</string>

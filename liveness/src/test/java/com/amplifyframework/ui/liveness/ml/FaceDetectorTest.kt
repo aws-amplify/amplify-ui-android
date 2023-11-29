@@ -19,6 +19,7 @@ import com.amplifyframework.ui.liveness.ml.FaceDetector.Landmark
 import com.amplifyframework.ui.liveness.state.LivenessState
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,13 +59,9 @@ internal class FaceDetectorTest {
         )
 
         // then
-        assertClose(0.16585289f, boundingBox.left)
-        assertClose(0.04175697f, boundingBox.top)
-        assertClose(0.16585289f + 0.62404186f, boundingBox.right)
-        assertClose(0.04175697f + 0.84570926f, boundingBox.bottom)
-    }
-
-    private fun assertClose(actual: Float, expected: Float, difference: Float = 0.000001f) {
-        assert(kotlin.math.abs(actual - expected) < difference)
+        assertEquals(0.16585289f, boundingBox.left, 0.000001f)
+        assertEquals(0.04175697f, boundingBox.top, 0.000001f)
+        assertEquals(0.16585289f + 0.62404186f, boundingBox.right, 0.000001f)
+        assertEquals(0.04175697f + 0.84570926f, boundingBox.bottom, 0.000001f)
     }
 }

@@ -182,14 +182,17 @@ internal data class LivenessState(
         }
     }
 
+    /**
+     * returns true if face update inspect, false if thrown away
+     */
     fun onFrameFaceUpdate(
         faceRect: RectF,
         leftEye: FaceDetector.Landmark,
         rightEye: FaceDetector.Landmark,
         mouth: FaceDetector.Landmark
-    ) {
+    ): Boolean {
         if(showingStartView) {
-            return
+            return false
         }
 
         if (!initialFaceDistanceCheckPassed) {
@@ -293,6 +296,7 @@ internal data class LivenessState(
                 runningFreshness = true
             }
         }
+        return true
     }
 
     fun onStartViewComplete() {

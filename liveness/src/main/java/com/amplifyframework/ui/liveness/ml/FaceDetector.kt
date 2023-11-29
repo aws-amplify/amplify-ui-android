@@ -458,7 +458,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         private const val ANCHOR_OFFSET_Y = 0.5f
         private const val INPUT_SIZE_HEIGHT = 128
         private const val INPUT_SIZE_WIDTH = 128
-        private const val GOLDEN_RATIO = 1.68f
+        private const val GOLDEN_RATIO = 1.618f
         private const val ALPHA = 2.0f
         private const val GAMMA = 1.8f
         const val X_SCALE = 128f

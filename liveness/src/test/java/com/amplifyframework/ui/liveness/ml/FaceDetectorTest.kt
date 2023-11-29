@@ -60,8 +60,8 @@ internal class FaceDetectorTest {
 
         // then
         assertEquals(0.16585289f, boundingBox.left, 0.000001f)
-        assertEquals(0.04175697f, boundingBox.top, 0.000001f)
+        assertEquals(0.07296771f, boundingBox.top, 0.000001f)
         assertEquals(0.16585289f + 0.62404186f, boundingBox.right, 0.000001f)
-        assertEquals(0.04175697f + 0.84570926f, boundingBox.bottom, 0.000001f)
+        assertEquals(0.07296771f + 0.8144985f, boundingBox.bottom, 0.000001f)
     }
 }

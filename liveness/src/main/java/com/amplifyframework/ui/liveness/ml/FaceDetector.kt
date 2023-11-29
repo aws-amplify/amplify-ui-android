@@ -17,7 +17,6 @@ package com.amplifyframework.ui.liveness.ml
 
 import android.content.Context
 import android.graphics.RectF
-import androidx.annotation.VisibleForTesting
 import com.amplifyframework.predictions.aws.models.FaceTargetMatchingParameters
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator.Companion.TARGET_HEIGHT
@@ -176,7 +175,6 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         return renormalizedDetections
     }
 
-    @VisibleForTesting
     fun generateBoundingBoxFromLandmarks(
         faceBottom: Float,
         leftEye: Landmark,
@@ -428,10 +426,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
     }
 
     private class Anchor(val xCenter: Float, val yCenter: Float, val h: Float, val w: Float)
-    @VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
-    class Landmark(val x: Float, val y: Float)
-    @VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
-    class Detection(
+    internal class Landmark(val x: Float, val y: Float)
+    internal class Detection(
         val location: RectF,
         val leftEye: Landmark,
         val rightEye: Landmark,

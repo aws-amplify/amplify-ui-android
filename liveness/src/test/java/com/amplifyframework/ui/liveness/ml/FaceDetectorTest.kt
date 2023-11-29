@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  */
 
-package com.amplifyframework.ui.liveness.state
+package com.amplifyframework.ui.liveness.ml
 
 import android.graphics.RectF
-import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.ml.FaceDetector.Landmark
+import com.amplifyframework.ui.liveness.state.LivenessState
 import io.mockk.InvokeMatcher
 import io.mockk.every
 import io.mockk.mockk
@@ -26,10 +26,10 @@ import org.junit.Before
 import org.junit.Test
 
 internal class FaceDetectorTest {
-    lateinit var detector: FaceDetector
+    private lateinit var detector: FaceDetector
     @Before
     fun setup() {
-        val state = mockk<LivenessState>() {
+        val state = mockk<LivenessState> {
             every { faceTargetChallenge } returns null
         }
         detector = FaceDetector(state)

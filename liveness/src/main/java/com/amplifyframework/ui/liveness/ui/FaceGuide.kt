@@ -92,12 +92,11 @@ internal fun FaceGuide(
 
 @Preview
 @Composable
-private fun FaceGuidePreview() {
+internal fun FaceGuidePreview() {
     Box(Modifier.size(1080.dp, 1920.dp).background(color = Color.Red)) {
         FaceGuide(
             modifier = Modifier.fillMaxSize(),
             faceGuideRect = RectF(50f, 50f, 200f, 400f),
-
             videoViewportSize = VideoViewportSize(
                 IntSize(1080, 2100),
                 IntSize(1080, 1920),

@@ -131,28 +131,43 @@ internal data class LivenessState(
      */
     fun onFrameAvailable(): Boolean {
         if (showingStartView) return false
-        val livenessCheckState = livenessCheckState.value
-        if (livenessCheckState == LivenessCheckState.Error) return false
-        if (livenessCheckState !is LivenessCheckState.Success) return true
 
-        if (readyToSendFinalEvents) {
-            readyToSendFinalEvents = false
+        return when(val livenessCheckState = livenessCheckState.value) {
+            is LivenessCheckState.Error -> false
+            is LivenessCheckState.Initial, is LivenessCheckState.Running -> {
+                /**
+                 * Start freshness check if the face has matched oval (we know this if faceMatchOvalStart is not null)
+                 * We trigger this in onFrameAvailable instead of onFrameFaceUpdate in the event the user moved the face
+                 * away from the camera. We want to run this check on every frame if the challenge is in process.
+                 */
+                if (!runningFreshness && colorChallenge?.challengeType ==
+                    ColorChallengeType.SEQUENTIAL &&
+                    faceMatchOvalStart?.let { (Date().time - it) > 1000 } == true
+                ) {
+                    runningFreshness = true
+                }
+                true
+            }
+            is LivenessCheckState.Success -> {
+                if (readyToSendFinalEvents) {
+                    readyToSendFinalEvents = false
 
-            livenessSessionInfo!!.sendChallengeResponseEvent(
-                FaceTargetChallengeResponse(
-                    colorChallenge!!.challengeId,
-                    livenessCheckState.faceGuideRect,
-                    Date(faceMatchOvalStart!!),
-                    Date(faceMatchOvalEnd!!)
-                )
-            )
+                    livenessSessionInfo!!.sendChallengeResponseEvent(
+                        FaceTargetChallengeResponse(
+                            colorChallenge!!.challengeId,
+                            livenessCheckState.faceGuideRect,
+                            Date(faceMatchOvalStart!!),
+                            Date(faceMatchOvalEnd!!)
+                        )
+                    )
 
-            // Send empty video event to signal we're done sending video
-            livenessSessionInfo!!.sendVideoEvent(VideoEvent(ByteArray(0), Date()))
-            onFinalEventsSent()
+                    // Send empty video event to signal we're done sending video
+                    livenessSessionInfo!!.sendVideoEvent(VideoEvent(ByteArray(0), Date()))
+                    onFinalEventsSent()
+                }
+                false
+            }
         }
-
-        return false
     }
 
     fun onFrameFaceCountUpdate(faceCount: Int) {
@@ -286,14 +301,6 @@ internal data class LivenessState(
                     faceOvalMatchTimerStarted = false
                     cancel()
                 }
-            }
-
-            // Start freshness check if it's not already started and face is in oval
-            if (!runningFreshness && colorChallenge?.challengeType ==
-                ColorChallengeType.SEQUENTIAL &&
-                faceMatchOvalStart?.let { (Date().time - it) > 1000 } == true
-            ) {
-                runningFreshness = true
             }
         }
         return true

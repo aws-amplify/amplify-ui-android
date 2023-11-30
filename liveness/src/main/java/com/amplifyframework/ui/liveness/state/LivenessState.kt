@@ -295,17 +295,18 @@ internal data class LivenessState(
             // Start timer and then timeout if the detected face doesn't match
             // the oval after a period of time
             if (!detectedFaceMatchedOval && faceOvalMatchTimer == null) {
-                faceOvalMatchTimer = Timer().schedule(faceTargetChallenge!!.faceTargetMatching.ovalFitTimeout.toLong()) {
-                    if (!detectedFaceMatchedOval && faceGuideRect != null) {
-                        readyForOval = false
-                        val timeoutError =
-                            FaceLivenessDetectionException(
-                                "Face did not match oval within time limit."
-                            )
-                        onSessionError(timeoutError, true)
+                faceOvalMatchTimer =
+                    Timer().schedule(faceTargetChallenge!!.faceTargetMatching.ovalFitTimeout.toLong()) {
+                        if (!detectedFaceMatchedOval && faceGuideRect != null) {
+                            readyForOval = false
+                            val timeoutError =
+                                FaceLivenessDetectionException(
+                                    "Face did not match oval within time limit."
+                                )
+                            onSessionError(timeoutError, true)
+                        }
+                        cancel()
                     }
-                    cancel()
-                }
             }
         }
         return true

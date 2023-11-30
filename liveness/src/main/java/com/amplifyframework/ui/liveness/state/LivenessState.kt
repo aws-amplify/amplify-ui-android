@@ -36,6 +36,7 @@ import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
 import java.util.Date
 import java.util.Timer
+import java.util.TimerTask
 import kotlin.concurrent.schedule
 
 internal data class InitialStreamFace(val faceRect: RectF, val timestamp: Long)
@@ -67,7 +68,7 @@ internal data class LivenessState(
     @VisibleForTesting
     var faceMatchOvalEnd: Long? = null
     private var initialFaceOvalIou = -1f
-    private var faceOvalMatchTimerStarted = false
+    private var faceOvalMatchTimer: TimerTask? = null
     private var detectedFaceMatchedOval = false
 
     @VisibleForTesting
@@ -87,6 +88,7 @@ internal data class LivenessState(
     }
 
     fun onError(stopLivenessSession: Boolean) {
+        faceOvalMatchTimer?.cancel()
         livenessCheckState.value = LivenessCheckState.Error
         readyForOval = false
         faceGuideRect = null
@@ -132,7 +134,7 @@ internal data class LivenessState(
     fun onFrameAvailable(): Boolean {
         if (showingStartView) return false
 
-        return when(val livenessCheckState = livenessCheckState.value) {
+        return when (val livenessCheckState = livenessCheckState.value) {
             is LivenessCheckState.Error -> false
             is LivenessCheckState.Initial, is LivenessCheckState.Running -> {
                 /**
@@ -287,9 +289,8 @@ internal data class LivenessState(
 
             // Start timer and then timeout if the detected face doesn't match
             // the oval after a period of time
-            if (!detectedFaceMatchedOval && !faceOvalMatchTimerStarted) {
-                faceOvalMatchTimerStarted = true
-                Timer().schedule(faceTargetChallenge!!.faceTargetMatching.ovalFitTimeout.toLong()) {
+            if (!detectedFaceMatchedOval && faceOvalMatchTimer == null) {
+                faceOvalMatchTimer = Timer().schedule(faceTargetChallenge!!.faceTargetMatching.ovalFitTimeout.toLong()) {
                     if (!detectedFaceMatchedOval && faceGuideRect != null) {
                         readyForOval = false
                         val timeoutError =
@@ -298,7 +299,6 @@ internal data class LivenessState(
                             )
                         onSessionError(timeoutError, true)
                     }
-                    faceOvalMatchTimerStarted = false
                     cancel()
                 }
             }

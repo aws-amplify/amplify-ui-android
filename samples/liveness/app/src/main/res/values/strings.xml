@@ -43,6 +43,6 @@
     <string name="grant_camera_permission">Grant Camera Permission</string>
     <string name="open_settings_camera_permissions">Open app settings to grant camera permission.</string>
     <string name="result_tip_title">Tips to pass the video check:</string>
-    <string name="result_tip_1">Avoid very bright lighting conditions, such as direct sunlight. Remove sunglasses, mask, hat, or anything blocking your face.</string>
+    <string name="result_tip_1">Avoid very bright lighting conditions, such as direct sunlight.</string>
     <string name="result_tip_2">Remove sunglasses, mask, hat, or anything blocking your face.</string>
 </resources>

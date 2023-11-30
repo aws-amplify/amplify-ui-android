@@ -53,10 +53,74 @@ internal class LivenessStateTest {
         livenessState = LivenessState(
             "1234",
             ApplicationProvider.getApplicationContext(),
+            false,
             onCaptureReady,
             onFaceDistanceCheckPassed,
             onSessionError,
             onFinalEventsSent
+        )
+        livenessState.onStartViewComplete()
+    }
+
+    @Test
+    fun `start view blocks state from proceeding`() {
+        // given
+        val stateWithStartView = LivenessState(
+            "1234",
+            ApplicationProvider.getApplicationContext(),
+            false,
+            onCaptureReady,
+            onFaceDistanceCheckPassed,
+            onSessionError,
+            onFinalEventsSent
+        )
+
+        // then
+        assertFalse(stateWithStartView.onFrameAvailable())
+        stateWithStartView.onFrameFaceUpdate(
+            RectF(0f, 0f, 1f, 1f),
+            FaceDetector.Landmark(0f, 0f),
+            FaceDetector.Landmark(1f, 0f),
+            FaceDetector.Landmark(1f, 1f)
+        )
+
+        // when
+        stateWithStartView.onStartViewComplete()
+
+        // then
+        assertTrue(stateWithStartView.onFrameAvailable())
+        assertTrue(
+            stateWithStartView.onFrameFaceUpdate(
+                RectF(0f, 0f, 0f, 0f),
+                FaceDetector.Landmark(0f, 0f),
+                FaceDetector.Landmark(0f, 0f),
+                FaceDetector.Landmark(0f, 0f)
+            )
+        )
+    }
+
+    @Test
+    fun `disabling start view immediately starts processing`() {
+        // given
+        val stateWithoutStartView = LivenessState(
+            "1234",
+            ApplicationProvider.getApplicationContext(),
+            true,
+            onCaptureReady,
+            onFaceDistanceCheckPassed,
+            onSessionError,
+            onFinalEventsSent
+        )
+
+        // then
+        assertTrue(stateWithoutStartView.onFrameAvailable())
+        assertTrue(
+            stateWithoutStartView.onFrameFaceUpdate(
+                RectF(0f, 0f, 0f, 0f),
+                FaceDetector.Landmark(0f, 0f),
+                FaceDetector.Landmark(0f, 0f),
+                FaceDetector.Landmark(0f, 0f)
+            )
         )
     }
 

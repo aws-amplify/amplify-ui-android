@@ -520,9 +520,9 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             } else if (ovalRect.top - face.top > faceDetectionHeightThreshold ||
                 face.bottom - ovalRect.bottom > faceDetectionHeightThreshold ||
                 (
-                        ovalRect.left - face.left > faceDetectionWidthThreshold &&
-                                face.right - ovalRect.right > faceDetectionWidthThreshold
-                        )
+                    ovalRect.left - face.left > faceDetectionWidthThreshold &&
+                        face.right - ovalRect.right > faceDetectionWidthThreshold
+                    )
             ) {
                 FaceOvalPosition.TOO_CLOSE
             } else {
@@ -541,7 +541,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                 min(
                     1f,
                     (0.75f * (currentIou - initialIou)) /
-                            (faceOvalMatching.targetIouThreshold - initialIou) + 0.25f
+                        (faceOvalMatching.targetIouThreshold - initialIou) + 0.25f
                 ),
                 0f
             )
@@ -569,7 +569,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
 
         @VisibleForTesting(VisibleForTesting.PRIVATE)
         internal fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
-                Float {
+            Float {
             val eyeCenterX = (leftEye.x + rightEye.x) / 2
             val eyeCenterY = (leftEye.y + rightEye.y) / 2
             return sqrt((eyeCenterX - mouth.x).pow(2) + (eyeCenterY - mouth.y).pow(2))

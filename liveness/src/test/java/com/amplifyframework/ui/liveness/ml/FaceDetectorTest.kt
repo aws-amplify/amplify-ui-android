@@ -15,7 +15,6 @@
 
 package com.amplifyframework.ui.liveness.ml
 
-import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.ml.FaceDetector.Landmark
 import com.amplifyframework.ui.liveness.state.LivenessState
 import io.mockk.every

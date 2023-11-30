@@ -272,10 +272,10 @@ internal class LivenessCoordinator(
 
     fun destroy(context: Context) {
         // Destroy all resources so a new coordinator can safely be created
-        // livenessWebSocket.destroy()
         encoder.stop {
             encoder.destroy()
         }
+        livenessState.onDestroy(true)
         unbindCamera(context)
         analysisExecutor.shutdown()
     }

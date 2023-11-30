@@ -88,8 +88,13 @@ internal data class LivenessState(
     }
 
     fun onError(stopLivenessSession: Boolean) {
-        faceOvalMatchTimer?.cancel()
         livenessCheckState.value = LivenessCheckState.Error
+        onDestroy(stopLivenessSession)
+    }
+
+    // Cleans up state when challenge is completed or cancelled
+    fun onDestroy(stopLivenessSession: Boolean) {
+        faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
         runningFreshness = false

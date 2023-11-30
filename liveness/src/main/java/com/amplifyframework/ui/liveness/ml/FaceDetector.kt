@@ -17,6 +17,7 @@ package com.amplifyframework.ui.liveness.ml
 
 import android.content.Context
 import android.graphics.RectF
+import androidx.annotation.VisibleForTesting
 import com.amplifyframework.predictions.aws.models.FaceTargetMatchingParameters
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator.Companion.TARGET_HEIGHT
@@ -53,10 +54,10 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             var w = outputBoxes[0][i][2]
             var h = outputBoxes[0][i][3]
 
-            var leftEyeX = outputBoxes[0][i][4]
-            var leftEyeY = outputBoxes[0][i][5]
-            var rightEyeX = outputBoxes[0][i][6]
-            var rightEyeY = outputBoxes[0][i][7]
+            var rightEyeX = outputBoxes[0][i][4]
+            var rightEyeY = outputBoxes[0][i][5]
+            var leftEyeX = outputBoxes[0][i][6]
+            var leftEyeY = outputBoxes[0][i][7]
 
             var noseX = outputBoxes[0][i][8]
             var noseY = outputBoxes[0][i][9]
@@ -561,11 +562,13 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             return calibratedPupilDistance / ovalWidth
         }
 
-        private fun calculatePupilDistance(leftEye: Landmark, rightEye: Landmark): Float {
+        @VisibleForTesting(VisibleForTesting.PRIVATE)
+        internal fun calculatePupilDistance(leftEye: Landmark, rightEye: Landmark): Float {
             return sqrt((leftEye.x - rightEye.x).pow(2) + (leftEye.y - rightEye.y).pow(2))
         }
 
-        private fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
+        @VisibleForTesting(VisibleForTesting.PRIVATE)
+        internal fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
             Float {
             val eyeCenterX = (leftEye.x + rightEye.x) / 2
             val eyeCenterY = (leftEye.y + rightEye.y) / 2

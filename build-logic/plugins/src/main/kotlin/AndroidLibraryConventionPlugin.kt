@@ -102,7 +102,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 warningsAsErrors = true
                 abortOnError = true
                 enable += listOf("UnusedResources")
-                disable += listOf("GradleDependency", "NewerVersionAvailable")
+                disable += listOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
             }
 
             compileOptions {

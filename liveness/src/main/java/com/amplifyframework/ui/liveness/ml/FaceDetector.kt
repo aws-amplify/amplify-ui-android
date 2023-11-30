@@ -17,6 +17,7 @@ package com.amplifyframework.ui.liveness.ml
 
 import android.content.Context
 import android.graphics.RectF
+import androidx.annotation.VisibleForTesting
 import com.amplifyframework.predictions.aws.models.FaceTargetMatchingParameters
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator.Companion.TARGET_HEIGHT
@@ -519,9 +520,9 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             } else if (ovalRect.top - face.top > faceDetectionHeightThreshold ||
                 face.bottom - ovalRect.bottom > faceDetectionHeightThreshold ||
                 (
-                    ovalRect.left - face.left > faceDetectionWidthThreshold &&
-                        face.right - ovalRect.right > faceDetectionWidthThreshold
-                    )
+                        ovalRect.left - face.left > faceDetectionWidthThreshold &&
+                                face.right - ovalRect.right > faceDetectionWidthThreshold
+                        )
             ) {
                 FaceOvalPosition.TOO_CLOSE
             } else {
@@ -540,7 +541,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                 min(
                     1f,
                     (0.75f * (currentIou - initialIou)) /
-                        (faceOvalMatching.targetIouThreshold - initialIou) + 0.25f
+                            (faceOvalMatching.targetIouThreshold - initialIou) + 0.25f
                 ),
                 0f
             )
@@ -561,12 +562,14 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             return calibratedPupilDistance / ovalWidth
         }
 
-        private fun calculatePupilDistance(leftEye: Landmark, rightEye: Landmark): Float {
+        @VisibleForTesting(VisibleForTesting.PRIVATE)
+        internal fun calculatePupilDistance(leftEye: Landmark, rightEye: Landmark): Float {
             return sqrt((leftEye.x - rightEye.x).pow(2) + (leftEye.y - rightEye.y).pow(2))
         }
 
-        private fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
-            Float {
+        @VisibleForTesting(VisibleForTesting.PRIVATE)
+        internal fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
+                Float {
             val eyeCenterX = (leftEye.x + rightEye.x) / 2
             val eyeCenterY = (leftEye.y + rightEye.y) / 2
             return sqrt((eyeCenterX - mouth.x).pow(2) + (eyeCenterY - mouth.y).pow(2))

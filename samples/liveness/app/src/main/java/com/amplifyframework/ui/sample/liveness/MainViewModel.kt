@@ -88,6 +88,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun fetchSessionResult(sessionId: String) {
+        if (_resultData.value != null) return //we already have result, likely timout
+
         _fetchingResult.value = true
         viewModelScope.launch {
             try {
@@ -125,6 +127,7 @@ class MainViewModel : ViewModel() {
     fun reportErrorResult(exception: FaceLivenessDetectionException) {
         sessionId.value?.let {
             _resultData.value = ResultData(it, error = exception)
+            _fetchingResult.value = false
         }
     }
 

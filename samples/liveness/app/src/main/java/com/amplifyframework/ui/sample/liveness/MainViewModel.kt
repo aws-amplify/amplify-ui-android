@@ -88,7 +88,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun fetchSessionResult(sessionId: String) {
-        if (_resultData.value != null) return //we already have result, likely timout
+        if (_resultData.value != null) return //we already have result, likely timeout
 
         _fetchingResult.value = true
         viewModelScope.launch {

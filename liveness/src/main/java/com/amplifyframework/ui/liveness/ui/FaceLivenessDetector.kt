@@ -124,6 +124,7 @@ fun FaceLivenessDetector(
                 disableStartView,
                 onChallengeComplete = {
                     scope.launch {
+                        // if we are already finished, we already provided a result in complete or failed
                         if (!isFinished) {
                             isFinished = true
                             resetOrientation()
@@ -133,11 +134,11 @@ fun FaceLivenessDetector(
                 },
                 onChallengeFailed = {
                     scope.launch {
-                        if (!isFinished) {
-                            isFinished = true
-                            resetOrientation()
-                            currentOnError.accept(it)
-                        }
+                        // we don't have the check for !isFinished like we do in onChallengeComplete. If we have an
+                        // error, we should send it
+                        isFinished = true
+                        resetOrientation()
+                        currentOnError.accept(it)
                     }
                 }
             )

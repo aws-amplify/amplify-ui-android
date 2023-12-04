@@ -299,15 +299,16 @@ private fun getDisplayError(error: FaceLivenessDetectionException): DisplayError
         is FaceLivenessDetectionException.SessionTimedOutException -> {
             DisplayError(
                 title = stringResource(id = R.string.error_timed_out_title),
-                message = if (error.message.contains("did not match oval", true)) {
-                    stringResource(id = R.string.error_timed_out_face_fit_message)
-                } else {
-                    stringResource(id = R.string.error_timed_out_session_message)
-                }
+                message = stringResource(id = R.string.error_timed_out_session_message)
             )
         }
         else -> {
-            if (error.message.contains("failed during countdown", ignoreCase = true)) {
+            if (error.message.contains("did not match oval", true)) {
+                DisplayError(
+                    title = stringResource(id = R.string.error_timed_out_title),
+                    message = stringResource(id = R.string.error_timed_out_face_fit_message)
+                )
+            } else if (error.message.contains("failed during countdown", ignoreCase = true)) {
                 DisplayError(
                     title = stringResource(id = R.string.error_failure_during_countdown_title),
                     message = stringResource(id = R.string.error_failure_during_countdown_message)

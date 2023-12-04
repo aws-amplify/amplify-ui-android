@@ -1,3 +1,15 @@
+## [Release 1.2.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.0)
+
+## Important!
+* New string added (update translations): "amplify_ui_liveness_get_ready_center_face_label"
+* LivenessColorScheme defaults changed: errorContainer and onErrorContainer default colors have been modified.
+
+## Bug Fixes and Features
+* fix(liveness): use updated Liveness oval algorithm https://github.com/aws-amplify/amplify-ui-android/pull/95
+* feat(liveness): Update Liveness UI https://github.com/aws-amplify/amplify-ui-android/pull/100
+
+[See all changes between 1.1.6 and 1.2.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.6...release-liveness-1.2.0)
+
 ## [Release 1.1.6](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.6)
 
 ## Miscellaneous

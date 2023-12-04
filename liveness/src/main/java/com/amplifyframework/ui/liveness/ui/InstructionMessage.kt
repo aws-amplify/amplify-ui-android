@@ -43,12 +43,11 @@ import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 
 @Composable internal fun InstructionMessage(
-    livenessCheckState: LivenessCheckState,
-    isFaceOvalInstruction: Boolean = false
+    livenessCheckState: LivenessCheckState
 ) {
     val instructionText = livenessCheckState.instructionId?.let { stringResource(it) } ?: return
     val showProgress = livenessCheckState is LivenessCheckState.Success
-    if (isFaceOvalInstruction) {
+    if (livenessCheckState.isActionable) {
         FaceOvalInstructionMessage(message = instructionText)
     } else {
         InstructionMessage(message = instructionText, showProgress = showProgress)
@@ -90,18 +89,23 @@ private fun InstructionMessage(
 private fun FaceOvalInstructionMessage(
     message: String
 ) {
-    val backgroundColor = if (
-        message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
-    ) {
+
+    val isTooClose = message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
+    val isInitialCenterFace =
+        LivenessCheckState.Initial.withStartViewMessage().instructionId?.let { stringResource(it) == message } == true
+
+    val backgroundColor = if (isTooClose) {
         MaterialTheme.colorScheme.error
+    } else if (isInitialCenterFace) {
+        MaterialTheme.colorScheme.background
     } else {
         MaterialTheme.colorScheme.primary
     }
 
-    val textColor = if (
-        message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
-    ) {
+    val textColor = if (isTooClose) {
         MaterialTheme.colorScheme.onError
+    } else if (isInitialCenterFace) {
+        MaterialTheme.colorScheme.onBackground
     } else {
         MaterialTheme.colorScheme.onPrimary
     }

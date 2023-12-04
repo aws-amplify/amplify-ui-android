@@ -40,7 +40,8 @@ import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
 internal fun FaceGuide(
     modifier: Modifier,
     faceGuideRect: RectF?,
-    videoViewportSize: VideoViewportSize
+    videoViewportSize: VideoViewportSize,
+    backgroundColor: Color = Color.White
 ) {
 
     val scaledBoundingRect = faceGuideRect?.let {
@@ -50,7 +51,7 @@ internal fun FaceGuide(
     Canvas(modifier.graphicsLayer(alpha = 0.99f)) {
 
         drawRect(
-            color = Color.White,
+            color = backgroundColor,
             size = size
         )
 

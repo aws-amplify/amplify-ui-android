@@ -69,8 +69,9 @@ internal class LivenessCoordinator(
     private val sessionId: String,
     private val region: String,
     private val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
+    disableStartView: Boolean,
     private val onChallengeComplete: OnChallengeComplete,
-    val onChallengeFailed: Consumer<FaceLivenessDetectionException>,
+    val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
 
     private val analysisExecutor = Executors.newSingleThreadExecutor()
@@ -78,6 +79,7 @@ internal class LivenessCoordinator(
     val livenessState = LivenessState(
         sessionId,
         context,
+        disableStartView,
         this::processCaptureReady,
         this::startLivenessSession,
         this::processSessionError,
@@ -270,10 +272,10 @@ internal class LivenessCoordinator(
 
     fun destroy(context: Context) {
         // Destroy all resources so a new coordinator can safely be created
-        // livenessWebSocket.destroy()
         encoder.stop {
             encoder.destroy()
         }
+        livenessState.onDestroy(true)
         unbindCamera(context)
         analysisExecutor.shutdown()
     }

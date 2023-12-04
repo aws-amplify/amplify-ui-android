@@ -21,10 +21,16 @@ plugins {
 
 android {
     namespace = "com.amplifyframework.ui.authenticator.screenshots"
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.test.mockk)
     implementation(projects.authenticator)
+
+    coreLibraryDesugaring(libs.android.desugar)
 }

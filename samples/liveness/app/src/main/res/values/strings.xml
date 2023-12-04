@@ -16,8 +16,8 @@
 <resources>
     <string name="app_name">Liveness Sample App</string>
 
-    <string name="liveness_check">Liveness Check</string>
-    <string name="liveness_result">Liveness Result</string>
+    <string name="liveness_check">Liveness check</string>
+    <string name="liveness_result">Liveness result</string>
     <string name="session_id_label">Session ID:</string>
     <string name="confidence_score_label">Liveness confidence score:</string>
     <string name="result_label">Result:</string>
@@ -32,7 +32,7 @@
     <string name="error_camera_permission_denied_title">Camera permission not granted</string>
     <string name="error_camera_permission_denied_message">Camera permission required to perform check</string>
     <string name="error_timed_out_title">Time out</string>
-    <string name="error_timed_out_face_fit_message">Face did not fill oval within time limit. Try again and completely fill oval with face within it.</string>
+    <string name="error_timed_out_face_fit_message">Face didn\'t fill oval within time limit. Try again and completely fill oval with face in it.</string>
     <string name="error_timed_out_session_message">Session timed out. Try again.</string>
     <string name="error_failure_during_countdown_title">"Check failed during countdown"</string>
     <string name="error_failure_during_countdown_message">Avoid moving closer during countdown and ensure only one face is in front of camera.</string>

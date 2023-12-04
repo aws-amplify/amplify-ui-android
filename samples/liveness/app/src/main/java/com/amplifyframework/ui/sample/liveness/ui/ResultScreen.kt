@@ -270,7 +270,7 @@ private fun ResultsView(sessionId: String,
                     )
                 }
             }
-            if (!isLive) {
+            if (!isLive && error == null) {
                 Spacer(Modifier.height(8.dp))
                 TipView()
             }

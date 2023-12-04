@@ -17,7 +17,7 @@
 <resources>
     <string name="amplify_ui_liveness_get_ready_center_face_label">Center your face</string>
     <string name="amplify_ui_liveness_get_ready_photosensitivity_title">Photosensitivity warning</string>
-    <string name="amplify_ui_liveness_get_ready_photosensitivity_description">This check flashes different colors. Use caution if you are photosensitive</string>
+    <string name="amplify_ui_liveness_get_ready_photosensitivity_description">This check flashes different colors. Use caution if you are photosensitive.</string>
     <string name="amplify_ui_liveness_get_ready_a11y_photosensitivity_icon_content_description">Photosensitivity Information</string>
     <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_title">Photosensitivity warning</string>
     <string name="amplify_ui_liveness_get_ready_photosensitivity_dialog_description">Some people may experience epileptic seizures when exposed to colored lights. Use caution if you, or anyone in your family, have an epileptic condition.</string>

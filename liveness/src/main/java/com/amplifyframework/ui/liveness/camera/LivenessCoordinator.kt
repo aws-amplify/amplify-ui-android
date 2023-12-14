@@ -44,6 +44,7 @@ import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.LivenessState
+import com.amplifyframework.ui.liveness.util.ErrorCode
 import java.util.Date
 import java.util.Timer
 import java.util.concurrent.Executors
@@ -152,7 +153,8 @@ internal class LivenessCoordinator(
                     } else {
                         val faceLivenessException = FaceLivenessDetectionException(
                             "A front facing camera is required but no front facing camera detected.",
-                            "Enable a front facing camera."
+                            "Enable a front facing camera.",
+                            ErrorCode.RUNTIME_ERROR
                         )
                         processSessionError(faceLivenessException, true)
                     }
@@ -195,7 +197,7 @@ internal class LivenessCoordinator(
                         FaceLivenessDetectionException.SessionTimedOutException(throwable = error)
                     else -> FaceLivenessDetectionException(
                         error.message ?: "Unknown error.",
-                        error.recoverySuggestion, error
+                        error.recoverySuggestion, ErrorCode.RUNTIME_ERROR, error
                     )
                 }
                 processSessionError(faceLivenessException, false)
@@ -217,9 +219,9 @@ internal class LivenessCoordinator(
 
     internal fun processSessionError(
         faceLivenessException: FaceLivenessDetectionException,
-        stopLivenessSession: Boolean
+        stopLivenessSession: Boolean,
     ) {
-        livenessState.onError(stopLivenessSession)
+        livenessState.onError(stopLivenessSession, faceLivenessException.errorCode)
         unbindCamera(context)
         onChallengeFailed.accept(faceLivenessException)
     }
@@ -275,7 +277,8 @@ internal class LivenessCoordinator(
         encoder.stop {
             encoder.destroy()
         }
-        livenessState.onDestroy(true)
+        val code = if (disconnectEventReceived) ErrorCode.SUCCESS else ErrorCode.DISPOSED
+        livenessState.onDestroy(true, code.code)
         unbindCamera(context)
         analysisExecutor.shutdown()
     }

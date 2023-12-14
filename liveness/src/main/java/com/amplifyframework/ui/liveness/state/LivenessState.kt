@@ -34,6 +34,7 @@ import com.amplifyframework.ui.liveness.ml.FaceOval
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
+import com.amplifyframework.ui.liveness.util.ErrorCode
 import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
@@ -87,19 +88,19 @@ internal data class LivenessState(
         }
     }
 
-    fun onError(stopLivenessSession: Boolean) {
+    fun onError(stopLivenessSession: Boolean, errorCode: ErrorCode? = null) {
         livenessCheckState.value = LivenessCheckState.Error
-        onDestroy(stopLivenessSession)
+        onDestroy(stopLivenessSession, errorCode?.code)
     }
 
     // Cleans up state when challenge is completed or cancelled
-    fun onDestroy(stopLivenessSession: Boolean) {
+    fun onDestroy(stopLivenessSession: Boolean, code: Int? = null) {
         faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
         runningFreshness = false
         if (stopLivenessSession) {
-            livenessSessionInfo?.stopSession()
+            livenessSessionInfo?.stopSession(code)
         }
     }
 
@@ -301,7 +302,8 @@ internal data class LivenessState(
                             readyForOval = false
                             val timeoutError =
                                 FaceLivenessDetectionException(
-                                    "Face did not match oval within time limit."
+                                    "Face did not match oval within time limit.",
+                                    errorCode = ErrorCode.TIMEOUT
                                 )
                             onSessionError(timeoutError, true)
                         }

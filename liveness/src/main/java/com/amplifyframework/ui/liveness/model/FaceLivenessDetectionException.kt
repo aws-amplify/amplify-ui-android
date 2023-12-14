@@ -15,39 +15,42 @@
 
 package com.amplifyframework.ui.liveness.model
 
+import com.amplifyframework.ui.liveness.util.ErrorCode
+
 open class FaceLivenessDetectionException(
     val message: String,
     val recoverySuggestion: String = "Retry the face liveness check.",
+    val errorCode: ErrorCode,
     val throwable: Throwable? = null
 ) {
     class SessionNotFoundException(
         message: String = "Session not found.",
         recoverySuggestion: String = "Enter a valid session ID.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.RUNTIME_ERROR, throwable)
 
     class AccessDeniedException(
         message: String = "Not authorized to perform a face liveness check.",
         recoverySuggestion: String = "Valid credentials are required for the face liveness check.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.RUNTIME_ERROR, throwable)
 
     class CameraPermissionDeniedException(
         message: String = "Camera permissions have not been granted.",
         recoverySuggestion: String = "Prompt the user to grant camera permission.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.RUNTIME_ERROR, throwable)
 
     class SessionTimedOutException(
         message: String = "Session timed out.",
         recoverySuggestion: String = "Retry the face liveness check and prompt the user" +
             " to follow the on screen instructions.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.TIMEOUT, throwable)
 
     class UserCancelledException(
         message: String = "User cancelled the face liveness check.",
         recoverySuggestion: String = "Retry the face liveness check.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.CANCELED, throwable)
 }

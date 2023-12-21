@@ -10,6 +10,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import com.amplifyframework.auth.AWSCredentials
+import com.amplifyframework.auth.AWSCredentialsProvider
+import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.core.Action
@@ -49,6 +52,16 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
+class MockCredentialsProvider : AWSCredentialsProvider<AWSCredentials> {
+    override fun fetchAWSCredentials(
+        onSuccess: Consumer<AWSCredentials>,
+        onError: Consumer<AuthException>,
+    ) {
+        val creds: AWSCredentials = AWSCredentials.createAWSCredentials("asdf", "asdf", "asdf", 1000000L)!!
+        onSuccess.accept(creds)
+    }
+}
+
 class LivenessFlowInstrumentationTest {
     private lateinit var livenessSessionInformation: CapturingSlot<FaceLivenessSessionInformation>
     private lateinit var livenessSessionOptions: CapturingSlot<FaceLivenessSessionOptions>
@@ -61,6 +74,8 @@ class LivenessFlowInstrumentationTest {
     private lateinit var connectingString: String
     private lateinit var moveCloserString: String
     private lateinit var holdStillString: String
+    private lateinit var mockCredentialsProvider: MockCredentialsProvider
+
     private var framesSent = 0
 
     @get:Rule
@@ -106,6 +121,8 @@ class LivenessFlowInstrumentationTest {
         holdStillString = context.getString(
             R.string.amplify_ui_liveness_challenge_instruction_hold_face_during_freshness,
         )
+
+        mockCredentialsProvider = MockCredentialsProvider()
     }
 
     @Test
@@ -284,9 +301,15 @@ class LivenessFlowInstrumentationTest {
         val sessionId = "sessionId"
         var completesSuccessfully = false
         composeTestRule.setContent {
-            FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", onComplete = {
+            FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", credentialsProvider = mockCredentialsProvider,
+                onComplete = {
                 completesSuccessfully = true
-            }, onError = { assertTrue(false) })
+            }, onError = {
+                println("!!!")
+                println(it.throwable)
+                println("!!!")
+                assertTrue(false)
+            })
         }
 
         composeTestRule.onNodeWithText(beginCheckString).assertExists()

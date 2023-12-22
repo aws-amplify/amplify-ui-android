@@ -28,6 +28,7 @@ import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
+import com.amplifyframework.ui.liveness.util.ErrorCode
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
@@ -138,19 +139,19 @@ internal class LivenessStateTest {
     @Test
     fun `session is stopped when stopLivenessSession is true and error occurs`() {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
-        val stopSession = mockk<() -> Unit>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onError(true)
-        verify(exactly = 1) { stopSession() }
+        livenessState.onError(true, ErrorCode.RUNTIME_ERROR)
+        verify(exactly = 1) { stopSession(ErrorCode.RUNTIME_ERROR.code) }
     }
 
     @Test
     fun `session is not stopped when stopLivenessSession is false and error occurs`() {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
-        val stopSession = mockk<() -> Unit>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
         livenessState.onError(false)
-        verify(exactly = 0) { stopSession() }
+        verify(exactly = 0) { stopSession(any()) }
     }
 
     @Test

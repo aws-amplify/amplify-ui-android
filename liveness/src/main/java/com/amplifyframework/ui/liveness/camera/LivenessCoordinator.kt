@@ -153,7 +153,7 @@ internal class LivenessCoordinator(
                     } else {
                         val faceLivenessException = FaceLivenessDetectionException(
                             "A front facing camera is required but no front facing camera detected.",
-                            "Enable a front facing camera.",
+                            "Enable a front facing camera."
                         )
                         processSessionError(faceLivenessException, true)
                     }
@@ -218,7 +218,7 @@ internal class LivenessCoordinator(
 
     internal fun processSessionError(
         faceLivenessException: FaceLivenessDetectionException,
-        stopLivenessSession: Boolean,
+        stopLivenessSession: Boolean
     ) {
         val webSocketCloseCode = when (faceLivenessException) {
             is FaceLivenessDetectionException.UserCancelledException -> WebSocketCloseCode.CANCELED

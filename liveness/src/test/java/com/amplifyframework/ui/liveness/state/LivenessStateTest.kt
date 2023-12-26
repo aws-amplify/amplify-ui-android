@@ -132,7 +132,7 @@ internal class LivenessStateTest {
 
     @Test
     fun `state is error after on error`() {
-        livenessState.onDestroy(true)
+        livenessState.onError(true)
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }
 
@@ -141,7 +141,7 @@ internal class LivenessStateTest {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
         val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onDestroy(true, WebSocketCloseCode.RUNTIME_ERROR)
+        livenessState.onError(true, WebSocketCloseCode.RUNTIME_ERROR)
         verify(exactly = 1) { stopSession(WebSocketCloseCode.RUNTIME_ERROR.code) }
     }
 
@@ -150,7 +150,7 @@ internal class LivenessStateTest {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
         val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onDestroy(false)
+        livenessState.onError(false)
         verify(exactly = 0) { stopSession(any()) }
     }
 
@@ -206,7 +206,7 @@ internal class LivenessStateTest {
     @Test
     fun `state is error after freshness completes and an error occurs`() {
         livenessState.faceGuideRect = mockk(relaxed = true)
-        livenessState.onDestroy(false)
+        livenessState.onError(false)
         livenessState.onFreshnessComplete()
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }

@@ -225,7 +225,7 @@ internal class LivenessCoordinator(
             is FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException -> WebSocketCloseCode.TIMEOUT
             else -> WebSocketCloseCode.RUNTIME_ERROR
         }
-        livenessState.onDestroy(stopLivenessSession, webSocketCloseCode)
+        livenessState.onError(stopLivenessSession, webSocketCloseCode)
         unbindCamera(context)
         onChallengeFailed.accept(faceLivenessException)
     }

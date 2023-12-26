@@ -88,6 +88,11 @@ internal data class LivenessState(
         }
     }
 
+    fun onError(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
+        livenessCheckState.value = LivenessCheckState.Error
+        onDestroy(stopLivenessSession, webSocketCloseCode)
+    }
+
     // Cleans up state when challenge is completed or cancelled.
     // We only send webSocketCloseCode if error encountered.
     fun onDestroy(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
@@ -298,9 +303,7 @@ internal data class LivenessState(
                         if (!detectedFaceMatchedOval && faceGuideRect != null) {
                             readyForOval = false
                             val timeoutError =
-                                FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException(
-                                    "Face did not match oval within time limit."
-                                )
+                                FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException()
                             onSessionError(timeoutError, true)
                         }
                         cancel()

@@ -55,6 +55,6 @@ open class FaceLivenessDetectionException(
      * This is not an error we have determined to publicly expose.
      * The error will come to the customer in onError, but only instance checked as FaceLivenessDetectionException.
      */
-    internal class FaceInOvalMatchExceededTimeLimitException:
+    internal class FaceInOvalMatchExceededTimeLimitException :
         FaceLivenessDetectionException("Face did not match oval within time limit.")
 }

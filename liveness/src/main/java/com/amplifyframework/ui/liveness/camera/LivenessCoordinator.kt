@@ -285,8 +285,8 @@ internal class LivenessCoordinator(
         encoder.stop {
             encoder.destroy()
         }
-        val code = if (!disconnectEventReceived) WebSocketCloseCode.DISPOSED else null
-        livenessState.onDestroy(true, code)
+        val webSocketCloseCode = if (!disconnectEventReceived) WebSocketCloseCode.DISPOSED else null
+        livenessState.onDestroy(true, webSocketCloseCode)
         unbindCamera(context)
         analysisExecutor.shutdown()
     }

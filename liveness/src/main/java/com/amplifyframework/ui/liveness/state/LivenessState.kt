@@ -88,7 +88,7 @@ internal data class LivenessState(
         }
     }
 
-    fun onError(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
+    fun onError(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode) {
         livenessCheckState.value = LivenessCheckState.Error
         onDestroy(stopLivenessSession, webSocketCloseCode)
     }

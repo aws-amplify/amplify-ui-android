@@ -132,7 +132,7 @@ internal class LivenessStateTest {
 
     @Test
     fun `state is error after on error`() {
-        livenessState.onError(true)
+        livenessState.onError(true, WebSocketCloseCode.RUNTIME_ERROR)
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }
 
@@ -146,12 +146,30 @@ internal class LivenessStateTest {
     }
 
     @Test
+    fun `proper code is sent when provided in onDestroy`() {
+        val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
+        livenessState.onDestroy(true, WebSocketCloseCode.DISPOSED)
+        verify(exactly = 1) { stopSession(WebSocketCloseCode.DISPOSED.code) }
+    }
+
+    @Test
+    fun `null close code is sent when no close code provided in onDestroy`() {
+        val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
+        livenessState.onDestroy(true, null)
+        verify(exactly = 1) { stopSession(null) }
+    }
+
+    @Test
     fun `session is not stopped when stopLivenessSession is false and error occurs`() {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
         val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onError(false)
-        verify(exactly = 0) { stopSession(any()) }
+        livenessState.onError(false, WebSocketCloseCode.RUNTIME_ERROR)
+        verify(exactly = 0) { stopSession(WebSocketCloseCode.RUNTIME_ERROR.code) }
     }
 
     @Test
@@ -206,7 +224,7 @@ internal class LivenessStateTest {
     @Test
     fun `state is error after freshness completes and an error occurs`() {
         livenessState.faceGuideRect = mockk(relaxed = true)
-        livenessState.onError(false)
+        livenessState.onError(false, WebSocketCloseCode.RUNTIME_ERROR)
         livenessState.onFreshnessComplete()
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }

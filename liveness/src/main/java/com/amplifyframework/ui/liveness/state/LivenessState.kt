@@ -34,7 +34,7 @@ import com.amplifyframework.ui.liveness.ml.FaceOval
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
-import com.amplifyframework.ui.liveness.util.ErrorCode
+import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
@@ -88,19 +88,16 @@ internal data class LivenessState(
         }
     }
 
-    fun onError(stopLivenessSession: Boolean, errorCode: ErrorCode? = null) {
+    // Cleans up state when challenge is completed or cancelled.
+    // We only send webSocketCloseCode if error encountered.
+    fun onDestroy(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
         livenessCheckState.value = LivenessCheckState.Error
-        onDestroy(stopLivenessSession, errorCode?.code)
-    }
-
-    // Cleans up state when challenge is completed or cancelled
-    fun onDestroy(stopLivenessSession: Boolean, code: Int? = null) {
         faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
         runningFreshness = false
         if (stopLivenessSession) {
-            livenessSessionInfo?.stopSession(code)
+            livenessSessionInfo?.stopSession(webSocketCloseCode?.code)
         }
     }
 
@@ -301,9 +298,8 @@ internal data class LivenessState(
                         if (!detectedFaceMatchedOval && faceGuideRect != null) {
                             readyForOval = false
                             val timeoutError =
-                                FaceLivenessDetectionException(
-                                    "Face did not match oval within time limit.",
-                                    errorCode = ErrorCode.TIMEOUT
+                                FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException(
+                                    "Face did not match oval within time limit."
                                 )
                             onSessionError(timeoutError, true)
                         }

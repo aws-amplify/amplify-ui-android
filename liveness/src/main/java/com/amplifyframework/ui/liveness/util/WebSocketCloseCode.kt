@@ -1,7 +1,6 @@
 package com.amplifyframework.ui.liveness.util
 
-enum class ErrorCode(val code: Int) {
-    SUCCESS(1000),
+internal enum class WebSocketCloseCode(val code: Int) {
     TIMEOUT(4001),
     CANCELED(4003),
     RUNTIME_ERROR(4005),

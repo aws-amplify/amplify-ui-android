@@ -115,8 +115,7 @@ class MainViewModel : ViewModel() {
                     sessionId,
                     error = FaceLivenessDetectionException(
                         e.message ?: "Error retrieving liveness results",
-                        throwable = e,
-                        errorCode = ErrorCode.RUNTIME_ERROR
+                        throwable = e
                     )
                 )
                 _resultData.value = results

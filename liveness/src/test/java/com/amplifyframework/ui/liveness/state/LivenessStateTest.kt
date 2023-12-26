@@ -28,7 +28,7 @@ import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
-import com.amplifyframework.ui.liveness.util.ErrorCode
+import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
@@ -132,7 +132,7 @@ internal class LivenessStateTest {
 
     @Test
     fun `state is error after on error`() {
-        livenessState.onError(true)
+        livenessState.onDestroy(true)
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }
 
@@ -141,8 +141,8 @@ internal class LivenessStateTest {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
         val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onError(true, ErrorCode.RUNTIME_ERROR)
-        verify(exactly = 1) { stopSession(ErrorCode.RUNTIME_ERROR.code) }
+        livenessState.onDestroy(true, WebSocketCloseCode.RUNTIME_ERROR)
+        verify(exactly = 1) { stopSession(WebSocketCloseCode.RUNTIME_ERROR.code) }
     }
 
     @Test
@@ -150,7 +150,7 @@ internal class LivenessStateTest {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
         val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onError(false)
+        livenessState.onDestroy(false)
         verify(exactly = 0) { stopSession(any()) }
     }
 
@@ -206,7 +206,7 @@ internal class LivenessStateTest {
     @Test
     fun `state is error after freshness completes and an error occurs`() {
         livenessState.faceGuideRect = mockk(relaxed = true)
-        livenessState.onError(false)
+        livenessState.onDestroy(false)
         livenessState.onFreshnessComplete()
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }

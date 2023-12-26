@@ -44,7 +44,7 @@ import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.LivenessState
-import com.amplifyframework.ui.liveness.util.ErrorCode
+import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
 import java.util.Timer
 import java.util.concurrent.Executors
@@ -154,7 +154,6 @@ internal class LivenessCoordinator(
                         val faceLivenessException = FaceLivenessDetectionException(
                             "A front facing camera is required but no front facing camera detected.",
                             "Enable a front facing camera.",
-                            ErrorCode.RUNTIME_ERROR
                         )
                         processSessionError(faceLivenessException, true)
                     }
@@ -197,7 +196,7 @@ internal class LivenessCoordinator(
                         FaceLivenessDetectionException.SessionTimedOutException(throwable = error)
                     else -> FaceLivenessDetectionException(
                         error.message ?: "Unknown error.",
-                        error.recoverySuggestion, ErrorCode.RUNTIME_ERROR, error
+                        error.recoverySuggestion, error
                     )
                 }
                 processSessionError(faceLivenessException, false)
@@ -221,7 +220,12 @@ internal class LivenessCoordinator(
         faceLivenessException: FaceLivenessDetectionException,
         stopLivenessSession: Boolean,
     ) {
-        livenessState.onError(stopLivenessSession, faceLivenessException.errorCode)
+        val webSocketCloseCode = when (faceLivenessException) {
+            is FaceLivenessDetectionException.UserCancelledException -> WebSocketCloseCode.CANCELED
+            is FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException -> WebSocketCloseCode.TIMEOUT
+            else -> WebSocketCloseCode.RUNTIME_ERROR
+        }
+        livenessState.onDestroy(stopLivenessSession, webSocketCloseCode)
         unbindCamera(context)
         onChallengeFailed.accept(faceLivenessException)
     }
@@ -272,13 +276,17 @@ internal class LivenessCoordinator(
         }
     }
 
+    /**
+     * This is only called when onDispose is triggered from FaceLivenessDetector view.
+     * If we begin calling destroy in other places, we should ensure we are still tracking the proper error code.
+     */
     fun destroy(context: Context) {
         // Destroy all resources so a new coordinator can safely be created
         encoder.stop {
             encoder.destroy()
         }
-        val code = if (disconnectEventReceived) ErrorCode.SUCCESS else ErrorCode.DISPOSED
-        livenessState.onDestroy(true, code.code)
+        val code = if (!disconnectEventReceived) WebSocketCloseCode.DISPOSED else null
+        livenessState.onDestroy(true, code)
         unbindCamera(context)
         analysisExecutor.shutdown()
     }

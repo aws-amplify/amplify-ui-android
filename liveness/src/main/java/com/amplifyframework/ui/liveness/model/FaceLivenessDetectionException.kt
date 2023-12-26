@@ -15,42 +15,47 @@
 
 package com.amplifyframework.ui.liveness.model
 
-import com.amplifyframework.ui.liveness.util.ErrorCode
-
 open class FaceLivenessDetectionException(
     val message: String,
     val recoverySuggestion: String = "Retry the face liveness check.",
-    val errorCode: ErrorCode,
     val throwable: Throwable? = null
 ) {
     class SessionNotFoundException(
         message: String = "Session not found.",
         recoverySuggestion: String = "Enter a valid session ID.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.RUNTIME_ERROR, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 
     class AccessDeniedException(
         message: String = "Not authorized to perform a face liveness check.",
         recoverySuggestion: String = "Valid credentials are required for the face liveness check.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.RUNTIME_ERROR, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 
     class CameraPermissionDeniedException(
         message: String = "Camera permissions have not been granted.",
         recoverySuggestion: String = "Prompt the user to grant camera permission.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.RUNTIME_ERROR, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 
     class SessionTimedOutException(
         message: String = "Session timed out.",
         recoverySuggestion: String = "Retry the face liveness check and prompt the user" +
             " to follow the on screen instructions.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.TIMEOUT, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 
     class UserCancelledException(
         message: String = "User cancelled the face liveness check.",
         recoverySuggestion: String = "Retry the face liveness check.",
         throwable: Throwable? = null
-    ) : FaceLivenessDetectionException(message, recoverySuggestion, ErrorCode.CANCELED, throwable)
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+
+    /**
+     * This is not an error we have determined to publicly expose.
+     * The error will come to the customer in onError, but only instance checked as FaceLivenessDetectionException.
+     */
+    internal class FaceInOvalMatchExceededTimeLimitException(
+        message: String = "Face did not match oval within time limit."
+    ) : FaceLivenessDetectionException(message)
 }

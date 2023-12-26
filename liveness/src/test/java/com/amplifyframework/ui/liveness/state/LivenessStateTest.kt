@@ -169,7 +169,7 @@ internal class LivenessStateTest {
         val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
         livenessState.onError(false, WebSocketCloseCode.RUNTIME_ERROR)
-        verify(exactly = 0) { stopSession(WebSocketCloseCode.RUNTIME_ERROR.code) }
+        verify(exactly = 0) { stopSession(any()) }
     }
 
     @Test

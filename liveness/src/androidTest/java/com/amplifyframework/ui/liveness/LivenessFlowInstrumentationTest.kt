@@ -31,6 +31,7 @@ import com.amplifyframework.predictions.options.FaceLivenessSessionOptions
 import com.amplifyframework.ui.liveness.camera.FrameAnalyzer
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
+import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.ui.FaceLivenessDetector
 import io.mockk.CapturingSlot
@@ -98,6 +99,7 @@ class LivenessFlowInstrumentationTest {
                 any(), // sessionId
                 capture(livenessSessionInformation), // sessionInformation
                 capture(livenessSessionOptions), // options
+                any(), // version
                 capture(onSessionStarted), // onSessionStarted
                 capture(onLivenessComplete), // onComplete
                 any(), // onError
@@ -253,7 +255,7 @@ class LivenessFlowInstrumentationTest {
         composeTestRule.setContent {
             FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", onComplete = {
                 completesSuccessfully = true
-            }, onError = { assertTrue(false) })
+            }, onError = {assertTrue(false) })
         }
 
         composeTestRule.onNodeWithText(beginCheckString).assertExists()
@@ -263,6 +265,9 @@ class LivenessFlowInstrumentationTest {
                 .fetchSemanticsNodes().size == 1
         }
 
+        composeTestRule.waitForIdle()
+
+        val pause = 1
         onSessionStarted.captured.accept(FaceLivenessSession(emptyList(), {}, {}, {}))
 
         composeTestRule.waitForIdle()
@@ -304,12 +309,7 @@ class LivenessFlowInstrumentationTest {
             FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", credentialsProvider = mockCredentialsProvider,
                 onComplete = {
                 completesSuccessfully = true
-            }, onError = {
-                println("!!!")
-                println(it.throwable)
-                println("!!!")
-                assertTrue(false)
-            })
+            }, onError = { assertTrue(false) })
         }
 
         composeTestRule.onNodeWithText(beginCheckString).assertExists()
@@ -325,6 +325,7 @@ class LivenessFlowInstrumentationTest {
         every { faceTargetMatchingParameters.targetIouHeightThreshold }.returns(0.25f)
         every { faceTargetMatchingParameters.faceIouWidthThreshold }.returns(0.15f)
         every { faceTargetMatchingParameters.faceIouHeightThreshold }.returns(0.15f)
+        every { faceTargetMatchingParameters.ovalFitTimeout }.returns(10000)
 
         val faceTargetChallenge = mockk<FaceTargetChallenge>()
         val faceRect = RectF(19f, -49f, 441f, 633f)

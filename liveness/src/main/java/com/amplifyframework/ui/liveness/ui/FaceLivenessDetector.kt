@@ -16,7 +16,6 @@
 package com.amplifyframework.ui.liveness.ui
 
 import android.graphics.RectF
-import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -144,8 +143,7 @@ fun FaceLivenessDetector(
 }
 
 @Composable
-@VisibleForTesting(VisibleForTesting.PACKAGE_PRIVATE)
-fun ChallengeView(
+internal fun ChallengeView(
     key: Any,
     sessionId: String,
     region: String,

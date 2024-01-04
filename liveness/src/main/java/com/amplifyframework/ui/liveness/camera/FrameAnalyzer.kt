@@ -18,7 +18,6 @@ package com.amplifyframework.ui.liveness.camera
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Size
-import androidx.annotation.VisibleForTesting
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.amplifyframework.ui.liveness.ml.FaceDetector
@@ -33,8 +32,7 @@ import org.tensorflow.lite.support.image.ops.Rot90Op
 
 internal class FrameAnalyzer(
     context: Context,
-    @get:VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val livenessState: LivenessState
+    private val livenessState: LivenessState
 ) : ImageAnalysis.Analyzer {
 
     private val tfLite = FaceDetector.loadModel(context)

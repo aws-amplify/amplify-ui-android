@@ -34,3 +34,8 @@ dependencies {
 
     coreLibraryDesugaring(libs.android.desugar)
 }
+
+// Verify screenshots when running the check task
+tasks.named("check").configure {
+    dependsOn(tasks.first { it.name == "verifyPaparazzi" })
+}

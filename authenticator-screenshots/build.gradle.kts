@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("amplify.android.library")
     alias(libs.plugins.paparazzi)

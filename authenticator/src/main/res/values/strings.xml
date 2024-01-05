@@ -19,4 +19,11 @@
     <string name="amplify_ui_authenticator_confirmation_code_sent_unknown">A confirmation code has been sent.</string>
     <!-- TOTP Code Screen -->
     <string name="amplify_ui_authenticator_enter_totp_code">Please enter the code from your registered Authenticator app</string>
+    <!-- TOTP Setup Screen -->
+    <string name="amplify_ui_authenticator_step1_title">Step 1: Download an Authenticator App</string>
+    <string name="amplify_ui_authenticator_step1_content">Authenticator apps generate one-time codes that can be used to verify your identity</string>
+    <string name="amplify_ui_authenticator_step2_title">Step 2: Scan the QR code</string>
+    <string name="amplify_ui_authenticator_step2_content">Open the Authenticator app and scan the QR code or enter the key to get your verification code</string>
+    <string name="amplify_ui_authenticator_step3_title">Step 3: Verify your code</string>
+    <string name="amplify_ui_authenticator_step3_content">Enter the 6 digit code from your Authenticator app</string>
 </resources>

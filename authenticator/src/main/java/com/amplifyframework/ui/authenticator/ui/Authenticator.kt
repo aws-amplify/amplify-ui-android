@@ -46,6 +46,7 @@ import com.amplifyframework.ui.authenticator.SignInConfirmCustomState
 import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
 import com.amplifyframework.ui.authenticator.SignInConfirmNewPasswordState
 import com.amplifyframework.ui.authenticator.SignInConfirmTotpCodeState
+import com.amplifyframework.ui.authenticator.SignInContinueWithTotpSetupState
 import com.amplifyframework.ui.authenticator.SignInState
 import com.amplifyframework.ui.authenticator.SignUpConfirmState
 import com.amplifyframework.ui.authenticator.SignUpState
@@ -90,6 +91,9 @@ fun Authenticator(
     signInConfirmTotpCodeContent: @Composable (state: SignInConfirmTotpCodeState) -> Unit = {
         SignInConfirmTotpCode(it)
     },
+    signInContinueWithTotpSetupContent: @Composable (state: SignInContinueWithTotpSetupState) -> Unit = {
+        SignInContinueWithTotpSetup(it)
+    },
     signUpContent: @Composable (state: SignUpState) -> Unit = { SignUp(it) },
     signUpConfirmContent: @Composable (state: SignUpConfirmState) -> Unit = { SignUpConfirm(it) },
     passwordResetContent: @Composable (state: PasswordResetState) -> Unit = { PasswordReset(it) },
@@ -129,6 +133,7 @@ fun Authenticator(
                             targetState
                         )
                         is SignInConfirmTotpCodeState -> signInConfirmTotpCodeContent(targetState)
+                        is SignInContinueWithTotpSetupState -> signInContinueWithTotpSetupContent(targetState)
                         is SignUpState -> signUpContent(targetState)
                         is PasswordResetState -> passwordResetContent(targetState)
                         is PasswordResetConfirmState -> passwordResetConfirmContent(targetState)

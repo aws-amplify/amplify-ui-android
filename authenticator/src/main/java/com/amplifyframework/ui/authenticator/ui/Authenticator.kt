@@ -90,7 +90,7 @@ fun Authenticator(
     signInConfirmTotpCodeContent: @Composable (state: SignInConfirmTotpCodeState) -> Unit = {
         SignInConfirmTotpCode(it)
     },
-    signUpContent: @Composable (stat: SignUpState) -> Unit = { SignUp(it) },
+    signUpContent: @Composable (state: SignUpState) -> Unit = { SignUp(it) },
     signUpConfirmContent: @Composable (state: SignUpConfirmState) -> Unit = { SignUpConfirm(it) },
     passwordResetContent: @Composable (state: PasswordResetState) -> Unit = { PasswordReset(it) },
     passwordResetConfirmContent: @Composable (state: PasswordResetConfirmState) -> Unit = { PasswordResetConfirm(it) },

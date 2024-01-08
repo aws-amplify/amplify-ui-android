@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.authenticator.ui
 
 internal object TestTags {
-    val SignInConfirmButton = "SignInConfirmButton"
-    val BackToSignInButton = "BackToSignIn"
+    const val SignInConfirmButton = "SignInConfirmButton"
+    const val BackToSignInButton = "BackToSignInButton"
+    const val CopyKeyButton = "CopyKeyButton"
 }

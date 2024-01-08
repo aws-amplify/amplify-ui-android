@@ -21,6 +21,7 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 
 /**
@@ -36,7 +37,9 @@ open class ComposeRobot(protected val composeTestRule: ComposeTestRule) {
     fun assertExists(tag: String, text: String) = composeTestRule.onNode(hasTestTag(tag) and hasText(text))
         .assertExists()
 
-    fun clickOnTag(tag: String) = composeTestRule.onNodeWithTag(tag).performClick()
+    fun clickOnTag(tag: String) = composeTestRule.onNodeWithTag(tag)
+        .performScrollTo()
+        .performClick()
 
     fun writeTo(tag: String, text: String) = composeTestRule.onNodeWithTag(tag).performTextInput(text)
 }

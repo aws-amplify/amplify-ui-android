@@ -15,8 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.SignInContinueWithTotpSetupState
@@ -34,7 +37,7 @@ fun SignInContinueWithTotpSetup(
         SignInContinueWithTotpSetupFooter(state = it)
     }
 ) {
-    val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
 
     Column(
@@ -56,9 +59,10 @@ fun SignInContinueWithTotpSetup(
         )
         OutlinedButton(
             modifier = Modifier
+                .testTag(TestTags.CopyKeyButton)
                 .padding(vertical = 16.dp)
                 .align(alignment = Alignment.CenterHorizontally),
-            onClick = { copyToClipboard(context, state.sharedSecret) }
+            onClick = { clipboard.setText(AnnotatedString(state.sharedSecret)) }
         ) {
             Text(stringResource(R.string.amplify_ui_authenticator_button_copy_key))
         }
@@ -66,6 +70,7 @@ fun SignInContinueWithTotpSetup(
         StepContent(text = stringResource(R.string.amplify_ui_authenticator_step3_content))
         AuthenticatorForm(state = state.form)
         AuthenticatorButton(
+            modifier = modifier.testTag(TestTags.SignInConfirmButton),
             onClick = { scope.launch { state.continueSignIn() } },
             loading = !state.form.enabled
         )
@@ -91,9 +96,3 @@ private fun StepContent(text: String) = Text(
     style = MaterialTheme.typography.bodyMedium,
     text = text
 )
-
-private fun copyToClipboard(context: Context, value: String) {
-    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    val clip = ClipData.newPlainText("Authenticator Shared Secret", value)
-    clipboard.setPrimaryClip(clip)
-}

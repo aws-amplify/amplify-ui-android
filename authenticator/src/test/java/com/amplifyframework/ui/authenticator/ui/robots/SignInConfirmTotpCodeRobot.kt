@@ -17,11 +17,17 @@ package com.amplifyframework.ui.authenticator.ui.robots
 
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import com.amplifyframework.ui.authenticator.forms.FieldKey
-import com.amplifyframework.ui.testing.ComposeRobot
+import com.amplifyframework.ui.authenticator.ui.TestTags
+import com.amplifyframework.ui.testing.ComposeTest
 
-abstract class ScreenLevelRobot(rule: ComposeTestRule) : ComposeRobot(rule) {
-    // Check that the composable has the expected title
-    fun hasTitle(expected: String) = assertExists("AuthenticatorTitle", expected)
+fun ComposeTest.signInConfirmTotpCode(func: SignInConfirmTotpCodeRobot.() -> Unit) = SignInConfirmTotpCodeRobot(
+    composeTestRule
+).func()
 
-    fun setFieldContent(key: FieldKey, content: String) = writeTo(key.toString(), content)
+class SignInConfirmTotpCodeRobot(composeTestRule: ComposeTestRule) : ScreenLevelRobot(composeTestRule) {
+    fun hasSubmitButton(expected: String) = assertExists(TestTags.SignInConfirmButton, expected)
+
+    fun setConfirmationCode(code: String) = setFieldContent(FieldKey.ConfirmationCode, code)
+    fun clickSubmitButton() = clickOnTag(TestTags.SignInConfirmButton)
+    fun clickBackToSignInButton() = clickOnTag(TestTags.BackToSignInButton)
 }

@@ -65,6 +65,12 @@ abstract class AuthenticatorStep internal constructor() {
     object SignInConfirmNewPassword : AuthenticatorStep()
 
     /**
+     * The user has completed the initial Sign In step, and needs to enter a TOTP code from a registered authenticator
+     * app.
+     */
+    object SignInConfirmTotpCode : AuthenticatorStep()
+
+    /**
      * The user is on the Sign Up step
      */
     object SignUp : AuthenticatorInitialStep()

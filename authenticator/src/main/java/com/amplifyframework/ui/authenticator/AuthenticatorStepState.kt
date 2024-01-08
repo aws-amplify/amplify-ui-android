@@ -176,6 +176,28 @@ interface SignInConfirmNewPasswordState : AuthenticatorStepState {
 }
 
 /**
+ * The user has completed the initial Sign In step, and needs to enter a TOTP code from a registered authenticator
+ * app.
+ */
+@Stable
+interface SignInConfirmTotpCodeState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Confirm the user's sign in using the information entered into the [form].
+     */
+    suspend fun confirmSignIn()
+}
+
+/**
  * The user is on the Sign Up step, and can fill out the account creation form to Sign Up.
  */
 @Stable

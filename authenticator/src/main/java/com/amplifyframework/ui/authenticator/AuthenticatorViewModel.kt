@@ -322,8 +322,7 @@ internal class AuthenticatorViewModel(
             AuthSignInStep.CONFIRM_SIGN_UP -> handleUnconfirmedSignIn(username, password)
             // Show an error for TOTP next step
             AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP,
-            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
-            AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> {
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION -> {
                 val exception = AuthException(
                     "Authenticator does not yet support TOTP workflows.",
                     "Disable TOTP to use Authenticator."
@@ -331,6 +330,11 @@ internal class AuthenticatorViewModel(
                 logger.error("Unsupported next step $nextStep", exception)
                 sendMessage(UnknownErrorMessage(exception))
             }
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> moveTo(
+                stateFactory.newSignInConfirmTotpCodeState { confirmationCode ->
+                    confirmSignIn(username, password, confirmationCode)
+                }
+            )
             else -> {
                 // Generic error for any other next steps that may be added in the future
                 val exception = AuthException(

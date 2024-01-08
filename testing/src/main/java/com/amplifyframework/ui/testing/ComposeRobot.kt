@@ -18,7 +18,10 @@ package com.amplifyframework.ui.testing
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 
 /**
  * Base class for a [compose testing robot](https://proandroiddev.com/jetpack-compose-with-robot-testing-pattern-ad6293335a20)
@@ -30,7 +33,10 @@ import androidx.compose.ui.test.onNodeWithText
 open class ComposeRobot(protected val composeTestRule: ComposeTestRule) {
     fun assertExists(text: String) = composeTestRule.onNodeWithText(text).assertExists()
 
-    fun assertExists(tag: String, text: String) {
-        composeTestRule.onNode(hasTestTag(tag) and hasText(text)).assertExists()
-    }
+    fun assertExists(tag: String, text: String) = composeTestRule.onNode(hasTestTag(tag) and hasText(text))
+        .assertExists()
+
+    fun clickOnTag(tag: String) = composeTestRule.onNodeWithTag(tag).performClick()
+
+    fun writeTo(tag: String, text: String) = composeTestRule.onNodeWithTag(tag).performTextInput(text)
 }

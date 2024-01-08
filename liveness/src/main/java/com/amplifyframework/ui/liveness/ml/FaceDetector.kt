@@ -17,6 +17,7 @@ package com.amplifyframework.ui.liveness.ml
 
 import android.content.Context
 import android.graphics.RectF
+import androidx.annotation.VisibleForTesting
 import com.amplifyframework.predictions.aws.models.FaceTargetMatchingParameters
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator.Companion.TARGET_HEIGHT
@@ -64,6 +65,14 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             var mouthX = outputBoxes[0][i][10]
             var mouthY = outputBoxes[0][i][11]
 
+            // the face's right ear is actually the one on the left on screen, and vice versa.
+            // this is the same for the eyes, but we need the ears to be correct with respect to the
+            // bounding box for the algorithm to work.
+            var rightEarX = outputBoxes[0][i][12]
+            var rightEarY = outputBoxes[0][i][13]
+            var leftEarX = outputBoxes[0][i][14]
+            var leftEarY = outputBoxes[0][i][15]
+
             xCenter = xCenter / X_SCALE * anchors[i].w + anchors[i].xCenter
             yCenter = yCenter / Y_SCALE * anchors[i].h + anchors[i].yCenter
             h = h / H_SCALE * anchors[i].h
@@ -85,6 +94,11 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             mouthX = mouthX / X_SCALE * anchors[i].w + anchors[i].xCenter
             mouthY = mouthY / Y_SCALE * anchors[i].h + anchors[i].yCenter
 
+            leftEarX = leftEarX / X_SCALE * anchors[i].w + anchors[i].xCenter
+            leftEarY = leftEarY / Y_SCALE * anchors[i].h + anchors[i].yCenter
+            rightEarX = rightEarX / X_SCALE * anchors[i].w + anchors[i].xCenter
+            rightEarY = rightEarY / Y_SCALE * anchors[i].h + anchors[i].yCenter
+
             detections.add(
                 Detection(
                     RectF(xMin, yMin, xMax, yMax),
@@ -92,6 +106,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                     Landmark(rightEyeX, rightEyeY),
                     Landmark(noseX, noseY),
                     Landmark(mouthX, mouthY),
+                    Landmark(leftEarX, leftEarY),
+                    Landmark(rightEarX, rightEarY),
                     score
                 )
             )
@@ -111,6 +127,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         val renormalizedDetections = mutableListOf<Detection>()
         weightedDetections.forEach { detection ->
             // Change landmark coordinates to be for actual image size instead of model input size
+            val scaledBottom = (detection.location.bottom / Y_SCALE) * TARGET_HEIGHT
+
             val scaledLeftEyeX = (detection.leftEye.x / X_SCALE) * TARGET_WIDTH
             val scaledLeftEyeY = (detection.leftEye.y / Y_SCALE) * TARGET_HEIGHT
             val scaledRightEyeX = (detection.rightEye.x / X_SCALE) * TARGET_WIDTH
@@ -119,19 +137,28 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             val scaledNoseY = (detection.nose.y / Y_SCALE) * TARGET_HEIGHT
             val scaledMouthX = (detection.mouth.x / X_SCALE) * TARGET_WIDTH
             val scaledMouthY = (detection.mouth.y / Y_SCALE) * TARGET_HEIGHT
+            val scaledLeftEarX = (detection.leftEar.x / X_SCALE) * TARGET_WIDTH
+            val scaledLeftEarY = (detection.leftEar.y / Y_SCALE) * TARGET_HEIGHT
+            val scaledRightEarX = (detection.rightEar.x / X_SCALE) * TARGET_WIDTH
+            val scaledRightEarY = (detection.rightEar.y / Y_SCALE) * TARGET_HEIGHT
 
             val scaledLeftEye = Landmark(scaledLeftEyeX, scaledLeftEyeY)
             val scaledRightEye = Landmark(scaledRightEyeX, scaledRightEyeY)
             val scaledNose = Landmark(scaledNoseX, scaledNoseY)
             val scaledMouth = Landmark(scaledMouthX, scaledMouthY)
+            val scaledLeftEar = Landmark(scaledLeftEarX, scaledLeftEarY)
+            val scaledRightEar = Landmark(scaledRightEarX, scaledRightEarY)
 
             // Generate the face bounding box from the landmarks
             val renormalizedBoundingBox =
                 generateBoundingBoxFromLandmarks(
+                    scaledBottom,
                     scaledLeftEye,
                     scaledRightEye,
                     scaledNose,
-                    scaledMouth
+                    scaledMouth,
+                    scaledLeftEar,
+                    scaledRightEar,
                 )
             renormalizedDetections.add(
                 Detection(
@@ -140,6 +167,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                     scaledRightEye,
                     scaledNose,
                     scaledMouth,
+                    scaledLeftEar,
+                    scaledRightEar,
                     detection.score
                 )
             )
@@ -147,11 +176,14 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         return renormalizedDetections
     }
 
-    private fun generateBoundingBoxFromLandmarks(
+    fun generateBoundingBoxFromLandmarks(
+        faceBottom: Float,
         leftEye: Landmark,
         rightEye: Landmark,
         nose: Landmark,
-        mouth: Landmark
+        mouth: Landmark,
+        leftEar: Landmark,
+        rightEar: Landmark
     ): RectF {
         val pupilDistance = calculatePupilDistance(leftEye, rightEye)
         val faceHeight = calculateFaceHeight(leftEye, rightEye, mouth)
@@ -163,18 +195,16 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         val eyeCenterY = (leftEye.y + rightEye.y) / 2
 
         var cx = eyeCenterX
-        var cy = eyeCenterY
         val ovalInfo = livenessState.faceTargetChallenge
         if (ovalInfo != null && eyeCenterY <= ovalInfo.targetCenterY / 2) {
             cx = (eyeCenterX + nose.x) / 2
-            cy = (eyeCenterY + nose.y) / 2
         }
 
-        val left = cx - ow / 2
-        val top = cy - oh / 2
-        val right = left + ow
-        val bottom = top + oh
-        return RectF(left, top, right, bottom)
+        val top = faceBottom - oh
+        val left = min(cx - ow / 2, rightEar.x)
+        val right = max(cx + ow / 2, leftEar.x)
+
+        return RectF(left, top, right, faceBottom)
     }
 
     private fun generateAnchors(): List<Anchor> {
@@ -284,6 +314,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             var weightedRightEye = detection.rightEye
             var weightedNose = detection.nose
             var weightedMouth = detection.mouth
+            var weightedLeftEar = detection.leftEar
+            var weightedRightEar = detection.rightEar
             if (candidates.isNotEmpty()) {
                 var wXMin = 0.0f
                 var wYMin = 0.0f
@@ -297,6 +329,10 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                 var wNoseY = 0.0f
                 var wMouthX = 0.0f
                 var wMouthY = 0.0f
+                var wLeftEarX = 0.0f
+                var wLeftEarY = 0.0f
+                var wRightEarX = 0.0f
+                var wRightEarY = 0.0f
                 var totalScore = 0.0f
                 candidates.forEach { candidate ->
                     totalScore += candidate.score
@@ -305,6 +341,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                     val rightEye = detections[candidate.index].rightEye
                     val nose = detections[candidate.index].nose
                     val mouth = detections[candidate.index].mouth
+                    val leftEar = detections[candidate.index].leftEar
+                    val rightEar = detections[candidate.index].rightEar
 
                     wXMin += bbox.left * candidate.score
                     wYMin += bbox.top * candidate.score
@@ -321,6 +359,11 @@ internal class FaceDetector(private val livenessState: LivenessState) {
 
                     wMouthX += mouth.x * candidate.score
                     wMouthY += mouth.y * candidate.score
+
+                    wLeftEarX += leftEar.x * candidate.score
+                    wLeftEarY += leftEar.y * candidate.score
+                    wRightEarX += rightEar.x * candidate.score
+                    wRightEarY += rightEar.y * candidate.score
                 }
                 weightedLocation.left = wXMin / totalScore * INPUT_SIZE_WIDTH
                 weightedLocation.top = wYMin / totalScore * INPUT_SIZE_HEIGHT
@@ -342,6 +385,13 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                 val weightedMouthX = wMouthX / totalScore * INPUT_SIZE_WIDTH
                 val weightedMouthY = wMouthY / totalScore * INPUT_SIZE_HEIGHT
                 weightedMouth = Landmark(weightedMouthX, weightedMouthY)
+
+                val weightedLeftEarX = wLeftEarX / totalScore * INPUT_SIZE_WIDTH
+                val weightedLeftEarY = wLeftEarY / totalScore * INPUT_SIZE_HEIGHT
+                weightedLeftEar = Landmark(weightedLeftEarX, weightedLeftEarY)
+                val weightedRightEarX = wRightEarX / totalScore * INPUT_SIZE_WIDTH
+                val weightedRightEarY = wRightEarY / totalScore * INPUT_SIZE_HEIGHT
+                weightedRightEar = Landmark(weightedRightEarX, weightedRightEarY)
             }
             remainedIndexedScores.clear()
             remainedIndexedScores.addAll(remained)
@@ -351,6 +401,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                 weightedRightEye,
                 weightedNose,
                 weightedMouth,
+                weightedLeftEar,
+                weightedRightEar,
                 detection.score
             )
             outputLocations.add(weightedDetection)
@@ -382,6 +434,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         val rightEye: Landmark,
         val nose: Landmark,
         val mouth: Landmark,
+        val leftEar: Landmark,
+        val rightEar: Landmark,
         val score: Float
     )
     private class IndexedScore(val index: Int, val score: Float)
@@ -508,11 +562,13 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             return calibratedPupilDistance / ovalWidth
         }
 
-        private fun calculatePupilDistance(leftEye: Landmark, rightEye: Landmark): Float {
+        @VisibleForTesting(VisibleForTesting.PRIVATE)
+        internal fun calculatePupilDistance(leftEye: Landmark, rightEye: Landmark): Float {
             return sqrt((leftEye.x - rightEye.x).pow(2) + (leftEye.y - rightEye.y).pow(2))
         }
 
-        private fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
+        @VisibleForTesting(VisibleForTesting.PRIVATE)
+        internal fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
             Float {
             val eyeCenterX = (leftEye.x + rightEye.x) / 2
             val eyeCenterY = (leftEye.y + rightEye.y) / 2

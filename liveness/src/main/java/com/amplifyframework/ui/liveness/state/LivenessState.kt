@@ -34,8 +34,10 @@ import com.amplifyframework.ui.liveness.ml.FaceOval
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
+import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
 import java.util.Timer
+import java.util.TimerTask
 import kotlin.concurrent.schedule
 
 internal data class InitialStreamFace(val faceRect: RectF, val timestamp: Long)
@@ -43,10 +45,11 @@ internal data class InitialStreamFace(val faceRect: RectF, val timestamp: Long)
 internal data class LivenessState(
     val sessionId: String,
     val context: Context,
+    val disableStartView: Boolean,
     val onCaptureReady: () -> Unit,
     val onFaceDistanceCheckPassed: () -> Unit,
     val onSessionError: (FaceLivenessDetectionException, Boolean) -> Unit,
-    val onFinalEventsSent: () -> Unit
+    val onFinalEventsSent: () -> Unit,
 ) {
     var videoViewportSize: VideoViewportSize? by mutableStateOf(null)
     var livenessCheckState = mutableStateOf<LivenessCheckState>(
@@ -58,13 +61,15 @@ internal data class LivenessState(
     var initialFaceDistanceCheckPassed by mutableStateOf(false)
     var initialLocalFaceFound by mutableStateOf(false)
 
+    var showingStartView by mutableStateOf(!disableStartView)
+
     private var initialStreamFace: InitialStreamFace? = null
     @VisibleForTesting
     var faceMatchOvalStart: Long? = null
     @VisibleForTesting
     var faceMatchOvalEnd: Long? = null
     private var initialFaceOvalIou = -1f
-    private var faceOvalMatchTimerStarted = false
+    private var faceOvalMatchTimer: TimerTask? = null
     private var detectedFaceMatchedOval = false
 
     @VisibleForTesting
@@ -83,13 +88,21 @@ internal data class LivenessState(
         }
     }
 
-    fun onError(stopLivenessSession: Boolean) {
+    fun onError(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode) {
         livenessCheckState.value = LivenessCheckState.Error
+        onDestroy(stopLivenessSession, webSocketCloseCode)
+    }
+
+    // Cleans up state when challenge is completed or cancelled.
+    // We only send webSocketCloseCode if error encountered.
+    fun onDestroy(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
+        livenessCheckState.value = LivenessCheckState.Error
+        faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
         runningFreshness = false
         if (stopLivenessSession) {
-            livenessSessionInfo?.stopSession()
+            livenessSessionInfo?.stopSession(webSocketCloseCode?.code)
         }
     }
 
@@ -127,28 +140,44 @@ internal data class LivenessState(
      * @return true if FrameAnalyzer should continue processing the frame
      */
     fun onFrameAvailable(): Boolean {
-        val livenessCheckState = livenessCheckState.value
-        if (livenessCheckState == LivenessCheckState.Error) return false
-        if (livenessCheckState !is LivenessCheckState.Success) return true
+        if (showingStartView) return false
 
-        if (readyToSendFinalEvents) {
-            readyToSendFinalEvents = false
+        return when (val livenessCheckState = livenessCheckState.value) {
+            is LivenessCheckState.Error -> false
+            is LivenessCheckState.Initial, is LivenessCheckState.Running -> {
+                /**
+                 * Start freshness check if the face has matched oval (we know this if faceMatchOvalStart is not null)
+                 * We trigger this in onFrameAvailable instead of onFrameFaceUpdate in the event the user moved the face
+                 * away from the camera. We want to run this check on every frame if the challenge is in process.
+                 */
+                if (!runningFreshness && colorChallenge?.challengeType ==
+                    ColorChallengeType.SEQUENTIAL &&
+                    faceMatchOvalStart?.let { (Date().time - it) > 1000 } == true
+                ) {
+                    runningFreshness = true
+                }
+                true
+            }
+            is LivenessCheckState.Success -> {
+                if (readyToSendFinalEvents) {
+                    readyToSendFinalEvents = false
 
-            livenessSessionInfo!!.sendChallengeResponseEvent(
-                FaceTargetChallengeResponse(
-                    colorChallenge!!.challengeId,
-                    livenessCheckState.faceGuideRect,
-                    Date(faceMatchOvalStart!!),
-                    Date(faceMatchOvalEnd!!)
-                )
-            )
+                    livenessSessionInfo!!.sendChallengeResponseEvent(
+                        FaceTargetChallengeResponse(
+                            colorChallenge!!.challengeId,
+                            livenessCheckState.faceGuideRect,
+                            Date(faceMatchOvalStart!!),
+                            Date(faceMatchOvalEnd!!)
+                        )
+                    )
 
-            // Send empty video event to signal we're done sending video
-            livenessSessionInfo!!.sendVideoEvent(VideoEvent(ByteArray(0), Date()))
-            onFinalEventsSent()
+                    // Send empty video event to signal we're done sending video
+                    livenessSessionInfo!!.sendVideoEvent(VideoEvent(ByteArray(0), Date()))
+                    onFinalEventsSent()
+                }
+                false
+            }
         }
-
-        return false
     }
 
     fun onFrameFaceCountUpdate(faceCount: Int) {
@@ -178,12 +207,19 @@ internal data class LivenessState(
         }
     }
 
+    /**
+     * returns true if face update inspect, false if thrown away
+     */
     fun onFrameFaceUpdate(
         faceRect: RectF,
         leftEye: FaceDetector.Landmark,
         rightEye: FaceDetector.Landmark,
         mouth: FaceDetector.Landmark
-    ) {
+    ): Boolean {
+        if (showingStartView) {
+            return false
+        }
+
         if (!initialFaceDistanceCheckPassed) {
             val faceDistance = FaceDetector.calculateFaceDistance(
                 leftEye, rightEye, mouth,
@@ -261,29 +297,23 @@ internal data class LivenessState(
 
             // Start timer and then timeout if the detected face doesn't match
             // the oval after a period of time
-            if (!detectedFaceMatchedOval && !faceOvalMatchTimerStarted) {
-                faceOvalMatchTimerStarted = true
-                Timer().schedule(faceTargetChallenge!!.faceTargetMatching.ovalFitTimeout.toLong()) {
-                    if (!detectedFaceMatchedOval && faceGuideRect != null) {
-                        readyForOval = false
-                        val timeoutError =
-                            FaceLivenessDetectionException(
-                                "Face did not match oval within time limit."
-                            )
-                        onSessionError(timeoutError, true)
+            if (!detectedFaceMatchedOval && faceOvalMatchTimer == null) {
+                faceOvalMatchTimer =
+                    Timer().schedule(faceTargetChallenge!!.faceTargetMatching.ovalFitTimeout.toLong()) {
+                        if (!detectedFaceMatchedOval && faceGuideRect != null) {
+                            readyForOval = false
+                            val timeoutError =
+                                FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException()
+                            onSessionError(timeoutError, true)
+                        }
+                        cancel()
                     }
-                    faceOvalMatchTimerStarted = false
-                    cancel()
-                }
-            }
-
-            // Start freshness check if it's not already started and face is in oval
-            if (!runningFreshness && colorChallenge?.challengeType ==
-                ColorChallengeType.SEQUENTIAL &&
-                faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
-            ) {
-                runningFreshness = true
             }
         }
+        return true
+    }
+
+    fun onStartViewComplete() {
+        showingStartView = false
     }
 }

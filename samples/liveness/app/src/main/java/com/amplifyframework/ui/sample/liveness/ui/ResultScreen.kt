@@ -270,6 +270,10 @@ private fun ResultsView(sessionId: String,
                     )
                 }
             }
+            if (!isLive && error == null) {
+                Spacer(Modifier.height(8.dp))
+                TipView()
+            }
         }
 
         Button(
@@ -295,15 +299,16 @@ private fun getDisplayError(error: FaceLivenessDetectionException): DisplayError
         is FaceLivenessDetectionException.SessionTimedOutException -> {
             DisplayError(
                 title = stringResource(id = R.string.error_timed_out_title),
-                message = if (error.message.contains("did not match oval", true)) {
-                    stringResource(id = R.string.error_timed_out_face_fit_message)
-                } else {
-                    stringResource(id = R.string.error_timed_out_session_message)
-                }
+                message = stringResource(id = R.string.error_timed_out_session_message)
             )
         }
         else -> {
-            if (error.message.contains("failed during countdown", ignoreCase = true)) {
+            if (error.message.contains("did not match oval", true)) {
+                DisplayError(
+                    title = stringResource(id = R.string.error_timed_out_title),
+                    message = stringResource(id = R.string.error_timed_out_face_fit_message)
+                )
+            } else if (error.message.contains("failed during countdown", ignoreCase = true)) {
                 DisplayError(
                     title = stringResource(id = R.string.error_failure_during_countdown_title),
                     message = stringResource(id = R.string.error_failure_during_countdown_message)
@@ -315,6 +320,53 @@ private fun getDisplayError(error: FaceLivenessDetectionException): DisplayError
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TipView() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(16.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.result_tip_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column(Modifier.padding(start = 8.dp)) {
+            Tip(1, stringResource(id = R.string.result_tip_1))
+            Spacer(modifier = Modifier.height(8.dp))
+            Tip(2, stringResource(id = R.string.result_tip_2))
+        }
+    }
+}
+
+@Composable
+private fun Tip(tipNumber: Int, body: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "$tipNumber.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = body,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 

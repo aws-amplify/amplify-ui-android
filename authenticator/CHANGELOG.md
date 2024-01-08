@@ -1,3 +1,10 @@
+## [Release 1.0.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.2)
+
+## Miscellaneous
+* Compose and Material3 version bump https://github.com/aws-amplify/amplify-ui-android/pull/80
+
+[See all changes between 1.0.1 and 1.0.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.0.1...release_authenticator_v1.0.2)
+
 ## [Release 1.0.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.1)
 
 ### Fixes

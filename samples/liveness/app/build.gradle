@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace 'com.amplifyframework.ui.sample.liveness'
-    compileSdk 33
+    compileSdk 34
 
     buildFeatures {
         buildConfig true
@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "com.amplifyframework.ui.sample.liveness"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1"
         buildConfigField "boolean", "SHOW_DEBUG_UI", "false"
@@ -45,6 +45,7 @@ android {
     packaging {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += 'META-INF/versions/9/previous-compilation-data.bin'
         }
     }
 }

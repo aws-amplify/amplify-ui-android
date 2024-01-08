@@ -20,15 +20,16 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Create the [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for the
@@ -44,6 +45,7 @@ fun rememberAuthenticatorState(
     signUpForm: SignUpFormBuilder.() -> Unit = {}
 ): AuthenticatorState {
     val viewModel = viewModel<AuthenticatorViewModel>()
+    val scope = rememberCoroutineScope()
     return remember {
         val configuration = AuthenticatorConfiguration(
             initialStep = initialStep,
@@ -51,7 +53,9 @@ fun rememberAuthenticatorState(
         )
 
         viewModel.start(configuration)
-        AuthenticatorStateImpl(viewModel)
+        AuthenticatorStateImpl(viewModel).also { state ->
+            viewModel.stepState.onEach { state.stepState = it }.launchIn(scope)
+        }
     }
 }
 
@@ -82,12 +86,4 @@ internal class AuthenticatorStateImpl constructor(
 
     override val messages: Flow<AuthenticatorMessage>
         get() = viewModel.events
-
-    init {
-        viewModel.viewModelScope.launch {
-            viewModel.stepState.collect {
-                stepState = it
-            }
-        }
-    }
 }

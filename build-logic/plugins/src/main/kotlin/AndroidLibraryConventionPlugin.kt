@@ -76,7 +76,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         }
 
         extension.apply {
-            compileSdk = 33
+            compileSdk = 34
 
             buildFeatures {
                 buildConfig = true
@@ -101,7 +101,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             lint {
                 warningsAsErrors = true
                 abortOnError = true
-                enable += listOf("UnusedResources", "NewerVersionAvailable")
+                enable += listOf("UnusedResources")
+                disable += listOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
             }
 
             compileOptions {

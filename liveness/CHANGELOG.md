@@ -1,3 +1,36 @@
+## [Release 1.2.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.1)
+
+## Miscellaneous
+* Pass error codes on close to Amplify https://github.com/aws-amplify/amplify-ui-android/pull/106
+
+[See all changes between 1.2.0 and 1.2.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.2.0...release-liveness-1.2.1)
+
+## [Release 1.2.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.0)
+
+## Important!
+* New string added (update translations): "amplify_ui_liveness_get_ready_center_face_label"
+* LivenessColorScheme defaults changed: errorContainer and onErrorContainer default colors have been modified.
+
+## Bug Fixes and Features
+* fix(liveness): use updated Liveness oval algorithm https://github.com/aws-amplify/amplify-ui-android/pull/95
+* feat(liveness): Update Liveness UI https://github.com/aws-amplify/amplify-ui-android/pull/100
+
+[See all changes between 1.1.6 and 1.2.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.6...release-liveness-1.2.0)
+
+## [Release 1.1.6](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.6)
+
+## Miscellaneous
+* Compose and Material3 version bump https://github.com/aws-amplify/amplify-ui-android/pull/80
+
+[See all changes between 1.1.5 and 1.1.6](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.5...release_liveness_v1.1.6)
+
+## [Release 1.1.5](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.5)
+
+## Miscellaneous
+* Amplify version bump to fix DST time issue on some devices https://github.com/aws-amplify/amplify-ui-android/pull/89
+
+[See all changes between 1.1.3 and 1.1.5](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.1.5...release_liveness_v1.1.3)
+
 ## [Release 1.1.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.1.3)
 
 ## Bug Fixes

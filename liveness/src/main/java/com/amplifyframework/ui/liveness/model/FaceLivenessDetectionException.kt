@@ -50,4 +50,11 @@ open class FaceLivenessDetectionException(
         recoverySuggestion: String = "Retry the face liveness check.",
         throwable: Throwable? = null
     ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+
+    /**
+     * This is not an error we have determined to publicly expose.
+     * The error will come to the customer in onError, but only instance checked as FaceLivenessDetectionException.
+     */
+    internal class FaceInOvalMatchExceededTimeLimitException :
+        FaceLivenessDetectionException("Face did not match oval within time limit.")
 }

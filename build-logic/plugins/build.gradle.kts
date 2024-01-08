@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `kotlin-dsl`
     alias(libs.plugins.ktlint)
@@ -31,7 +30,6 @@ ktlint {
 dependencies {
     compileOnly(libs.plugin.android.gradle)
     compileOnly(libs.plugin.kotlin.android)
-    compileOnly(libs.plugin.dokka)
     compileOnly(libs.plugin.kover)
     compileOnly(libs.plugin.ktlint)
 }
@@ -45,10 +43,6 @@ gradlePlugin {
         register("publishing") {
             id = "amplify.android.publishing"
             implementationClass = "PublishingConventionPlugin"
-        }
-        register("dokka") {
-            id = "amplify.android.dokka"
-            implementationClass = "DokkaConventionPlugin"
         }
         register("ktlint") {
             id = "amplify.android.ktlint"

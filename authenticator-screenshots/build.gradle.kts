@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("amplify.android.library")
     alias(libs.plugins.paparazzi)
@@ -21,10 +20,21 @@ plugins {
 
 android {
     namespace = "com.amplifyframework.ui.authenticator.screenshots"
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.test.mockk)
     implementation(projects.authenticator)
+
+    coreLibraryDesugaring(libs.android.desugar)
+}
+
+// Verify screenshots when running the check task
+tasks.named("check").configure {
+    dependsOn(tasks.first { it.name == "verifyPaparazzi" })
 }

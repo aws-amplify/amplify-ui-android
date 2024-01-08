@@ -19,7 +19,6 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.testing.ComposeTest
-import org.robolectric.shadows.ShadowView.clickOn
 
 fun ComposeTest.signInContinueWithTotpSetup(func: SignInContinueWithTotpSetupRobot.() -> Unit) =
     SignInContinueWithTotpSetupRobot(composeTestRule).func()

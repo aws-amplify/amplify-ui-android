@@ -65,6 +65,8 @@ import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
  * @param signInConfirmMfaContent The content to show for the [SignInConfirmMfaState].
  * @param signInConfirmCustomContent The content to show for the [SignInConfirmCustomState].
  * @param signInConfirmNewPasswordContent The content to show for the [SignInConfirmNewPasswordState].
+ * @param signInConfirmTotpCodeContent The content to show for the [SignInConfirmTotpCodeState].
+ * @param signInContinueWithTotpSetupContent The content to show for the [SignInContinueWithTotpSetupState].
  * @param signUpContent The content to show for the [SignUpState].
  * @param signUpConfirmContent The content to show for the [SignUpConfirmState].
  * @param passwordResetContent The content to show for the [PasswordResetState].

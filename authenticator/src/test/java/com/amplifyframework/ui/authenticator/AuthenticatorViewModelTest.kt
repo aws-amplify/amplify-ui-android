@@ -16,7 +16,6 @@
 package com.amplifyframework.ui.authenticator
 
 import android.app.Application
-import app.cash.turbine.test
 import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
@@ -155,18 +154,19 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
-    fun `MFA Selection next step is unsupported`() = runTest {
+    fun `MFA Selection next step shows the SignInContinueWithMfaSelection screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
-            mockSignInResult(signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION)
+            mockSignInResult(
+                signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
+                allowedMFATypes = emptySet()
+            )
         )
 
         viewModel.start(mockAuthConfiguration(initialStep = AuthenticatorStep.SignIn))
 
-        viewModel.events.test {
-            viewModel.signIn("username", "password")
-            awaitItem().shouldBeError(causeMessage = "Authenticator does not yet support TOTP workflows.")
-        }
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInContinueWithMfaSelection
     }
 
 //endregion

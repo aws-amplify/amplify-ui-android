@@ -22,6 +22,7 @@ import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
+import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.TOTPSetupDetails
 import com.amplifyframework.auth.cognito.exceptions.service.CodeDeliveryFailureException
 import com.amplifyframework.auth.cognito.exceptions.service.CodeExpiredException
@@ -73,6 +74,7 @@ import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
+import com.amplifyframework.ui.authenticator.util.challengeResponse
 import com.amplifyframework.ui.authenticator.util.toFieldError
 import java.net.UnknownHostException
 import kotlinx.coroutines.channels.BufferOverflow
@@ -317,6 +319,25 @@ internal class AuthenticatorViewModel(
         moveTo(newState)
     }
 
+    private suspend fun handleMfaSelectionRequired(
+        username: String,
+        password: String,
+        allowedMfaTypes: Set<MFAType>?
+    ) {
+        if (allowedMfaTypes == null) {
+            val exception = AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify")
+            handleGeneralFailure(exception)
+            return
+        }
+
+        moveTo(
+            stateFactory.newSignInContinueWithMfaSelectionState(
+                allowedMfaTypes = allowedMfaTypes,
+                onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
+            )
+        )
+    }
+
     private suspend fun handleSignInSuccess(username: String, password: String, result: AuthSignInResult) {
         when (val nextStep = result.nextStep.signInStep) {
             AuthSignInStep.DONE -> checkVerificationMechanisms()
@@ -342,15 +363,8 @@ internal class AuthenticatorViewModel(
             // This step isn't actually returned, it comes back as a UserNotConfirmedException.
             // Handling here for future correctness
             AuthSignInStep.CONFIRM_SIGN_UP -> handleUnconfirmedSignIn(username, password)
-            // Show an error for TOTP next step
-            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION -> {
-                val exception = AuthException(
-                    "Authenticator does not yet support TOTP workflows.",
-                    "Disable TOTP to use Authenticator."
-                )
-                logger.error("Unsupported next step $nextStep", exception)
-                sendMessage(UnknownErrorMessage(exception))
-            }
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION ->
+                handleMfaSelectionRequired(username, password, result.nextStep.allowedMFATypes)
             AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP ->
                 handleTotpSetupRequired(username, password, result.nextStep.totpSetupDetails)
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> moveTo(

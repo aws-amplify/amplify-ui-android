@@ -15,6 +15,9 @@
 
 package com.amplifyframework.ui.authenticator.ui.robots
 
+import androidx.compose.ui.test.hasParent
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.ui.authenticator.ui.TestTags
@@ -26,7 +29,8 @@ fun ComposeTest.signInContinueWithMfaSelection(func: SignInContinueWithMfaSelect
 
 class SignInContinueWithMfaSelectionRobot(composeTestRule: ComposeTestRule) : ScreenLevelRobot(composeTestRule) {
     fun hasSubmitButton(expected: String) = assertExists(TestTags.SignInConfirmButton, expected)
-    fun hasMfaTypes(expected: List<MFAType>) {
+    fun hasMfaTypeSelected(expected: MFAType) {
+        composeTestRule.onNode(hasParent(hasTestTag(expected.challengeResponse)) and isSelected()).assertExists()
     }
 
     fun selectMfaType(type: MFAType) = clickOnTag(type.challengeResponse)

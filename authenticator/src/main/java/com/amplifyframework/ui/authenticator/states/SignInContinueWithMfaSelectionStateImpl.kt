@@ -17,6 +17,7 @@ internal class SignInContinueWithMfaSelectionStateImpl(
         form.addFields {
             mfaSelection()
         }
+        form.fields[FieldKey.MfaSelection]?.state?.content = allowedMfaTypes.first().challengeResponse
     }
 
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)

@@ -8,6 +8,7 @@ import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.mockFieldData
+import com.amplifyframework.ui.authenticator.mockFieldState
 import com.amplifyframework.ui.authenticator.mockForm
 import org.junit.Test
 
@@ -21,7 +22,12 @@ class SignInContinueWithMfaSelectionScreenshots : ScreenshotTestBase() {
     }
 
     private fun mockSignInContinueWithMfaSelectionState() = object : SignInContinueWithMfaSelectionState {
-        override val form = mockForm(mockFieldData(FieldConfig.Text(FieldKey.MfaSelection)))
+        override val form = mockForm(
+            mockFieldData(
+                config = FieldConfig.Text(FieldKey.MfaSelection),
+                state = mockFieldState(content = "SMS_MFA")
+            )
+        )
         override val allowedMfaTypes = MFAType.values().toSet()
         override fun moveTo(step: AuthenticatorInitialStep) {}
         override suspend fun continueSignIn() {}

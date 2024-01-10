@@ -34,16 +34,13 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
     }
 
     @Test
-    fun `Requires MFA Type selection`() {
+    fun `defaults to first MFA type`() {
         val onSubmit = mockk<(String) -> Unit>(relaxed = true)
         setContent {
             SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState(onSubmit = onSubmit))
         }
         signInContinueWithMfaSelection {
-            clickSubmitButton()
-        }
-        verify(exactly = 0) {
-            onSubmit(any())
+            hasMfaTypeSelected(MFAType.SMS)
         }
     }
 
@@ -55,6 +52,7 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
         }
         signInContinueWithMfaSelection {
             selectMfaType(MFAType.SMS)
+            hasMfaTypeSelected(MFAType.SMS)
             clickSubmitButton()
         }
         verify {
@@ -70,6 +68,7 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
         }
         signInContinueWithMfaSelection {
             selectMfaType(MFAType.TOTP)
+            hasMfaTypeSelected(MFAType.TOTP)
             clickSubmitButton()
         }
         verify {

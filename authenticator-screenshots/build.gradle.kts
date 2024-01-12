@@ -1,5 +1,3 @@
-more meta-inf
-
 /*
  * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -26,6 +24,10 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/LICENSE.md")
     }
 }
 

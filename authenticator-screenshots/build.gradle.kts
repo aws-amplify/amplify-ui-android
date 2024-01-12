@@ -26,7 +26,7 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    packaging {
+    packagingOptions {
         resources.excludes.add("META-INF/LICENSE.md")
     }
 }

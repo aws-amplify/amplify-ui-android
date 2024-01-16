@@ -26,3 +26,13 @@ class MissingConfigurationException : AuthException(
     "Make sure the Auth plugin is added and Amplify.configure is called. See " +
         "https://docs.amplify.aws/lib/auth/getting-started/q/platform/android/ for details"
 )
+
+/**
+ * Exception that is passed to the errorContent if the configuration passed to the auth plugin is missing a required
+ * property or has an invalid property
+ */
+class InvalidConfigurationException(message: String, cause: Exception?) : AuthException(
+    message = message,
+    recoverySuggestion = "Check that the configuration passed to Amplify.configure has all required fields",
+    cause = cause
+)

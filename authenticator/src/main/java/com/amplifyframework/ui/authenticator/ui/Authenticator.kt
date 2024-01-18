@@ -46,6 +46,7 @@ import com.amplifyframework.ui.authenticator.SignInConfirmCustomState
 import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
 import com.amplifyframework.ui.authenticator.SignInConfirmNewPasswordState
 import com.amplifyframework.ui.authenticator.SignInConfirmTotpCodeState
+import com.amplifyframework.ui.authenticator.SignInContinueWithTotpSetupState
 import com.amplifyframework.ui.authenticator.SignInState
 import com.amplifyframework.ui.authenticator.SignUpConfirmState
 import com.amplifyframework.ui.authenticator.SignUpState
@@ -64,6 +65,8 @@ import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
  * @param signInConfirmMfaContent The content to show for the [SignInConfirmMfaState].
  * @param signInConfirmCustomContent The content to show for the [SignInConfirmCustomState].
  * @param signInConfirmNewPasswordContent The content to show for the [SignInConfirmNewPasswordState].
+ * @param signInConfirmTotpCodeContent The content to show for the [SignInConfirmTotpCodeState].
+ * @param signInContinueWithTotpSetupContent The content to show for the [SignInContinueWithTotpSetupState].
  * @param signUpContent The content to show for the [SignUpState].
  * @param signUpConfirmContent The content to show for the [SignUpConfirmState].
  * @param passwordResetContent The content to show for the [PasswordResetState].
@@ -89,6 +92,9 @@ fun Authenticator(
     },
     signInConfirmTotpCodeContent: @Composable (state: SignInConfirmTotpCodeState) -> Unit = {
         SignInConfirmTotpCode(it)
+    },
+    signInContinueWithTotpSetupContent: @Composable (state: SignInContinueWithTotpSetupState) -> Unit = {
+        SignInContinueWithTotpSetup(it)
     },
     signUpContent: @Composable (state: SignUpState) -> Unit = { SignUp(it) },
     signUpConfirmContent: @Composable (state: SignUpConfirmState) -> Unit = { SignUpConfirm(it) },
@@ -129,6 +135,7 @@ fun Authenticator(
                             targetState
                         )
                         is SignInConfirmTotpCodeState -> signInConfirmTotpCodeContent(targetState)
+                        is SignInContinueWithTotpSetupState -> signInContinueWithTotpSetupContent(targetState)
                         is SignUpState -> signUpContent(targetState)
                         is PasswordResetState -> passwordResetContent(targetState)
                         is PasswordResetConfirmState -> passwordResetConfirmContent(targetState)

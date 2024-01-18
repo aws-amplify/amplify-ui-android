@@ -81,6 +81,17 @@ internal class StepStateFactory(
         onMoveTo = onMoveTo
     )
 
+    fun newSignInContinueWithTotpSetupState(
+        sharedSecret: String,
+        setupUri: String,
+        onSubmit: suspend (confirmationCode: String) -> Unit
+    ) = SignInContinueWithTotpSetupStateImpl(
+        sharedSecret = sharedSecret,
+        setupUri = setupUri,
+        onSubmit = onSubmit,
+        onMoveTo = onMoveTo
+    )
+
     fun newSignUpState(
         onSubmit: suspend (username: String, password: String, attributes: List<AuthUserAttribute>) -> Unit
     ) = SignUpStateImpl(

@@ -126,18 +126,19 @@ class AuthenticatorViewModelTest {
 //region signIn tests
 
     @Test
-    fun `TOTPSetup next step is unsupported`() = runTest {
+    fun `TOTPSetup next step shows SignInContinueWithTotpSetup screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
-            mockSignInResult(signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP)
+            mockSignInResult(
+                signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP,
+                totpSetupDetails = mockk(relaxed = true)
+            )
         )
 
         viewModel.start(mockAuthConfiguration(initialStep = AuthenticatorStep.SignIn))
 
-        viewModel.events.test {
-            viewModel.signIn("username", "password")
-            awaitItem().shouldBeError(causeMessage = "Authenticator does not yet support TOTP workflows.")
-        }
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInContinueWithTotpSetup
     }
 
     @Test

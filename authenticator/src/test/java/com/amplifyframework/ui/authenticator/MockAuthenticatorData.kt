@@ -27,13 +27,16 @@ import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
+import com.amplifyframework.ui.authenticator.options.TotpOptions
 
 internal fun mockAuthConfiguration(
     initialStep: AuthenticatorInitialStep = AuthenticatorStep.SignIn,
-    signUpForm: SignUpFormBuilder.() -> Unit = {}
+    signUpForm: SignUpFormBuilder.() -> Unit = {},
+    totpOptions: TotpOptions? = null
 ) = AuthenticatorConfiguration(
     initialStep = initialStep,
-    signUpForm = signUpForm
+    signUpForm = signUpForm,
+    totpOptions = totpOptions
 )
 
 internal fun mockAuthException(

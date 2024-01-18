@@ -24,4 +24,5 @@
     <string name="amplify_ui_authenticator_button_lost_code">Lost your code?</string>
     <string name="amplify_ui_authenticator_button_resend_code">Send Code</string>
     <string name="amplify_ui_authenticator_button_skip">Skip</string>
+    <string name="amplify_ui_authenticator_button_copy_key">Copy Key</string>
 </resources>

@@ -15,7 +15,12 @@
 
 package com.amplifyframework.ui.testing
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import org.junit.Before
 import org.junit.Rule
@@ -34,5 +39,9 @@ abstract class ComposeTest {
         ShadowLog.stream = System.out // Redirect Logcat to console
     }
 
-    protected fun setContent(content: @Composable () -> Unit) = composeTestRule.setContent(content)
+    protected fun setContent(content: @Composable () -> Unit) = composeTestRule.setContent {
+        Box(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            content()
+        }
+    }
 }

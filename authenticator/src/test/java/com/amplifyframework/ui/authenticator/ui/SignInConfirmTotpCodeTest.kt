@@ -36,6 +36,16 @@ class SignInConfirmTotpCodeTest : ComposeTest() {
     }
 
     @Test
+    fun `Submit button label is Submit`() {
+        setContent {
+            SignInConfirmTotpCode(state = mockSignInConfirmTotpCodeState())
+        }
+        signInConfirmTotpCode {
+            hasSubmitButton("Submit")
+        }
+    }
+
+    @Test
     fun `passes confirmation code to onSubmit`() {
         val onSubmit = mockk<(String) -> Unit>(relaxed = true)
 

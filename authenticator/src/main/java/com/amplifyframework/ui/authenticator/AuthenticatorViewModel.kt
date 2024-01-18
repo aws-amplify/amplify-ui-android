@@ -324,9 +324,8 @@ internal class AuthenticatorViewModel(
         password: String,
         allowedMfaTypes: Set<MFAType>?
     ) {
-        if (allowedMfaTypes == null) {
-            val exception = AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify")
-            handleGeneralFailure(exception)
+        if (allowedMfaTypes.isNullOrEmpty()) {
+            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
             return
         }
 

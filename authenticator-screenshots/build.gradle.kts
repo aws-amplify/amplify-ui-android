@@ -26,7 +26,7 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "META-INF/LICENSE.md"
         }
@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.plugin.android.gradle)
     implementation(libs.bundles.compose)
     implementation(libs.test.mockk)
     implementation(projects.authenticator)

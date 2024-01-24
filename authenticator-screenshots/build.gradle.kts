@@ -27,7 +27,9 @@ android {
     }
 
     packagingOptions {
-        resources.excludes.add("META-INF/LICENSE.md")
+        resources {
+            excludes += "META-INF/LICENSE.md"
+        }
     }
 }
 

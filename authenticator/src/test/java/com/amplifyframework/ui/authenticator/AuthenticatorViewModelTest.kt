@@ -20,6 +20,7 @@ import app.cash.turbine.test
 import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
+import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
 import com.amplifyframework.ui.testing.CoroutineTestRule
 import io.kotest.matchers.shouldBe
@@ -29,6 +30,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -46,6 +48,11 @@ class AuthenticatorViewModelTest {
 
     private val viewModel = AuthenticatorViewModel(application, authProvider)
 
+    @Before
+    fun setup() {
+        coEvery { authProvider.getConfiguration() } returns AuthConfigurationResult.Valid(mockk(relaxed = true))
+    }
+
 //region start tests
 
     @Test
@@ -62,7 +69,18 @@ class AuthenticatorViewModelTest {
 
     @Test
     fun `missing configuration results in an error`() = runTest {
-        coEvery { authProvider.getConfiguration() } returns null
+        coEvery { authProvider.getConfiguration() } returns AuthConfigurationResult.Missing
+
+        viewModel.start(mockAuthConfiguration())
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { authProvider.fetchAuthSession() }
+        viewModel.currentStep shouldBe AuthenticatorStep.Error
+    }
+
+    @Test
+    fun `invalid configuration results in an error`() = runTest {
+        coEvery { authProvider.getConfiguration() } returns AuthConfigurationResult.Invalid("Invalid")
 
         viewModel.start(mockAuthConfiguration())
         advanceUntilIdle()

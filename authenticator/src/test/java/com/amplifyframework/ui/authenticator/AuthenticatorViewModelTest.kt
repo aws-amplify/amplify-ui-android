@@ -16,7 +16,7 @@
 package com.amplifyframework.ui.authenticator
 
 import android.app.Application
-import app.cash.turbine.test
+import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
@@ -126,6 +126,22 @@ class AuthenticatorViewModelTest {
 //region signIn tests
 
     @Test
+    fun `TOTPSetup next step shows error if totpSetupDetails is null`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
+            mockSignInResult(
+                signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP,
+                totpSetupDetails = null
+            )
+        )
+
+        viewModel.start(mockAuthConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.Error
+    }
+
+    @Test
     fun `TOTPSetup next step shows SignInContinueWithTotpSetup screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
@@ -155,18 +171,51 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
-    fun `MFA Selection next step is unsupported`() = runTest {
+    fun `MFA selection next step shows error if allowedMFATypes is null`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
-            mockSignInResult(signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION)
+            mockSignInResult(
+                signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
+                allowedMFATypes = null
+            )
         )
 
         viewModel.start(mockAuthConfiguration(initialStep = AuthenticatorStep.SignIn))
 
-        viewModel.events.test {
-            viewModel.signIn("username", "password")
-            awaitItem().shouldBeError(causeMessage = "Authenticator does not yet support TOTP workflows.")
-        }
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.Error
+    }
+
+    @Test
+    fun `MFA selection next step shows error if allowedMFATypes is empty`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
+            mockSignInResult(
+                signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
+                allowedMFATypes = emptySet()
+            )
+        )
+
+        viewModel.start(mockAuthConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.Error
+    }
+
+    @Test
+    fun `MFA Selection next step shows the SignInContinueWithMfaSelection screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns AmplifyResult.Success(
+            mockSignInResult(
+                signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
+                allowedMFATypes = setOf(MFAType.TOTP, MFAType.SMS)
+            )
+        )
+
+        viewModel.start(mockAuthConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInContinueWithMfaSelection
     }
 
 //endregion

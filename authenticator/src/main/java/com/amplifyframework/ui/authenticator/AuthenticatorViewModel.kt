@@ -62,11 +62,13 @@ import com.amplifyframework.ui.authenticator.forms.setFieldError
 import com.amplifyframework.ui.authenticator.states.BaseStateImpl
 import com.amplifyframework.ui.authenticator.states.StepStateFactory
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
+import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 import com.amplifyframework.ui.authenticator.util.CannotSendCodeMessage
 import com.amplifyframework.ui.authenticator.util.CodeSentMessage
 import com.amplifyframework.ui.authenticator.util.ExpiredCodeMessage
+import com.amplifyframework.ui.authenticator.util.InvalidConfigurationException
 import com.amplifyframework.ui.authenticator.util.InvalidLoginMessage
 import com.amplifyframework.ui.authenticator.util.MissingConfigurationException
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
@@ -124,14 +126,19 @@ internal class AuthenticatorViewModel(
         this.configuration = configuration
 
         viewModelScope.launch {
-            val authConfig = authProvider.getConfiguration()
-
-            if (authConfig == null) {
-                handleGeneralFailure(MissingConfigurationException())
-                return@launch
+            when (val authConfigResult = authProvider.getConfiguration()) {
+                is AuthConfigurationResult.Invalid -> {
+                    handleGeneralFailure(
+                        InvalidConfigurationException(authConfigResult.message, authConfigResult.cause)
+                    )
+                    return@launch
+                }
+                AuthConfigurationResult.Missing -> {
+                    handleGeneralFailure(MissingConfigurationException())
+                    return@launch
+                }
+                is AuthConfigurationResult.Valid -> authConfiguration = authConfigResult.configuration
             }
-
-            authConfiguration = authConfig
 
             stateFactory = StepStateFactory(
                 authConfiguration,

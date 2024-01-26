@@ -13,15 +13,10 @@
  * permissions and limitations under the License.
  */
 
-plugins {
-    id("amplify.android.library")
-}
+package com.amplifyframework.ui.authenticator.ui
 
-android {
-    namespace = "com.amplifyframework.ui.testing"
-}
-
-dependencies {
-    api(libs.bundles.test)
-    implementation(libs.bundles.compose)
+internal object TestTags {
+    const val SignInConfirmButton = "SignInConfirmButton"
+    const val BackToSignInButton = "BackToSignInButton"
+    const val CopyKeyButton = "CopyKeyButton"
 }

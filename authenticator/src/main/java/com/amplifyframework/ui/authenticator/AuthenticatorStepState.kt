@@ -21,6 +21,7 @@ import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
+import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
@@ -173,6 +174,85 @@ interface SignInConfirmNewPasswordState : AuthenticatorStepState {
      * Confirm the user's sign in using the information entered into the [form].
      */
     suspend fun confirmSignIn()
+}
+
+/**
+ * The user has completed the initial Sign In step, and needs to enter a TOTP code from a registered authenticator
+ * app.
+ */
+@Stable
+interface SignInConfirmTotpCodeState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Confirm the user's sign in using the information entered into the [form].
+     */
+    suspend fun confirmSignIn()
+}
+
+/**
+ * The user has completed the initial Sign In step, and must register a TOTP authenticator app to continue.
+ */
+@Stable
+interface SignInContinueWithTotpSetupState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * The code that can be used to manually register with the authenticator application.
+     */
+    val sharedSecret: String
+
+    /**
+     * The URI that can be used to automatically register with the authenticator application.
+     */
+    val setupUri: String
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Continue the user's sign in using the information entered into the [form].
+     */
+    suspend fun continueSignIn()
+}
+
+/**
+ * The user has completed the initial Sign In step,  and must select their desired MFA method to continue.
+ */
+@Stable
+interface SignInContinueWithMfaSelectionState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * The set of [MFAType] that could be used to continue this sign in.
+     */
+    val allowedMfaTypes: Set<MFAType>
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Continue the user's sign in using the information entered into the [form].
+     */
+    suspend fun continueSignIn()
 }
 
 /**

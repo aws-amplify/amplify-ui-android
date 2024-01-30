@@ -29,6 +29,7 @@ ktlint {
 
 dependencies {
     compileOnly(libs.plugin.android.gradle)
+    compileOnly(libs.plugin.binary.compatibility)
     compileOnly(libs.plugin.kotlin.android)
     compileOnly(libs.plugin.kover)
     compileOnly(libs.plugin.ktlint)
@@ -39,6 +40,10 @@ gradlePlugin {
         register("androidLibrary") {
             id = "amplify.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("apiValidator") {
+            id = "amplify.android.api.validator"
+            implementationClass = "ApiValidatorConventionPlugin"
         }
         register("publishing") {
             id = "amplify.android.publishing"

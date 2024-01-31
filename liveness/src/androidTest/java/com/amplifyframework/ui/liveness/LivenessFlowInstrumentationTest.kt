@@ -31,7 +31,6 @@ import com.amplifyframework.predictions.options.FaceLivenessSessionOptions
 import com.amplifyframework.ui.liveness.camera.FrameAnalyzer
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
-import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.ui.FaceLivenessDetector
 import io.mockk.CapturingSlot
@@ -255,7 +254,7 @@ class LivenessFlowInstrumentationTest {
         composeTestRule.setContent {
             FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", onComplete = {
                 completesSuccessfully = true
-            }, onError = {assertTrue(false) })
+            }, onError = { assertTrue(false) })
         }
 
         composeTestRule.onNodeWithText(beginCheckString).assertExists()
@@ -306,10 +305,15 @@ class LivenessFlowInstrumentationTest {
         val sessionId = "sessionId"
         var completesSuccessfully = false
         composeTestRule.setContent {
-            FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", credentialsProvider = mockCredentialsProvider,
+            FaceLivenessDetector(
+                sessionId = sessionId,
+                region = "us-east-1",
+                credentialsProvider = mockCredentialsProvider,
                 onComplete = {
-                completesSuccessfully = true
-            }, onError = { assertTrue(false) })
+                    completesSuccessfully = true
+                },
+                onError = { assertTrue(false) },
+            )
         }
 
         composeTestRule.onNodeWithText(beginCheckString).assertExists()

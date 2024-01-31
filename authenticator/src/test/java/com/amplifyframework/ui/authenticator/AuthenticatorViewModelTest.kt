@@ -50,7 +50,7 @@ class AuthenticatorViewModelTest {
 
     @Test
     fun `start only executes once`() = runTest {
-        coEvery {authProvider.fetchAuthSession()}.returns(AmplifyResult.Error(mockAuthException()))
+        coEvery { authProvider.fetchAuthSession() }.returns(AmplifyResult.Error(mockAuthException()))
         viewModel.start(mockAuthConfiguration())
         viewModel.start(mockAuthConfiguration())
         advanceUntilIdle()

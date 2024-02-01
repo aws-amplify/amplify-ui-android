@@ -13,16 +13,10 @@
  * permissions and limitations under the License.
  */
 
-package com.amplifyframework.ui.authenticator.util
+package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.auth.AuthException
-
-/**
- * Exception that is passed to the errorContent if the application does not have the auth plugin
- * configured when attempting to use Authenticator
- */
-class MissingConfigurationException : AuthException(
-    "Missing auth configuration",
-    "Make sure the Auth plugin is added and Amplify.configure is called. See " +
-        "https://docs.amplify.aws/lib/auth/getting-started/q/platform/android/ for details"
-)
+internal object TestTags {
+    const val SignInConfirmButton = "SignInConfirmButton"
+    const val BackToSignInButton = "BackToSignInButton"
+    const val CopyKeyButton = "CopyKeyButton"
+}

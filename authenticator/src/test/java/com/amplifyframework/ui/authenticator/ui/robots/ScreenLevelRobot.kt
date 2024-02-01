@@ -16,9 +16,12 @@
 package com.amplifyframework.ui.authenticator.ui.robots
 
 import androidx.compose.ui.test.junit4.ComposeTestRule
+import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.testing.ComposeRobot
 
 abstract class ScreenLevelRobot(rule: ComposeTestRule) : ComposeRobot(rule) {
     // Check that the composable has the expected title
     fun hasTitle(expected: String) = assertExists("AuthenticatorTitle", expected)
+
+    fun setFieldContent(key: FieldKey, content: String) = writeTo(key.toString(), content)
 }

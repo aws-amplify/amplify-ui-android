@@ -60,8 +60,6 @@ subprojects {
     }
 }
 
-// Plugin aliases are a warning in Gradle < 8.1, this suppress can be removed after updating
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false

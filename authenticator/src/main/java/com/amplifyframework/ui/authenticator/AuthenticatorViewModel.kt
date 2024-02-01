@@ -22,6 +22,8 @@ import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
+import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.TOTPSetupDetails
 import com.amplifyframework.auth.cognito.exceptions.service.CodeDeliveryFailureException
 import com.amplifyframework.auth.cognito.exceptions.service.CodeExpiredException
 import com.amplifyframework.auth.cognito.exceptions.service.CodeMismatchException
@@ -60,11 +62,13 @@ import com.amplifyframework.ui.authenticator.forms.setFieldError
 import com.amplifyframework.ui.authenticator.states.BaseStateImpl
 import com.amplifyframework.ui.authenticator.states.StepStateFactory
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
+import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 import com.amplifyframework.ui.authenticator.util.CannotSendCodeMessage
 import com.amplifyframework.ui.authenticator.util.CodeSentMessage
 import com.amplifyframework.ui.authenticator.util.ExpiredCodeMessage
+import com.amplifyframework.ui.authenticator.util.InvalidConfigurationException
 import com.amplifyframework.ui.authenticator.util.InvalidLoginMessage
 import com.amplifyframework.ui.authenticator.util.MissingConfigurationException
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
@@ -72,6 +76,7 @@ import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
+import com.amplifyframework.ui.authenticator.util.challengeResponse
 import com.amplifyframework.ui.authenticator.util.toFieldError
 import java.net.UnknownHostException
 import kotlinx.coroutines.channels.BufferOverflow
@@ -121,14 +126,19 @@ internal class AuthenticatorViewModel(
         this.configuration = configuration
 
         viewModelScope.launch {
-            val authConfig = authProvider.getConfiguration()
-
-            if (authConfig == null) {
-                handleGeneralFailure(MissingConfigurationException())
-                return@launch
+            when (val authConfigResult = authProvider.getConfiguration()) {
+                is AuthConfigurationResult.Invalid -> {
+                    handleGeneralFailure(
+                        InvalidConfigurationException(authConfigResult.message, authConfigResult.cause)
+                    )
+                    return@launch
+                }
+                AuthConfigurationResult.Missing -> {
+                    handleGeneralFailure(MissingConfigurationException())
+                    return@launch
+                }
+                is AuthConfigurationResult.Valid -> authConfiguration = authConfigResult.configuration
             }
-
-            authConfiguration = authConfig
 
             stateFactory = StepStateFactory(
                 authConfiguration,
@@ -295,6 +305,45 @@ internal class AuthenticatorViewModel(
         }
     }
 
+    private suspend fun handleTotpSetupRequired(
+        username: String,
+        password: String,
+        totpSetupDetails: TOTPSetupDetails?
+    ) {
+        if (totpSetupDetails == null) {
+            val exception = AuthException("Missing TOTPSetupDetails", "Please open a bug with Amplify")
+            handleGeneralFailure(exception)
+            return
+        }
+
+        val issuer = configuration.totpOptions?.issuer ?: getAppName()
+        val setupUri = totpSetupDetails.getSetupURI(issuer, username).toString()
+        val newState = stateFactory.newSignInContinueWithTotpSetupState(
+            sharedSecret = totpSetupDetails.sharedSecret,
+            setupUri = setupUri,
+            onSubmit = { confirmationCode -> confirmSignIn(username, password, confirmationCode) }
+        )
+        moveTo(newState)
+    }
+
+    private suspend fun handleMfaSelectionRequired(
+        username: String,
+        password: String,
+        allowedMfaTypes: Set<MFAType>?
+    ) {
+        if (allowedMfaTypes.isNullOrEmpty()) {
+            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
+            return
+        }
+
+        moveTo(
+            stateFactory.newSignInContinueWithMfaSelectionState(
+                allowedMfaTypes = allowedMfaTypes,
+                onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
+            )
+        )
+    }
+
     private suspend fun handleSignInSuccess(username: String, password: String, result: AuthSignInResult) {
         when (val nextStep = result.nextStep.signInStep) {
             AuthSignInStep.DONE -> checkVerificationMechanisms()
@@ -320,17 +369,15 @@ internal class AuthenticatorViewModel(
             // This step isn't actually returned, it comes back as a UserNotConfirmedException.
             // Handling here for future correctness
             AuthSignInStep.CONFIRM_SIGN_UP -> handleUnconfirmedSignIn(username, password)
-            // Show an error for TOTP next step
-            AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP,
-            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
-            AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> {
-                val exception = AuthException(
-                    "Authenticator does not yet support TOTP workflows.",
-                    "Disable TOTP to use Authenticator."
-                )
-                logger.error("Unsupported next step $nextStep", exception)
-                sendMessage(UnknownErrorMessage(exception))
-            }
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION ->
+                handleMfaSelectionRequired(username, password, result.nextStep.allowedMFATypes)
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP ->
+                handleTotpSetupRequired(username, password, result.nextStep.totpSetupDetails)
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> moveTo(
+                stateFactory.newSignInConfirmTotpCodeState { confirmationCode ->
+                    confirmSignIn(username, password, confirmationCode)
+                }
+            )
             else -> {
                 // Generic error for any other next steps that may be added in the future
                 val exception = AuthException(
@@ -548,5 +595,11 @@ internal class AuthenticatorViewModel(
 
     private fun FormState.setSignInMethodError(error: FieldError) {
         setFieldError(authConfiguration.signInMethod.toFieldKey(), error)
+    }
+
+    private fun getAppName(): String {
+        val context = getApplication<Application>()
+        val appInfo = context.applicationInfo
+        return context.packageManager.getApplicationLabel(appInfo).toString()
     }
 }

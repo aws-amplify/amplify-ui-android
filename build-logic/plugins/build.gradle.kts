@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `kotlin-dsl`
     alias(libs.plugins.ktlint)

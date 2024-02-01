@@ -28,6 +28,7 @@ import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
+import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
@@ -131,26 +132,44 @@ internal class LivenessStateTest {
 
     @Test
     fun `state is error after on error`() {
-        livenessState.onError(true)
+        livenessState.onError(true, WebSocketCloseCode.RUNTIME_ERROR)
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }
 
     @Test
     fun `session is stopped when stopLivenessSession is true and error occurs`() {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
-        val stopSession = mockk<() -> Unit>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onError(true)
-        verify(exactly = 1) { stopSession() }
+        livenessState.onError(true, WebSocketCloseCode.RUNTIME_ERROR)
+        verify(exactly = 1) { stopSession(WebSocketCloseCode.RUNTIME_ERROR.code) }
+    }
+
+    @Test
+    fun `proper code is sent when provided in onDestroy`() {
+        val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
+        livenessState.onDestroy(true, WebSocketCloseCode.DISPOSED)
+        verify(exactly = 1) { stopSession(WebSocketCloseCode.DISPOSED.code) }
+    }
+
+    @Test
+    fun `null close code is sent when no close code provided in onDestroy`() {
+        val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
+        livenessState.onDestroy(true, null)
+        verify(exactly = 1) { stopSession(null) }
     }
 
     @Test
     fun `session is not stopped when stopLivenessSession is false and error occurs`() {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
-        val stopSession = mockk<() -> Unit>(relaxed = true)
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
         livenessState.livenessSessionInfo = FaceLivenessSession(challenges, { }, { }, stopSession)
-        livenessState.onError(false)
-        verify(exactly = 0) { stopSession() }
+        livenessState.onError(false, WebSocketCloseCode.RUNTIME_ERROR)
+        verify(exactly = 0) { stopSession(any()) }
     }
 
     @Test
@@ -205,7 +224,7 @@ internal class LivenessStateTest {
     @Test
     fun `state is error after freshness completes and an error occurs`() {
         livenessState.faceGuideRect = mockk(relaxed = true)
-        livenessState.onError(false)
+        livenessState.onError(false, WebSocketCloseCode.RUNTIME_ERROR)
         livenessState.onFreshnessComplete()
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }

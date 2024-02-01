@@ -1,6 +1,6 @@
 [versions]
 agp = "8.1.4"
-amplify = "2.14.5"
+amplify = "2.14.8"
 cameraX = "1.2.0"
 compose = "1.5.4"
 coroutines = "1.7.3"
@@ -12,6 +12,7 @@ kotest = "5.7.1"
 material3 = "1.1.2"
 paparazzi = "1.2.0"
 turbine = "1.0.0"
+zxing = "3.5.2"
 
 [libraries]
 # Amplify Dependencies
@@ -38,6 +39,9 @@ kotlin-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.
 # TensorFlow
 tensorflow = "org.tensorflow:tensorflow-lite:2.0.0"
 tensorflow-support = "org.tensorflow:tensorflow-lite-support:0.3.0"
+
+# Other
+zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 # Testing libraries
 test-androidx-junit = "androidx.test.ext:junit:1.1.4"

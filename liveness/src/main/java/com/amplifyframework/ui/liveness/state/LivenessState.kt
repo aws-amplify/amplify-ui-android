@@ -34,6 +34,7 @@ import com.amplifyframework.ui.liveness.ml.FaceOval
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
+import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
 import java.util.Timer
 import java.util.TimerTask
@@ -87,19 +88,21 @@ internal data class LivenessState(
         }
     }
 
-    fun onError(stopLivenessSession: Boolean) {
+    fun onError(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode) {
         livenessCheckState.value = LivenessCheckState.Error
-        onDestroy(stopLivenessSession)
+        onDestroy(stopLivenessSession, webSocketCloseCode)
     }
 
-    // Cleans up state when challenge is completed or cancelled
-    fun onDestroy(stopLivenessSession: Boolean) {
+    // Cleans up state when challenge is completed or cancelled.
+    // We only send webSocketCloseCode if error encountered.
+    fun onDestroy(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
+        livenessCheckState.value = LivenessCheckState.Error
         faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
         runningFreshness = false
         if (stopLivenessSession) {
-            livenessSessionInfo?.stopSession()
+            livenessSessionInfo?.stopSession(webSocketCloseCode?.code)
         }
     }
 
@@ -300,9 +303,7 @@ internal data class LivenessState(
                         if (!detectedFaceMatchedOval && faceGuideRect != null) {
                             readyForOval = false
                             val timeoutError =
-                                FaceLivenessDetectionException(
-                                    "Face did not match oval within time limit."
-                                )
+                                FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException()
                             onSessionError(timeoutError, true)
                         }
                         cancel()

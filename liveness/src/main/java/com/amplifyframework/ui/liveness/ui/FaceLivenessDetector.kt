@@ -124,9 +124,12 @@ fun FaceLivenessDetector(
                 disableStartView,
                 onChallengeComplete = {
                     scope.launch {
-                        isFinished = true
-                        resetOrientation()
-                        currentOnComplete.call()
+                        // if we are already finished, we already provided a result in complete or failed
+                        if (!isFinished) {
+                            isFinished = true
+                            resetOrientation()
+                            currentOnComplete.call()
+                        }
                     }
                 },
                 onChallengeFailed = {

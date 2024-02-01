@@ -46,11 +46,10 @@ import com.amplifyframework.ui.liveness.model.LivenessCheckState
     livenessCheckState: LivenessCheckState
 ) {
     val instructionText = livenessCheckState.instructionId?.let { stringResource(it) } ?: return
-    val showProgress = livenessCheckState is LivenessCheckState.Success
     if (livenessCheckState.isActionable) {
         FaceOvalInstructionMessage(message = instructionText)
     } else {
-        InstructionMessage(message = instructionText, showProgress = showProgress)
+        InstructionMessage(message = instructionText, showProgress = true)
     }
 }
 @Composable

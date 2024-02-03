@@ -23,4 +23,5 @@ android {
 
 dependencies {
     api(libs.bundles.test)
+    implementation(libs.bundles.compose)
 }

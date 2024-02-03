@@ -368,9 +368,11 @@ internal class FormBuilderImpl : SignUpFormBuilder {
     }
 
     fun verificationAttribute() {
-        this += FieldConfig.Text(
-            key = FieldKey.VerificationAttribute
-        )
+        this += FieldConfig.Text(key = FieldKey.VerificationAttribute)
+    }
+
+    fun mfaSelection() {
+        this += FieldConfig.Text(key = FieldKey.MfaSelection, required = true)
     }
 
     fun fieldForSignInMethod(method: SignInMethod) = when (method) {

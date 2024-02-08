@@ -115,7 +115,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
             // More collisions occurred using JUnit, so just using META-INF/* now.
             packaging {
-                resources.excludes.add("META-INF/*")
+                resources.excludes.add("META-INF/DEPENDENCIES")
+                resources.excludes.add("META-INF/LICENSE.md")
+                resources.excludes.add("META-INF/LICENSE-notice.md")
             }
 
             buildFeatures {

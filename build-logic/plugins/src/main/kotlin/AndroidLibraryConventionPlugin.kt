@@ -113,7 +113,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             // Needed when running integration tests. The oauth2 library uses relies on two
             // dependencies (Apache's httpcore and httpclient), both of which include
             // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
-            // More collisions occurred using JUnit, so just using META-INF/* now.
+            // More collisions occurred using JUnit, so also adding LICENSE-*.md files.
             packaging {
                 resources.excludes.add("META-INF/DEPENDENCIES")
                 resources.excludes.add("META-INF/LICENSE.md")

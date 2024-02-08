@@ -30,6 +30,7 @@ class ApiValidatorConventionPlugin : Plugin<Project> {
             extensions.configure<ApiValidationExtension> {
                 // Ignore anything marked with an internal API marker
                 nonPublicMarkers += amplifyInternalMarkers
+                nonPublicMarkers += "androidx.annotation.VisibleForTesting"
             }
         }
     }

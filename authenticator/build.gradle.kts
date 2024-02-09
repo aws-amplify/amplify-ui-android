@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.compose.viewmodel)
+    implementation(libs.zxing)
     coreLibraryDesugaring(libs.android.desugar)
 
     testImplementation(projects.testing)

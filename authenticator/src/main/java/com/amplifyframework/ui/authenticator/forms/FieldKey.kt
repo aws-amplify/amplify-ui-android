@@ -48,6 +48,11 @@ abstract class FieldKey internal constructor() {
     object VerificationAttribute : FieldKey()
 
     /**
+     * Key for field to select an MFA type when signing in.
+     */
+    object MfaSelection : FieldKey()
+
+    /**
      * A [UserAttributeKey] is an [FieldKey] for a field that maps to an
      * [AuthUserAttributeKey] in Amplify.
      */

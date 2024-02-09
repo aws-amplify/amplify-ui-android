@@ -101,7 +101,13 @@ internal interface AuthProvider {
 
     fun authStatusEvents(): Flow<HubEvent<*>>
 
-    suspend fun getConfiguration(): AmplifyAuthConfiguration?
+    suspend fun getConfiguration(): AuthConfigurationResult
+}
+
+internal sealed interface AuthConfigurationResult {
+    data class Valid(val configuration: AmplifyAuthConfiguration) : AuthConfigurationResult
+    data class Invalid(val message: String, val cause: Exception? = null) : AuthConfigurationResult
+    object Missing : AuthConfigurationResult
 }
 
 /**
@@ -246,8 +252,8 @@ internal class RealAuthProvider : AuthProvider {
         awaitClose { Amplify.Hub.unsubscribe(token) }
     }
 
-    override suspend fun getConfiguration(): AmplifyAuthConfiguration? {
-        val authConfigJSON = getCognitoPlugin()?.getPluginConfiguration() ?: return null
+    override suspend fun getConfiguration(): AuthConfigurationResult {
+        val authConfigJSON = getCognitoPlugin()?.getPluginConfiguration() ?: return AuthConfigurationResult.Missing
         try {
             val innerJSON = authConfigJSON
                 .getJSONObject("Auth")
@@ -292,14 +298,16 @@ internal class RealAuthProvider : AuthProvider {
                 }
             }.toSet()
 
-            return AmplifyAuthConfiguration(
-                signInMethod,
-                signUpAttributeList,
-                passwordCriteria,
-                verificationMechanisms
+            return AuthConfigurationResult.Valid(
+                AmplifyAuthConfiguration(
+                    signInMethod,
+                    signUpAttributeList,
+                    passwordCriteria,
+                    verificationMechanisms
+                )
             )
         } catch (e: JSONException) {
-            return null
+            return AuthConfigurationResult.Invalid(e.message ?: "Auth configuration is not valid", e)
         }
     }
 

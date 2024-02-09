@@ -54,10 +54,10 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             var w = outputBoxes[0][i][2]
             var h = outputBoxes[0][i][3]
 
-            var leftEyeX = outputBoxes[0][i][4]
-            var leftEyeY = outputBoxes[0][i][5]
-            var rightEyeX = outputBoxes[0][i][6]
-            var rightEyeY = outputBoxes[0][i][7]
+            var rightEyeX = outputBoxes[0][i][4]
+            var rightEyeY = outputBoxes[0][i][5]
+            var leftEyeX = outputBoxes[0][i][6]
+            var leftEyeY = outputBoxes[0][i][7]
 
             var noseX = outputBoxes[0][i][8]
             var noseY = outputBoxes[0][i][9]

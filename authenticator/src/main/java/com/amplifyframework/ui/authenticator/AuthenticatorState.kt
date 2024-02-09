@@ -26,10 +26,43 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
+import com.amplifyframework.ui.authenticator.options.TotpOptions
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
+/**
+ * Create the [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for the
+ * Authenticator composable.
+ * @param initialStep The [AuthenticatorInitialStep] that the user sees first when the Authenticator becomes visible. Default is [AuthenticatorStep.SignIn].
+ * @param signUpForm The builder instance for configuring the sign up form content. A default sign up form will be inferred from your
+ * Amplify configuration, but this may be used to modify that form by changing the order of the fields, adding fields for custom or optional user attributes,
+ * or adding fully custom fields. Has an [SignUpFormBuilder] receiver.
+ * @param totpOptions Optional information that can be used to configure the user's experience when using
+ * [TOTP MFA](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa-totp.html).
+ */
+@Composable
+fun rememberAuthenticatorState(
+    initialStep: AuthenticatorInitialStep = AuthenticatorStep.SignIn,
+    signUpForm: SignUpFormBuilder.() -> Unit = {},
+    totpOptions: TotpOptions? = null
+): AuthenticatorState {
+    val viewModel = viewModel<AuthenticatorViewModel>()
+    val scope = rememberCoroutineScope()
+    return remember {
+        val configuration = AuthenticatorConfiguration(
+            initialStep = initialStep,
+            signUpForm = signUpForm,
+            totpOptions = totpOptions
+        )
+
+        viewModel.start(configuration)
+        AuthenticatorStateImpl(viewModel).also { state ->
+            viewModel.stepState.onEach { state.stepState = it }.launchIn(scope)
+        }
+    }
+}
 
 /**
  * Create the [state holder](https://developer.android.com/jetpack/compose/state#managing-state) for the
@@ -43,21 +76,11 @@ import kotlinx.coroutines.flow.onEach
 fun rememberAuthenticatorState(
     initialStep: AuthenticatorInitialStep = AuthenticatorStep.SignIn,
     signUpForm: SignUpFormBuilder.() -> Unit = {}
-): AuthenticatorState {
-    val viewModel = viewModel<AuthenticatorViewModel>()
-    val scope = rememberCoroutineScope()
-    return remember {
-        val configuration = AuthenticatorConfiguration(
-            initialStep = initialStep,
-            signUpForm = signUpForm
-        )
-
-        viewModel.start(configuration)
-        AuthenticatorStateImpl(viewModel).also { state ->
-            viewModel.stepState.onEach { state.stepState = it }.launchIn(scope)
-        }
-    }
-}
+): AuthenticatorState = rememberAuthenticatorState(
+    initialStep = initialStep,
+    totpOptions = null,
+    signUpForm = signUpForm
+)
 
 /**
  * The [state holder](https://developer.android.com/jetpack/compose/state#managing-state) instance for

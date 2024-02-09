@@ -1,5 +1,5 @@
-name: Unit tests
-run-name: Unit tests for ${{ github.ref }}
+name: Integration tests
+run-name: Integration tests for ${{ github.ref }}
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ env:
   AWS_REGION: "us-east-1"
 
 jobs:
-  ci-unit-tests:
+  ci-integration-tests:
     permissions:
       id-token: write # This is required for requesting the JWT with configure-aws-credentials
       contents: read # This is required for actions/checkout

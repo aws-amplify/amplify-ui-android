@@ -1,0 +1,126 @@
+public final class com/amplifyframework/ui/liveness/BuildConfig {
+	public static final field BUILD_TYPE Ljava/lang/String;
+	public static final field DEBUG Z
+	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
+	public static final field VERSION_NAME Ljava/lang/String;
+	public fun <init> ()V
+}
+
+public class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getRecoverySuggestion ()Ljava/lang/String;
+	public final fun getThrowable ()Ljava/lang/Throwable;
+}
+
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$AccessDeniedException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$CameraPermissionDeniedException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$SessionNotFoundException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$SessionTimedOutException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$UserCancelledException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$CancelChallengeButtonKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$CancelChallengeButtonKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function2;
+	public static field lambda-2 Lkotlin/jvm/functions/Function2;
+	public fun <init> ()V
+	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function3;
+	public fun <init> ()V
+	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function3;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function2;
+	public static field lambda-2 Lkotlin/jvm/functions/Function2;
+	public static field lambda-3 Lkotlin/jvm/functions/Function2;
+	public static field lambda-4 Lkotlin/jvm/functions/Function2;
+	public static field lambda-5 Lkotlin/jvm/functions/Function2;
+	public fun <init> ()V
+	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-3$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-4$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-5$liveness_release ()Lkotlin/jvm/functions/Function2;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function3;
+	public static field lambda-2 Lkotlin/jvm/functions/Function2;
+	public static field lambda-3 Lkotlin/jvm/functions/Function2;
+	public static field lambda-4 Lkotlin/jvm/functions/Function2;
+	public static field lambda-5 Lkotlin/jvm/functions/Function2;
+	public fun <init> ()V
+	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-3$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-4$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-5$liveness_release ()Lkotlin/jvm/functions/Function2;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$RecordingIndicatorKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$RecordingIndicatorKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function2;
+	public static field lambda-2 Lkotlin/jvm/functions/Function2;
+	public static field lambda-3 Lkotlin/jvm/functions/Function2;
+	public fun <init> ()V
+	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda-3$liveness_release ()Lkotlin/jvm/functions/Function2;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/FaceLivenessDetectorKt {
+	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class com/amplifyframework/ui/liveness/ui/LivenessColorScheme {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/LivenessColorScheme;
+	public final fun default (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/ColorScheme;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defaults {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defaults;
+	public final fun getDarkColorScheme ()Landroidx/compose/material3/ColorScheme;
+	public final fun getLightColorScheme ()Landroidx/compose/material3/ColorScheme;
+}
+

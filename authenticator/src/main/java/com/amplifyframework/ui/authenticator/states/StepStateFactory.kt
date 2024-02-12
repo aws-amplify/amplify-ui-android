@@ -19,6 +19,7 @@ import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
+import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
@@ -70,6 +71,33 @@ internal class StepStateFactory(
         onSubmit: suspend (password: String) -> Unit
     ) = SignInConfirmNewPasswordStateImpl(
         passwordCriteria = authConfiguration.passwordCriteria,
+        onSubmit = onSubmit,
+        onMoveTo = onMoveTo
+    )
+
+    fun newSignInConfirmTotpCodeState(
+        onSubmit: suspend (confirmationCode: String) -> Unit
+    ) = SignInConfirmTotpCodeStateImpl(
+        onSubmit = onSubmit,
+        onMoveTo = onMoveTo
+    )
+
+    fun newSignInContinueWithMfaSelectionState(
+        allowedMfaTypes: Set<MFAType>,
+        onSubmit: suspend (selection: String) -> Unit
+    ) = SignInContinueWithMfaSelectionStateImpl(
+        allowedMfaTypes = allowedMfaTypes,
+        onSubmit = onSubmit,
+        onMoveTo = onMoveTo
+    )
+
+    fun newSignInContinueWithTotpSetupState(
+        sharedSecret: String,
+        setupUri: String,
+        onSubmit: suspend (confirmationCode: String) -> Unit
+    ) = SignInContinueWithTotpSetupStateImpl(
+        sharedSecret = sharedSecret,
+        setupUri = setupUri,
         onSubmit = onSubmit,
         onMoveTo = onMoveTo
     )

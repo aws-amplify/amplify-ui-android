@@ -18,7 +18,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val optInAnnotations = listOf(
+val amplifyInternalMarkers = listOf(
     "com.amplifyframework.annotations.InternalApiWarning",
     "com.amplifyframework.annotations.InternalAmplifyApi"
 )
@@ -32,10 +32,11 @@ class ComponentConventionPlugin : Plugin<Project> {
             pluginManager.apply("amplify.android.library")
             pluginManager.apply("amplify.android.publishing")
             pluginManager.apply("amplify.android.kover")
+            pluginManager.apply("amplify.android.api.validator")
 
             tasks.withType<KotlinCompile>().configureEach {
                 kotlinOptions {
-                    freeCompilerArgs = freeCompilerArgs + optInAnnotations.map { "-opt-in=$it" }
+                    freeCompilerArgs = freeCompilerArgs + amplifyInternalMarkers.map { "-opt-in=$it" }
                 }
             }
         }

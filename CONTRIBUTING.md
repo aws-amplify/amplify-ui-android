@@ -39,6 +39,13 @@ To send us a pull request, please:
 GitHub provides additional document on [forking a repository](https://help.github.com/articles/fork-a-repo/) and
 [creating a pull request](https://help.github.com/articles/creating-a-pull-request/).
 
+### Public API Changes
+This project uses the [Kotlin Binary Compatibility Validator Plugin](https://github.com/Kotlin/binary-compatibility-validator) to validate our public API surface. Pull requests that include public API changes must modify the API file by running this gradle command:
+
+```bash
+./gradlew apiDump
+```
+
 
 ## Finding contributions to work on
 Looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any 'help wanted' issues is a great place to start.

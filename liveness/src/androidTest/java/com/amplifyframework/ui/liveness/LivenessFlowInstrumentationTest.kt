@@ -31,7 +31,6 @@ import com.amplifyframework.predictions.options.FaceLivenessSessionOptions
 import com.amplifyframework.ui.liveness.camera.FrameAnalyzer
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
-import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.ui.FaceLivenessDetector
 import io.mockk.CapturingSlot
@@ -46,6 +45,7 @@ import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.unmockkConstructor
+import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -75,6 +75,7 @@ class LivenessFlowInstrumentationTest {
     private lateinit var connectingString: String
     private lateinit var moveCloserString: String
     private lateinit var holdStillString: String
+    private lateinit var verifyingString: String
     private lateinit var mockCredentialsProvider: MockCredentialsProvider
 
     private var framesSent = 0
@@ -123,6 +124,7 @@ class LivenessFlowInstrumentationTest {
         holdStillString = context.getString(
             R.string.amplify_ui_liveness_challenge_instruction_hold_face_during_freshness,
         )
+        verifyingString = context.getString(R.string.amplify_ui_liveness_challenge_verifying)
 
         mockCredentialsProvider = MockCredentialsProvider()
     }
@@ -255,7 +257,7 @@ class LivenessFlowInstrumentationTest {
         composeTestRule.setContent {
             FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", onComplete = {
                 completesSuccessfully = true
-            }, onError = {assertTrue(false) })
+            }, onError = { assertTrue(false) })
         }
 
         composeTestRule.onNodeWithText(beginCheckString).assertExists()
@@ -306,10 +308,15 @@ class LivenessFlowInstrumentationTest {
         val sessionId = "sessionId"
         var completesSuccessfully = false
         composeTestRule.setContent {
-            FaceLivenessDetector(sessionId = sessionId, region = "us-east-1", credentialsProvider = mockCredentialsProvider,
+            FaceLivenessDetector(
+                sessionId = sessionId,
+                region = "us-east-1",
+                credentialsProvider = mockCredentialsProvider,
                 onComplete = {
-                completesSuccessfully = true
-            }, onError = { assertTrue(false) })
+                    completesSuccessfully = true
+                },
+                onError = { assertTrue(false) },
+            )
         }
 
         composeTestRule.onNodeWithText(beginCheckString).assertExists()
@@ -403,11 +410,23 @@ class LivenessFlowInstrumentationTest {
         )
         faceUpdates += 1
 
-        // now, the face is inside the oval.  wait for the colors to finish
         composeTestRule.waitForIdle()
 
-        assertEquals(livenessState?.readyToSendFinalEvents, true)
+        // countdown is now invsible, wait one second so that we can start freshness
+        composeTestRule.waitUntil(2000) {
+            livenessState?.faceMatchOvalStart?.let { (Date().time - it) > 1000 } ?: false
+        }
+        livenessState?.onFrameAvailable()
+        assert(livenessState?.runningFreshness!!)
+
+        // now, freshness is running.  wait for the colors to finish
+        composeTestRule.waitUntil(10000) {
+            composeTestRule.onAllNodesWithText(verifyingString)
+                .fetchSemanticsNodes().size == 1
+        }
+
         val state = livenessState?.livenessCheckState?.value
+        assertEquals(livenessState?.readyToSendFinalEvents, true)
         assertTrue(state is LivenessCheckState.Success)
         assertTrue((state as LivenessCheckState.Success).faceGuideRect == faceRect)
         // inconsistent number of frames sent

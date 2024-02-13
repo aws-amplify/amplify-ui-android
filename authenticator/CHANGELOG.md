@@ -1,3 +1,14 @@
+## [Release 1.1.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.1.0)
+
+### Features
+- **authenticator:** Add support for TOTP to Authenticator ([#114](https://github.com/aws-amplify/amplify-ui-android/pull/114))
+
+### Fixes
+- **authenticator:** Don't use viewModelScope from the state holder ([#83](https://github.com/aws-amplify/amplify-ui-android/pull/83))
+- **authenticator:** Improve error messaging if auth configuration is invalid/incomplete ([#112](https://github.com/aws-amplify/amplify-ui-android/pull/112))
+
+[See all changes between 1.0.2 and 1.1.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.0.2...release_authenticator_v1.1.0)
+
 ## [Release 1.0.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.0.2)
 
 ## Miscellaneous

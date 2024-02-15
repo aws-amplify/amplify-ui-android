@@ -1,7 +1,7 @@
 buildscript {
     ext {
         compose_version = '1.5.4'
-        amplifyVersion = '2.14.8'
+        amplifyVersion = '2.14.10'
         amplifyUIVersion = '1.2.1'
     }
     repositories {

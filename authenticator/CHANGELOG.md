@@ -1,5 +1,8 @@
 ## [Release 1.1.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.1.0)
 
+## Important!
+* New strings added (update translations): "amplify_ui_authenticator_button_copy_key", "amplify_ui_authenticator_enter_totp_code", "amplify_ui_authenticator_step1_title", "amplify_ui_authenticator_step1_content", "amplify_ui_authenticator_step2_title", "amplify_ui_authenticator_step2_content", "amplify_ui_authenticator_step3_title", "amplify_ui_authenticator_step3_content", "amplify_ui_authenticator_mfa_sms", "amplify_ui_authenticator_mfa_totp", "amplify_ui_authenticator_title_signin_confirm_totp", "amplify_ui_authenticator_title_signin_continue_totp_setup", "amplify_ui_authenticator_title_signin_continue_mfa_select"
+
 ### Features
 - **authenticator:** Add support for TOTP to Authenticator ([#114](https://github.com/aws-amplify/amplify-ui-android/pull/114))
 

@@ -29,18 +29,7 @@ class LicensesConventionPlugin : Plugin<Project> {
             extensions.configure<app.cash.licensee.LicenseeExtension> {
                 allow("Apache-2.0")
                 allow("MIT")
-                allow("BSD-2-Clause")
-                allowDependency("org.bouncycastle", "bcprov-jdk15on", "1.70") {
-                    because("MIT License")
-                }
-                allowDependency("org.ow2.asm", "asm", "9.4") {
-                    because("3-Clause BSD License")
-                }
-                allowDependency("org.ow2.asm", "asm-analysis", "9.4")
-                allowDependency("org.ow2.asm", "asm-commons", "9.4")
-                allowDependency("org.ow2.asm", "asm-tree", "9.4")
-                allowDependency("org.ow2.asm", "asm-util", "9.4")
-                allowDependency("com.ibm.icu", "icu4j", "70.1")
+
                 allowUrl("http://aws.amazon.com/apache2.0")
                 allowUrl("https://developer.android.com/studio/terms.html")
 

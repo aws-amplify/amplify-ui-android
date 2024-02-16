@@ -35,7 +35,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             apply("com.android.library")
             apply("org.jetbrains.kotlin.android")
             apply("amplify.android.ktlint")
-            apply("amplify.android.licenses")
         }
 
         val POM_GROUP: String by target

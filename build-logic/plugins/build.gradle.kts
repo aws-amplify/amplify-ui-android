@@ -30,10 +30,10 @@ ktlint {
 dependencies {
     compileOnly(libs.plugin.android.gradle)
     compileOnly(libs.plugin.binary.compatibility)
-    compileOnly(libs.plugin.licensee)
     compileOnly(libs.plugin.kotlin.android)
     compileOnly(libs.plugin.kover)
     compileOnly(libs.plugin.ktlint)
+    compileOnly(libs.plugin.licensee)
 }
 
 gradlePlugin {
@@ -50,10 +50,6 @@ gradlePlugin {
             id = "amplify.android.ui.component"
             implementationClass = "ComponentConventionPlugin"
         }
-        register("licenses") {
-            id = "amplify.android.licenses"
-            implementationClass = "LicensesConventionPlugin"
-        }
         register("kover") {
             id = "amplify.android.kover"
             implementationClass = "KoverConventionPlugin"
@@ -61,6 +57,10 @@ gradlePlugin {
         register("ktlint") {
             id = "amplify.android.ktlint"
             implementationClass = "KtLintConventionPlugin"
+        }
+        register("licenses") {
+            id = "amplify.android.licenses"
+            implementationClass = "LicensesConventionPlugin"
         }
         register("publishing") {
             id = "amplify.android.publishing"

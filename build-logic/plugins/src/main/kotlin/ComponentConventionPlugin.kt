@@ -33,6 +33,7 @@ class ComponentConventionPlugin : Plugin<Project> {
             pluginManager.apply("amplify.android.publishing")
             pluginManager.apply("amplify.android.kover")
             pluginManager.apply("amplify.android.api.validator")
+            pluginManager.apply("amplify.android.licenses")
 
             tasks.withType<KotlinCompile>().configureEach {
                 kotlinOptions {

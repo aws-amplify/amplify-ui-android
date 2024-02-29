@@ -33,6 +33,7 @@ dependencies {
     compileOnly(libs.plugin.kotlin.android)
     compileOnly(libs.plugin.kover)
     compileOnly(libs.plugin.ktlint)
+    compileOnly(libs.plugin.licensee)
 }
 
 gradlePlugin {
@@ -45,14 +46,6 @@ gradlePlugin {
             id = "amplify.android.api.validator"
             implementationClass = "ApiValidatorConventionPlugin"
         }
-        register("publishing") {
-            id = "amplify.android.publishing"
-            implementationClass = "PublishingConventionPlugin"
-        }
-        register("ktlint") {
-            id = "amplify.android.ktlint"
-            implementationClass = "KtLintConventionPlugin"
-        }
         register("component") {
             id = "amplify.android.ui.component"
             implementationClass = "ComponentConventionPlugin"
@@ -60,6 +53,18 @@ gradlePlugin {
         register("kover") {
             id = "amplify.android.kover"
             implementationClass = "KoverConventionPlugin"
+        }
+        register("ktlint") {
+            id = "amplify.android.ktlint"
+            implementationClass = "KtLintConventionPlugin"
+        }
+        register("licenses") {
+            id = "amplify.android.licenses"
+            implementationClass = "LicensesConventionPlugin"
+        }
+        register("publishing") {
+            id = "amplify.android.publishing"
+            implementationClass = "PublishingConventionPlugin"
         }
     }
 }

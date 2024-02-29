@@ -5,11 +5,12 @@ binary-compatibility = "0.14.0"
 cameraX = "1.2.0"
 compose = "1.5.4"
 coroutines = "1.7.3"
-lifecycle = "2.4.0"
-kotlin = "1.8.10"
-ktlint = "11.0.0"
-kover = "0.7.2"
 kotest = "5.7.1"
+kotlin = "1.8.10"
+kover = "0.7.2"
+ktlint = "11.0.0"
+licensee = "1.7.0"
+lifecycle = "2.4.0"
 material3 = "1.1.2"
 paparazzi = "1.2.0"
 turbine = "1.0.0"
@@ -62,6 +63,7 @@ plugin-binary-compatibility = { module = "org.jetbrains.kotlinx:binary-compatibi
 plugin-kotlin-android = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-kover = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
 plugin-ktlint = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint" }
+plugin-licensee = { module = "app.cash.licensee:app.cash.licensee.gradle.plugin", version.ref = "licensee" }
 
 [bundles]
 camera = ["androidx-camera-core", "androidx-camera-camera2", "androidx-camera-lifecycle"]
@@ -87,4 +89,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+licensee = { id = "app.cash.licensee", version.ref = "licensee" }
 paparazzi = { id = "app.cash.paparazzi", version.ref = "paparazzi" }

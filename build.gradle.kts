@@ -5,59 +5,6 @@ buildscript {
         google()
         mavenCentral()
     }
-    dependencies {
-        classpath("app.cash.licensee:licensee-gradle-plugin:1.7.0")
-    }
-}
-
-subprojects {
-    apply(plugin = "app.cash.licensee")
-    configure<app.cash.licensee.LicenseeExtension> {
-        allow("Apache-2.0")
-        allow("MIT")
-        allow("BSD-2-Clause")
-        allowDependency("org.bouncycastle", "bcprov-jdk15on", "1.70") {
-            "MIT License"
-        }
-        allowDependency("org.ow2.asm", "asm", "9.4") {
-            "3-Clause BSD License"
-        }
-        allowDependency("org.ow2.asm", "asm-analysis", "9.4")
-        allowDependency("org.ow2.asm", "asm-commons", "9.4")
-        allowDependency("org.ow2.asm", "asm-tree", "9.4")
-        allowDependency("org.ow2.asm", "asm-util", "9.4")
-        allowDependency("com.ibm.icu", "icu4j", "70.1")
-        allowUrl("http://aws.amazon.com/apache2.0")
-        allowUrl("https://developer.android.com/studio/terms.html")
-
-        ignoreDependencies("javax.annotation", "javax.annotation-api") {
-            "Transitive dependency for androidx.test.espresso:espresso-core"
-        }
-        ignoreDependencies("org.junit", "junit-bom") {
-            because("Unit Testing Dependency")
-        }
-        ignoreDependencies("org.junit", "jupiter") {
-            because("Unit Testing Dependency")
-        }
-        ignoreDependencies("org.junit.jupiter", "junit-jupiter") {
-            because("Unit Testing Dependency")
-        }
-        ignoreDependencies("org.junit.jupiter", "junit-jupiter-params") {
-            because("Unit Testing Dependency")
-        }
-        ignoreDependencies("org.junit", "junit-jupiter-params") {
-            because("Unit Testing Dependency")
-        }
-        ignoreDependencies("org.junit.platform", "junit-platform-commons") {
-            because("Unit Testing Dependency")
-        }
-        ignoreDependencies("org.junit.platform", "junit-platform-engine") {
-            because("Unit Testing Dependency")
-        }
-        ignoreDependencies("junit", "junit") {
-            because("Unit Testing Dependency")
-        }
-    }
 }
 
 plugins {
@@ -68,6 +15,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.licensee) apply false
 }
 
 tasks.register<Delete>("clean").configure {

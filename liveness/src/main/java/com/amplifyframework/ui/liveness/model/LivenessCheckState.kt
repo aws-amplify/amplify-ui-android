@@ -43,7 +43,7 @@ internal sealed class LivenessCheckState(val instructionId: Int? = null, val isA
                 R.string.amplify_ui_liveness_challenge_instruction_move_face_closer
             )
             fun withMultipleFaceMessage() = Running(
-                R.string.amplify_ui_liveness_challenge_instruction_move_face_closer
+                R.string.amplify_ui_liveness_challenge_instruction_multiple_faces_detected
             )
             fun withFaceOvalPosition(faceOvalPosition: FaceDetector.FaceOvalPosition) =
                 Running(faceOvalPosition.instructionStringRes)

@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.util.Size
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.ml.FaceOval
 import com.amplifyframework.ui.liveness.state.LivenessState
@@ -42,7 +43,17 @@ internal class FrameAnalyzer(
     private var cachedBitmap: Bitmap? = null
     private var faceDetector = FaceDetector(livenessState)
 
+    private val logger = Amplify.Logging.forNamespace("Liveness")
+
     override fun analyze(image: ImageProxy) {
+        try {
+            attemptAnalyze(image)
+        } catch (e: Exception) {
+            logger.error("Failed to analyze frame", e)
+        }
+    }
+
+    private fun attemptAnalyze(image: ImageProxy) {
         if (cachedBitmap == null) {
             cachedBitmap = Bitmap.createBitmap(
                 image.width,

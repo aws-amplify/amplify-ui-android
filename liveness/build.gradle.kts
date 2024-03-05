@@ -12,6 +12,11 @@ android {
                 arguments += "-DCMAKE_VERBOSE_MAKEFILE=ON"
             }
         }
+        buildConfigField(
+            "String",
+            "LIVENESS_VERSION_NAME",
+            "\"${project.properties["VERSION_NAME"]}\""
+        )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

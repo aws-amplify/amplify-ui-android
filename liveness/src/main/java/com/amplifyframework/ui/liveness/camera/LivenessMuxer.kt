@@ -19,6 +19,7 @@ import android.media.MediaCodec
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import androidx.annotation.WorkerThread
+import com.amplifyframework.core.Amplify
 import java.io.File
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
@@ -48,6 +49,8 @@ internal class LivenessMuxer(
         currentVideoStartTime = System.currentTimeMillis()
     }
 
+    private val logger = Amplify.Logging.forNamespace("Liveness")
+
     /*
     Attempt to notify listener that chunked data is available if minimum chunk interval has exceeded
     Write new frame to muxer
@@ -61,7 +64,11 @@ internal class LivenessMuxer(
             }
         }
 
-        muxer.writeSampleData(videoTrack, byteBuf, bufferInfo)
+        try {
+            muxer.writeSampleData(videoTrack, byteBuf, bufferInfo)
+        } catch (e: Exception) {
+            logger.error("Failed to write encoded chunk to muxer", e)
+        }
     }
 
     @WorkerThread

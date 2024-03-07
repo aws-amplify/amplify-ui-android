@@ -67,6 +67,8 @@ internal class LivenessMuxer(
         try {
             muxer.writeSampleData(videoTrack, byteBuf, bufferInfo)
         } catch (e: Exception) {
+            // writeSampleData can throw for various reasons, such as an empty byte buffer.
+            // If this happens, we discard the frame, in hopes that future frames are valid.
             logger.error("Failed to write encoded chunk to muxer", e)
         }
     }

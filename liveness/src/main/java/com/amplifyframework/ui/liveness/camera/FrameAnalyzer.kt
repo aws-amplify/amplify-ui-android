@@ -49,6 +49,9 @@ internal class FrameAnalyzer(
         try {
             attemptAnalyze(image)
         } catch (e: Exception) {
+            // We've seen a few instances of exceptions thrown by copyPixelsFromBuffer.
+            // This indicates the image received may have been in an unexpected format.
+            // We discard this frame, in hopes that the next frame is readable.
             logger.error("Failed to analyze frame", e)
         }
     }

@@ -162,6 +162,8 @@ internal class LivenessVideoEncoder private constructor(
                                 )
                                 livenessMuxer = muxer
                             } catch (e: Exception) {
+                                // This is likely an unrecoverable error, such as file creation failing.
+                                // However, if it fails, we will allow another attempt at the next keyframe.
                                 logger.error("Failed to create liveness muxer", e)
                             }
                         }

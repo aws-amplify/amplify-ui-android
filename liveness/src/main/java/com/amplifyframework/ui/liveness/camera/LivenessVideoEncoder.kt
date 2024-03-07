@@ -24,6 +24,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import androidx.annotation.WorkerThread
+import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.util.isKeyFrame
 import java.io.File
 
@@ -124,6 +125,7 @@ internal class LivenessVideoEncoder private constructor(
 
     private var encoding = false
     private var livenessMuxer: LivenessMuxer? = null
+    private val logger = Amplify.Logging.forNamespace("Liveness")
 
     init {
         encoder.start()
@@ -152,11 +154,18 @@ internal class LivenessVideoEncoder private constructor(
 
                     if (info.isKeyFrame()) {
                         if (livenessMuxer == null) {
-                            livenessMuxer = LivenessMuxer(
-                                outputFile,
-                                encoder.outputFormat,
-                                onMuxedSegment
-                            )
+                            try {
+                                val muxer = LivenessMuxer(
+                                    outputFile,
+                                    encoder.outputFormat,
+                                    onMuxedSegment
+                                )
+                                livenessMuxer = muxer
+                            } catch (e: Exception) {
+                                // This is likely an unrecoverable error, such as file creation failing.
+                                // However, if it fails, we will allow another attempt at the next keyframe.
+                                logger.error("Failed to create liveness muxer", e)
+                            }
                         }
                         framesSinceSyncRequest = 0 // reset keyframe request on keyframe receipt
                     } else {

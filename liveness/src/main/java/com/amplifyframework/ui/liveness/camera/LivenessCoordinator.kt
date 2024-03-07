@@ -180,7 +180,7 @@ internal class LivenessCoordinator(
             sessionId,
             faceLivenessSessionInformation,
             faceLivenessSessionOptions,
-            BuildConfig.VERSION_NAME,
+            BuildConfig.LIVENESS_VERSION_NAME,
             { livenessState.onLivenessSessionReady(it) },
             {
                 disconnectEventReceived = true

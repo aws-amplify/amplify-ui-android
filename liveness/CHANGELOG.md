@@ -1,3 +1,11 @@
+## [Release 1.2.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.2)
+
+## Bug Fixes and Features
+* fix(liveness): Update Amplify to 2.14.12 to fix InvalidSignatureException https://github.com/aws-amplify/amplify-ui-android/pull/126
+* fix(liveness): Multiple Liveness Bug Fixes https://github.com/aws-amplify/amplify-ui-android/pull/124
+
+[See all changes between 1.2.1 and 1.2.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.2.1...release-liveness-1.2.2)
+
 ## [Release 1.2.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.1)
 
 ## Miscellaneous

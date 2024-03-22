@@ -46,9 +46,7 @@ import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
-import java.util.Timer
 import java.util.concurrent.Executors
-import kotlin.concurrent.schedule
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.MainScope
@@ -253,18 +251,6 @@ internal class LivenessCoordinator(
     }
 
     private fun processFinalEventsSent() {
-        // Timeout if the disconnect event isn't received (onComplete isn't invoked) within the time limit
-        Timer().schedule(DISCONNECT_EVENT_TIMEOUT_MS) {
-            if (!disconnectEventReceived) {
-                val timeoutError =
-                    FaceLivenessDetectionException.SessionTimedOutException(
-                        "Session timed out. Did not receive final response from server within " +
-                            "time limit."
-                    )
-                processSessionError(timeoutError, true)
-            }
-            cancel()
-        }
         unbindCamera(context)
     }
 
@@ -309,6 +295,5 @@ internal class LivenessCoordinator(
         const val TARGET_ENCODE_BITRATE = (1024 * 1024 * .6).toInt()
         const val TARGET_ENCODE_KEYFRAME_INTERVAL = 1 // webm muxer only flushes to file on keyframe
         val TARGET_RESOLUTION_SIZE = Size(TARGET_WIDTH, TARGET_HEIGHT)
-        const val DISCONNECT_EVENT_TIMEOUT_MS: Long = 8000
     }
 }

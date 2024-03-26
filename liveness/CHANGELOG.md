@@ -1,3 +1,10 @@
+## [Release 1.2.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.3)
+
+## Bug Fixes and Features
+* fix(liveness): Remove End Timeout https://github.com/aws-amplify/amplify-ui-android/pull/129
+
+[See all changes between 1.2.2 and 1.2.3](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.2.2...release-liveness-1.2.3)
+
 ## [Release 1.2.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.2)
 
 ## Bug Fixes and Features

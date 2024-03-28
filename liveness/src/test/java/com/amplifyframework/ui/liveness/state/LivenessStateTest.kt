@@ -17,6 +17,7 @@ package com.amplifyframework.ui.liveness.state
 
 import android.graphics.RectF
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.amplifyframework.predictions.aws.models.ColorChallenge
 import com.amplifyframework.predictions.aws.models.FaceTargetChallenge
 import com.amplifyframework.predictions.aws.models.FaceTargetChallengeResponse
@@ -37,9 +38,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 internal class LivenessStateTest {
 
     private lateinit var livenessState: LivenessState

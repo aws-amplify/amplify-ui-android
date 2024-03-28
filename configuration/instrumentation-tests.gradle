@@ -1,0 +1,45 @@
+/*
+Need to create backends for s3, pinpoint, predictions, core
+ */
+def module_backends = [
+        'liveness' : 'LivenessIntegTests',
+]
+
+def canaryTests = [
+//        'liveness' : [''],
+]
+
+subprojects {
+    afterEvaluate { project ->
+        if (module_backends.containsKey(project.name)) {
+            task runTestsInDeviceFarm {
+                doLast {
+                    exec {
+                        commandLine("$rootDir.path/scripts/run_test_in_devicefarm.sh")
+                        args([project.name])
+                    }
+                }
+            }
+//            task runNightlyTestsInDeviceFarmPool {
+//                dependsOn(assembleAndroidTest)
+//                doLast {
+//                    exec {
+//                        commandLine("$rootDir.path/scripts/run_nightly_tests_in_devicefarm_pool.sh")
+//                        args([project.name])
+//                    }
+//                }
+//            }
+//            task runCanaryInDeviceFarm {
+//                dependsOn(assembleAndroidTest)
+//                doLast {
+//                    for (canary in canaryTests[project.name]) {
+//                        exec {
+//                            commandLine("$rootDir.path/scripts/run_canary_in_devicefarm.sh")
+//                            args(project.name, canary)
+//                        }
+//                    }
+//                }
+//            }
+        }
+    }
+}

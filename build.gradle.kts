@@ -27,3 +27,5 @@ dependencies {
     kover(project(":authenticator"))
     kover(project(":liveness"))
 }
+
+apply(from = rootProject.file("configuration/instrumentation-tests.gradle"))

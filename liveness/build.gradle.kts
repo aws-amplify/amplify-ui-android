@@ -38,6 +38,11 @@ android {
     androidResources {
         noCompress += "tflite"
     }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/LICENSE.md")
+        resources.excludes.add("META-INF/LICENSE-notice.md")
+    }
 }
 
 dependencies {
@@ -57,4 +62,11 @@ dependencies {
     implementation(libs.tensorflow.support)
 
     testImplementation(projects.testing)
+    androidTestImplementation(libs.amplify.auth)
+    androidTestImplementation(libs.test.compose.junit)
+    androidTestImplementation(libs.test.androidx.monitor)
+    androidTestImplementation(libs.test.androidx.rules)
+    androidTestImplementation(libs.test.junit)
+    androidTestImplementation(libs.test.mockk.android)
+    debugImplementation(libs.debug.ui.test.manifest)
 }

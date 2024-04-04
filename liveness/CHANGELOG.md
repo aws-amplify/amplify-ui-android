@@ -1,3 +1,10 @@
+## [Release 1.2.4](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.4)
+
+## Bug Fixes and Features
+* fix(liveness): Update Amplify to 2.15.0 to improve visibility of auth issues https://github.com/aws-amplify/amplify-android/commit/0f61cc8e54adb65a3272ceeb9c06b7d2a0f09efc
+
+[See all changes between 1.2.3 and 1.2.4](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.2.3...release-liveness-1.2.4)
+
 ## [Release 1.2.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.3)
 
 ## Bug Fixes and Features

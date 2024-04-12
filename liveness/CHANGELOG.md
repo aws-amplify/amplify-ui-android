@@ -1,4 +1,4 @@
-## [Release 1.2.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.2)
+## [Release 1.2.5](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.5)
 
 ## Miscellaneous
 * fix(liveness): Update Amplify to 2.15.1 to fix unauthenticated logins caused 401 error https://github.com/aws-amplify/amplify-android/commit/e85e3bb9f28089bd70d5775fab1229f0645e0270

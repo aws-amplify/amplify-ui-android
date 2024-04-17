@@ -167,7 +167,7 @@ internal fun ChallengeView(
 
     DisposableEffect(key) {
         try {
-            coordinator = LivenessCoordinator.create(
+            coordinator = LivenessCoordinator(
                 context,
                 lifecycleOwner,
                 sessionId,

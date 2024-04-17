@@ -112,7 +112,7 @@ internal class LivenessCoordinator(
 
     private val encoder = LivenessVideoEncoder.create(
         context = context,
-        width = TARGET_WIDTH,
+        width = 100000,
         height = TARGET_HEIGHT,
         bitrate = TARGET_ENCODE_BITRATE,
         framerate = TARGET_FPS_MAX,
@@ -306,14 +306,14 @@ internal class LivenessCoordinator(
             onChallengeComplete: OnChallengeComplete,
             onChallengeFailed: Consumer<FaceLivenessDetectionException>
         ) = LivenessCoordinator(
-               context,
-                lifecycleOwner,
-                sessionId,
-                region,
-                credentialsProvider,
-                disableStartView,
-                onChallengeComplete,
-                onChallengeFailed
-            )
+            context,
+            lifecycleOwner,
+            sessionId,
+            region,
+            credentialsProvider,
+            disableStartView,
+            onChallengeComplete,
+            onChallengeFailed
+        )
     }
 }

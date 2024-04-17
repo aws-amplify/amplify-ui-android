@@ -120,7 +120,7 @@ internal class LivenessCoordinator(
         onMuxedSegment = { bytes, time ->
             livenessState.livenessSessionInfo?.sendVideoEvent(VideoEvent(bytes, Date(time)))
         }
-    )!!
+    ) ?: throw IllegalStateException("Failed to start the encoder.")
 
     private val renderer = OpenGLRenderer()
         .apply {
@@ -295,5 +295,25 @@ internal class LivenessCoordinator(
         const val TARGET_ENCODE_BITRATE = (1024 * 1024 * .6).toInt()
         const val TARGET_ENCODE_KEYFRAME_INTERVAL = 1 // webm muxer only flushes to file on keyframe
         val TARGET_RESOLUTION_SIZE = Size(TARGET_WIDTH, TARGET_HEIGHT)
+
+        fun create(
+            context: Context,
+            lifecycleOwner: LifecycleOwner,
+            sessionId: String,
+            region: String,
+            credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
+            disableStartView: Boolean,
+            onChallengeComplete: OnChallengeComplete,
+            onChallengeFailed: Consumer<FaceLivenessDetectionException>
+        ) = LivenessCoordinator(
+               context,
+                lifecycleOwner,
+                sessionId,
+                region,
+                credentialsProvider,
+                disableStartView,
+                onChallengeComplete,
+                onChallengeFailed
+            )
     }
 }

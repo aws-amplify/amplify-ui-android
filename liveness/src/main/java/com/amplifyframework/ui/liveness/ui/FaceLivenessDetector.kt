@@ -166,16 +166,25 @@ internal fun ChallengeView(
     val showPhotosensitivityAlert = remember { mutableStateOf(false) }
 
     DisposableEffect(key) {
-        coordinator = LivenessCoordinator(
-            context,
-            lifecycleOwner,
-            sessionId,
-            region,
-            credentialsProvider,
-            disableStartView,
-            onChallengeComplete = { currentOnChallengeComplete() },
-            onChallengeFailed = { currentOnChallengeFailed.accept(it) }
-        )
+        try {
+            coordinator = LivenessCoordinator(
+                context,
+                lifecycleOwner,
+                sessionId,
+                region,
+                credentialsProvider,
+                disableStartView,
+                onChallengeComplete = { currentOnChallengeComplete() },
+                onChallengeFailed = { currentOnChallengeFailed.accept(it) }
+            )
+        } catch (e: Exception) {
+            currentOnChallengeFailed.accept(
+                FaceLivenessDetectionException(
+                    message = "Failed to initialize video components required for Liveness check.",
+                    throwable = e
+                )
+            )
+        }
 
         onDispose {
             coordinator?.destroy(context)

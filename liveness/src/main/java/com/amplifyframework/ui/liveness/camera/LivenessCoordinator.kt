@@ -120,7 +120,7 @@ internal class LivenessCoordinator(
         onMuxedSegment = { bytes, time ->
             livenessState.livenessSessionInfo?.sendVideoEvent(VideoEvent(bytes, Date(time)))
         }
-    )!!
+    ) ?: throw IllegalStateException("Failed to start the encoder.")
 
     private val renderer = OpenGLRenderer()
         .apply {

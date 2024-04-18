@@ -1,3 +1,20 @@
+## [Release 1.2.6](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.6)
+
+## Bug Fixes
+* fix(liveness): Catch unhandled exceptions in coordinator (#141) https://github.com/aws-amplify/amplify-ui-android/commit/5e892a830a9d5da42facf0812f25e5d6a5945d29
+
+## [Release 1.2.5](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.5)
+
+## Bug Fixes
+* Update Amplify to 2.15.1 to fix unauthenticated logins caused 401 error https://github.com/aws-amplify/amplify-android/commit/e85e3bb9f28089bd70d5775fab1229f0645e0270
+
+## [Release 1.2.4](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.4)
+
+## Bug Fixes and Features
+* fix(liveness): Update Amplify to 2.15.0 to improve visibility of auth issues https://github.com/aws-amplify/amplify-android/commit/0f61cc8e54adb65a3272ceeb9c06b7d2a0f09efc
+
+[See all changes between 1.2.3 and 1.2.4](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.2.3...release-liveness-1.2.4)
+
 ## [Release 1.2.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.3)
 
 ## Bug Fixes and Features

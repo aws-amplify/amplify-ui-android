@@ -1,8 +1,8 @@
 buildscript {
     ext {
         compose_version = '1.5.4'
-        amplifyVersion = '2.14.12'
-        amplifyUIVersion = '1.2.3'
+        amplifyVersion = '2.15.1'
+        amplifyUIVersion = '1.2.6'
     }
     repositories {
         google()

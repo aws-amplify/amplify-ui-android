@@ -19,17 +19,25 @@ import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.AuthUser
+import com.amplifyframework.auth.AuthUserAttribute
+import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.TOTPSetupDetails
 import com.amplifyframework.auth.result.AuthSignInResult
 import com.amplifyframework.auth.result.step.AuthNextSignInStep
 import com.amplifyframework.auth.result.step.AuthSignInStep
+import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
+import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
+import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
 import com.amplifyframework.ui.authenticator.options.TotpOptions
+import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
+import io.mockk.mockk
 
-internal fun mockAuthConfiguration(
+internal fun mockAuthenticatorConfiguration(
     initialStep: AuthenticatorInitialStep = AuthenticatorStep.SignIn,
     signUpForm: SignUpFormBuilder.() -> Unit = {},
     totpOptions: TotpOptions? = null
@@ -37,6 +45,20 @@ internal fun mockAuthConfiguration(
     initialStep = initialStep,
     signUpForm = signUpForm,
     totpOptions = totpOptions
+)
+
+internal fun mockAmplifyAuthConfiguration(
+    signInMethod: SignInMethod = SignInMethod.Username,
+    signUpAttributes: List<AuthUserAttributeKey> = emptyList(),
+    passwordCriteria: PasswordCriteria = mockk(relaxed = true),
+    verificationMechanisms: Set<VerificationMechanism> = emptySet()
+) = AuthConfigurationResult.Valid(
+    AmplifyAuthConfiguration(
+        signInMethod = signInMethod,
+        signUpAttributes = signUpAttributes,
+        passwordCriteria = passwordCriteria,
+        verificationMechanisms = verificationMechanisms
+    )
 )
 
 internal fun mockAuthException(
@@ -87,3 +109,12 @@ internal fun mockNextSignInStep(
     totpSetupDetails: TOTPSetupDetails? = null,
     allowedMFATypes: Set<MFAType>? = null
 ) = AuthNextSignInStep(signInStep, additionalInfo, codeDeliveryDetails, totpSetupDetails, allowedMFATypes)
+
+internal fun mockUserAttributes(
+    vararg attribute: Pair<AuthUserAttributeKey, String>
+) = attribute.map { AuthUserAttribute(it.first, it.second) }
+
+internal fun mockUser(
+    userId: String = "userId",
+    username: String = "username"
+) = AuthUser(userId, username)

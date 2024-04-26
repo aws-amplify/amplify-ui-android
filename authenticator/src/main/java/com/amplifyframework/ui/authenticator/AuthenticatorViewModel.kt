@@ -408,7 +408,7 @@ internal class AuthenticatorViewModel(
                     }
                     val verificationAttributeKeys = mechanisms.map { it.toAttributeKey() }
                     val verificationAttributes = result.data.filter { verificationAttributeKeys.contains(it.key) }
-                    if (hasVerified) {
+                    if (hasVerified || verificationAttributes.isEmpty()) {
                         handleSignedIn()
                     } else {
                         val newState = stateFactory.newVerifyUserState(

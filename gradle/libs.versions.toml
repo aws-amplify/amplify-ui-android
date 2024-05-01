@@ -1,6 +1,6 @@
 [versions]
 agp = "8.1.4"
-amplify = "2.15.0"
+amplify = "2.16.0"
 binary-compatibility = "0.14.0"
 cameraX = "1.2.0"
 compose = "1.5.4"

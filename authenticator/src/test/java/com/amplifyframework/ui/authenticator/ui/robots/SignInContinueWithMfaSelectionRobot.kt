@@ -20,8 +20,8 @@ import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.cognito.challengeResponse
 import com.amplifyframework.ui.authenticator.ui.TestTags
-import com.amplifyframework.ui.authenticator.util.challengeResponse
 import com.amplifyframework.ui.testing.ComposeTest
 
 fun ComposeTest.signInContinueWithMfaSelection(func: SignInContinueWithMfaSelectionRobot.() -> Unit) =

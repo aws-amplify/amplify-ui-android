@@ -24,6 +24,9 @@ import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
+import com.amplifyframework.auth.cognito.PasswordProtectionSettings
+import com.amplifyframework.auth.cognito.UsernameAttribute
+import com.amplifyframework.auth.cognito.VerificationMechanism as AmplifyVerificationMechanism
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.AuthSignInResult
@@ -44,7 +47,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import org.json.JSONException
 
 /**
  * An abstraction of the Amplify.Auth API that allows us to use coroutines with no exceptions
@@ -253,62 +255,31 @@ internal class RealAuthProvider : AuthProvider {
     }
 
     override suspend fun getConfiguration(): AuthConfigurationResult {
-        val authConfigJSON = getCognitoPlugin()?.getPluginConfiguration() ?: return AuthConfigurationResult.Missing
-        try {
-            val innerJSON = authConfigJSON
-                .getJSONObject("Auth")
-                .getJSONObject("Default")
-            val signUpAttributes = innerJSON.getJSONArray("signupAttributes")
-            val usernameAttributes = innerJSON.getJSONArray("usernameAttributes")
-            val passwordAttributes = innerJSON.getJSONObject("passwordProtectionSettings")
+        val authConfiguration = getCognitoPlugin()?.getAuthConfiguration() ?: return AuthConfigurationResult.Missing
 
-            val signInAttributeList = List(usernameAttributes.length()) {
-                usernameAttributes.getString(it)
-            }
-            val containsEmail = signInAttributeList.contains("EMAIL")
-            val containsPhoneNumber = signInAttributeList.contains("PHONE_NUMBER")
-            val signInMethod = when {
-                containsEmail -> SignInMethod.Email
-                containsPhoneNumber -> SignInMethod.PhoneNumber
-                else -> SignInMethod.Username
-            }
-
-            val signUpAttributeList = List(signUpAttributes.length()) {
-                AuthUserAttributeKey.custom(signUpAttributes.getString(it).lowercase())
-            }
-
-            val passwordRequirementsJSON = passwordAttributes
-                .getJSONArray("passwordPolicyCharacters")
-            val passwordRequirements = List(passwordRequirementsJSON.length()) {
-                passwordRequirementsJSON.getString(it)
-            }
-            val passwordCriteria = PasswordCriteria(
-                length = passwordAttributes.getInt("passwordPolicyMinLength"),
-                requiresNumber = passwordRequirements.contains("REQUIRES_NUMBERS"),
-                requiresSpecial = passwordRequirements.contains("REQUIRES_SYMBOLS"),
-                requiresLower = passwordRequirements.contains("REQUIRES_LOWER"),
-                requiresUpper = passwordRequirements.contains("REQUIRES_UPPER")
+        val passwordCriteria = authConfiguration.passwordProtectionSettings?.toPasswordCriteria()
+            ?: return AuthConfigurationResult.Invalid(
+                """
+                    Your auth configuration does not define passwordProtectionSettings. 
+                    Authenticator needs these settings to perform client-side validation of passwords.
+                """.trimIndent()
             )
 
-            val verificationMechanismsJson = innerJSON.getJSONArray("verificationMechanisms")
-            val verificationMechanisms = List(verificationMechanismsJson.length()) {
-                when (verificationMechanismsJson.getString(it)) {
-                    "EMAIL" -> VerificationMechanism.Email
-                    else -> VerificationMechanism.PhoneNumber
-                }
-            }.toSet()
+        val verificationMechanisms = authConfiguration.verificationMechanisms.map {
+            when (it) {
+                AmplifyVerificationMechanism.Email -> VerificationMechanism.Email
+                AmplifyVerificationMechanism.PhoneNumber -> VerificationMechanism.PhoneNumber
+            }
+        }.toSet()
 
-            return AuthConfigurationResult.Valid(
-                AmplifyAuthConfiguration(
-                    signInMethod,
-                    signUpAttributeList,
-                    passwordCriteria,
-                    verificationMechanisms
-                )
-            )
-        } catch (e: JSONException) {
-            return AuthConfigurationResult.Invalid(e.message ?: "Auth configuration is not valid", e)
-        }
+        val amplifyAuthConfiguration = AmplifyAuthConfiguration(
+            signInMethod = getSignInMethod(authConfiguration.usernameAttributes),
+            signUpAttributes = authConfiguration.signUpAttributes,
+            passwordCriteria = passwordCriteria,
+            verificationMechanisms = verificationMechanisms
+        )
+
+        return AuthConfigurationResult.Valid(amplifyAuthConfiguration)
     }
 
     private fun getCognitoPlugin(): AWSCognitoAuthPlugin? {
@@ -319,6 +290,20 @@ internal class RealAuthProvider : AuthProvider {
             null
         }
     }
+
+    private fun getSignInMethod(attributes: List<UsernameAttribute>) = when {
+        attributes.contains(UsernameAttribute.Email) -> SignInMethod.Email
+        attributes.contains(UsernameAttribute.PhoneNumber) -> SignInMethod.PhoneNumber
+        else -> SignInMethod.Username
+    }
+
+    private fun PasswordProtectionSettings.toPasswordCriteria() = PasswordCriteria(
+        length = length,
+        requiresNumber = requiresNumber,
+        requiresSpecial = requiresSpecial,
+        requiresUpper = requiresUpper,
+        requiresLower = requiresLower
+    )
 }
 
 internal sealed interface AmplifyResult<out T : Any> {

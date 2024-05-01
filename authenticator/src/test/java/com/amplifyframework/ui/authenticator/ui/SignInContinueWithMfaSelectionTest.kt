@@ -1,11 +1,11 @@
 package com.amplifyframework.ui.authenticator.ui
 
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.cognito.challengeResponse
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSelectionStateImpl
 import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithMfaSelection
-import com.amplifyframework.ui.authenticator.util.challengeResponse
 import com.amplifyframework.ui.testing.ComposeTest
 import io.mockk.mockk
 import io.mockk.verify

@@ -76,7 +76,6 @@ import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
-import com.amplifyframework.ui.authenticator.util.challengeResponse
 import com.amplifyframework.ui.authenticator.util.toFieldError
 import java.net.UnknownHostException
 import kotlinx.coroutines.channels.BufferOverflow

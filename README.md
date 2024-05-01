@@ -22,7 +22,7 @@ Amplify UI for Android is an open-source UI library with cloud-connected compone
 
 | Component | Version | Amplify  | Material3 |
 | --- |---------|----------|-----------|
-| Authenticator | 1.1.0   | 2.16.0+ | 1.1.2     |
+| Authenticator | 1.2.0   | 2.16.0+ | 1.1.2     |
 | Liveness | 1.2.6   | 2.15.1+  | 1.1.2     |
 
 ## Getting Started

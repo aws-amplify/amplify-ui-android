@@ -15,6 +15,7 @@
 
 package com.amplifyframework.ui.authenticator
 
+import app.cash.turbine.test
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
@@ -44,4 +45,13 @@ fun AuthenticatorMessage?.shouldBeError(
     val casted = this.shouldBeInstanceOf<AuthenticatorMessage.Error>()
     causeMessage?.let { casted should haveMessage(it) }
     recoverySuggestion?.let { casted should haveRecoverySuggestion(it) }
+}
+
+internal suspend inline fun <reified T : AuthenticatorMessage> AuthenticatorViewModel.shouldEmitMessage(
+    crossinline block: suspend () -> Unit
+) {
+    events.test {
+        block()
+        awaitItem().shouldBeInstanceOf<T>()
+    }
 }

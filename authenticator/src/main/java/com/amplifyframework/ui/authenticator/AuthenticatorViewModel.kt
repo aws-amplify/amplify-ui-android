@@ -76,8 +76,8 @@ import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
+import com.amplifyframework.ui.authenticator.util.isConnectivityIssue
 import com.amplifyframework.ui.authenticator.util.toFieldError
-import java.net.UnknownHostException
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -554,7 +554,7 @@ internal class AuthenticatorViewModel(
             is CodeExpiredException -> sendMessage(ExpiredCodeMessage(error))
             is CodeValidationException -> sendMessage(UnknownErrorMessage(error))
             is UnknownException -> {
-                if (error.cause is UnknownHostException) {
+                if (error.isConnectivityIssue()) {
                     sendMessage(NetworkErrorMessage(error))
                 } else {
                     sendMessage(UnknownErrorMessage(error))

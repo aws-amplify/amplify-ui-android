@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.authenticator.util
 
 import com.amplifyframework.auth.AuthException
+import java.net.UnknownHostException
 
 /**
  * Exception that is passed to the errorContent if the application does not have the auth plugin
@@ -36,3 +37,13 @@ class InvalidConfigurationException(message: String, cause: Exception?) : AuthEx
     recoverySuggestion = "Check that the configuration passed to Amplify.configure has all required fields",
     cause = cause
 )
+
+internal fun Throwable.isConnectivityIssue(): Boolean {
+    if (this is UnknownHostException) {
+        return true
+    }
+    return when (val cause = this.cause) {
+        null -> false
+        else -> cause.isConnectivityIssue()
+    }
+}

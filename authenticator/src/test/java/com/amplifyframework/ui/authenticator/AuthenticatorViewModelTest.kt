@@ -16,21 +16,27 @@
 package com.amplifyframework.ui.authenticator
 
 import android.app.Application
+import aws.smithy.kotlin.runtime.http.HttpException
 import com.amplifyframework.auth.AuthUserAttributeKey.email
 import com.amplifyframework.auth.AuthUserAttributeKey.emailVerified
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
+import com.amplifyframework.ui.authenticator.util.AmplifyResult.Error
 import com.amplifyframework.ui.authenticator.util.AmplifyResult.Success
 import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
+import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
 import com.amplifyframework.ui.testing.CoroutineTestRule
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import java.net.UnknownHostException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -321,6 +327,29 @@ class AuthenticatorViewModelTest {
         viewModel.signIn("username", "password")
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+    }
+
+    @Test
+    fun `signing in with no internet results in network error message`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns
+            Error(
+                mockk<UnknownException> {
+                    every { cause } returns
+                        mockk<HttpException> {
+                            every { cause } returns mockk<UnknownHostException>()
+                        }
+                }
+            )
+
+        viewModel.start(mockAuthenticatorConfiguration())
+
+        viewModel.shouldEmitMessage<NetworkErrorMessage> {
+            viewModel.signIn("username", "password")
+        }
+
+        // Assert step does not change
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
 //endregion

@@ -55,6 +55,7 @@ import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
 import com.amplifyframework.core.Consumer
+import com.amplifyframework.predictions.models.FaceLivenessChallengeType
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
@@ -247,8 +248,11 @@ internal fun ChallengeView(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    PhotosensitivityView {
-                        showPhotosensitivityAlert.value = true
+                    if (livenessState.livenessSessionInfo?.challengeType ==
+                        FaceLivenessChallengeType.FaceMovementAndLightChallenge) {
+                        PhotosensitivityView {
+                            showPhotosensitivityAlert.value = true
+                        }
                     }
 
                     InstructionMessage(LivenessCheckState.Initial.withStartViewMessage())
@@ -277,7 +281,6 @@ internal fun ChallengeView(
                     }
                 }
             } else {
-
                 livenessState.faceGuideRect?.let {
                     FaceGuide(
                         modifier = Modifier
@@ -289,22 +292,29 @@ internal fun ChallengeView(
                 }
 
                 if (livenessState.runningFreshness) {
-                    FreshnessChallenge(
-                        key,
-                        modifier = Modifier.fillMaxSize(),
-                        colors = livenessState.colorChallenge!!.challengeColors,
-                        onColorDisplayed = { currentColor, previousColor, sequenceNumber, colorStart ->
-                            livenessCoordinator.processColorDisplayed(
-                                currentColor,
-                                previousColor,
-                                sequenceNumber,
-                                colorStart
-                            )
-                        },
-                        onComplete = {
+                    if (livenessState.livenessSessionInfo?.challengeType ==
+                        FaceLivenessChallengeType.FaceMovementAndLightChallenge) {
+                        FreshnessChallenge(
+                            key,
+                            modifier = Modifier.fillMaxSize(),
+                            colors = livenessState.colorChallenge!!.challengeColors,
+                            onColorDisplayed = { currentColor, previousColor, sequenceNumber, colorStart ->
+                                livenessCoordinator.processColorDisplayed(
+                                    currentColor,
+                                    previousColor,
+                                    sequenceNumber,
+                                    colorStart
+                                )
+                            },
+                            onComplete = {
+                                livenessCoordinator.processFreshnessChallengeComplete()
+                            }
+                        )
+                    } else {
+                        LaunchedEffect(key) {
                             livenessCoordinator.processFreshnessChallengeComplete()
                         }
-                    )
+                    }
                 }
 
                 livenessState.faceGuideRect?.let {

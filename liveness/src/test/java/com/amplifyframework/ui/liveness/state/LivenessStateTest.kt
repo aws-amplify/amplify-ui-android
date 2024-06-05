@@ -360,7 +360,6 @@ internal class LivenessStateTest {
         val mouth = FaceDetector.Landmark(40f, 80f)
         livenessState.onFrameFaceUpdate(faceRect, leftEye, rightEye, mouth)
         assertTrue(livenessState.initialFaceDistanceCheckPassed)
-//        verify(exactly = 1) { onFaceDistanceCheckPassed() }
     }
 
     @Test

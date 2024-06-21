@@ -352,6 +352,21 @@ class AuthenticatorViewModelTest {
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
+    @Test
+    fun `Sign in with temporary password requires password reset`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(
+                signInStep = AuthSignInStep.RESET_PASSWORD
+            )
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.PasswordReset
+    }
+
 //endregion
 //region helpers
     private val AuthenticatorViewModel.currentStep: AuthenticatorStep

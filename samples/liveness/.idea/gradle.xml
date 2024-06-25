@@ -10,23 +10,37 @@
               <build path="$PROJECT_DIR$/../.." name="amplify-ui-android">
                 <projects>
                   <project path="$PROJECT_DIR$/../.." />
+                  <project path="$PROJECT_DIR$/../../authenticator" />
+                  <project path="$PROJECT_DIR$/../../authenticator-screenshots" />
                   <project path="$PROJECT_DIR$/../../liveness" />
+                  <project path="$PROJECT_DIR$/../../testing" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/../../build-logic" name="build-logic">
+                <projects>
+                  <project path="$PROJECT_DIR$/../../build-logic" />
+                  <project path="$PROJECT_DIR$/../../build-logic/plugins" />
                 </projects>
               </build>
             </builds>
           </compositeBuild>
         </compositeConfiguration>
-        <option name="testRunner" value="GRADLE" />
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="jbr-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/../.." />
+            <option value="$PROJECT_DIR$/../../authenticator" />
+            <option value="$PROJECT_DIR$/../../authenticator-screenshots" />
+            <option value="$PROJECT_DIR$/../../build-logic" />
+            <option value="$PROJECT_DIR$/../../build-logic/plugins" />
             <option value="$PROJECT_DIR$/../../liveness" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/../../testing" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

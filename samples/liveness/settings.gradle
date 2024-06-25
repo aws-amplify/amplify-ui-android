@@ -18,4 +18,4 @@ include ':app'
 
 // Uncomment this to use local liveness module from Amplify UI Repo
 // Must also change samples/liveness/app/build.gradle implementation
-//includeBuild('../../') {}
+includeBuild('../../') {}

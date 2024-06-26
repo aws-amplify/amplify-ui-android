@@ -39,8 +39,8 @@ androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", vers
 kotlin-serialization-json = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
 # TensorFlow
-tensorflow = "org.tensorflow:tensorflow-lite:2.7.0"
-tensorflow-support = "org.tensorflow:tensorflow-lite-support:0.3.0"
+tensorflow = "org.tensorflow:tensorflow-lite:2.16.1"
+tensorflow-support = "org.tensorflow:tensorflow-lite-support:0.4.4"
 
 # Other
 zxing = { module = "com.google.zxing:core", version.ref = "zxing" }

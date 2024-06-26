@@ -40,7 +40,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.3'
+        kotlinCompilerExtensionVersion '1.5.14'
     }
     packaging {
         resources {
@@ -53,12 +53,12 @@ android {
 dependencies {
     // Use this to pull in local module of Amplify UI
     // Must also uncomment liveness sample project settings.gradle includeBuild
-    //implementation 'com.amplifyframework.ui:liveness'
+    implementation 'com.amplifyframework.ui:liveness'
 
     // or
 
     // Use this to use published version of Amplify UI
-    implementation "com.amplifyframework.ui:liveness:$amplifyUIVersion"
+    //implementation "com.amplifyframework.ui:liveness:$amplifyUIVersion"
 
     implementation "com.amplifyframework:core-kotlin:$amplifyVersion"
     implementation "com.amplifyframework:aws-api:$amplifyVersion"

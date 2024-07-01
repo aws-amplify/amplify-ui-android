@@ -393,10 +393,9 @@ class AuthenticatorViewModelTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.resetPassword(any()) } returns Error(
             mockk<UnknownException> {
-                every { cause } returns
-                        mockk<HttpException> {
-                            every { cause } returns mockk<UnknownHostException>()
-                        }
+                every { cause } returns mockk<HttpException> {
+                    every { cause } returns mockk<UnknownHostException>()
+                }
             }
         )
         viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
@@ -415,7 +414,7 @@ class AuthenticatorViewModelTest {
             )
         )
 
-        coEvery { authProvider.confirmResetPassword(any(), any(),any())} returns Success(Unit)
+        coEvery { authProvider.confirmResetPassword(any(), any(), any()) } returns Success(Unit)
         coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
 
         viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
@@ -435,12 +434,11 @@ class AuthenticatorViewModelTest {
             )
         )
 
-        coEvery { authProvider.confirmResetPassword(any(), any(),any())} returns Error(
+        coEvery { authProvider.confirmResetPassword(any(), any(), any()) } returns Error(
             mockk<UnknownException> {
-                every { cause } returns
-                        mockk<HttpException> {
-                            every { cause } returns mockk<UnknownHostException>()
-                        }
+                every { cause } returns mockk<HttpException> {
+                    every { cause } returns mockk<UnknownHostException>()
+                }
             }
         )
 
@@ -461,13 +459,12 @@ class AuthenticatorViewModelTest {
             )
         )
 
-        coEvery { authProvider.confirmResetPassword(any(), any(),any())} returns Success(Unit)
+        coEvery { authProvider.confirmResetPassword(any(), any(), any()) } returns Success(Unit)
         coEvery { authProvider.signIn(any(), any()) } returns Error(
             mockk<UnknownException> {
-                every { cause } returns
-                        mockk<HttpException> {
-                            every { cause } returns mockk<UnknownHostException>()
-                        }
+                every { cause } returns mockk<HttpException> {
+                    every { cause } returns mockk<UnknownHostException>()
+                }
             }
         )
 

@@ -424,8 +424,8 @@ internal class AuthenticatorViewModel(
 
     //endregion
     //region Password Reset
-
-    private suspend fun resetPassword(username: String) {
+    @VisibleForTesting
+    suspend fun resetPassword(username: String) {
         viewModelScope.launch {
             logger.debug("Initiating reset password")
             when (val result = authProvider.resetPassword(username)) {
@@ -435,12 +435,13 @@ internal class AuthenticatorViewModel(
         }.join()
     }
 
-    private suspend fun confirmResetPassword(username: String, password: String, code: String) {
+    @VisibleForTesting
+    suspend fun confirmResetPassword(username: String, password: String, code: String) {
         viewModelScope.launch {
             logger.debug("Confirming password reset")
             when (val result = authProvider.confirmResetPassword(username, password, code)) {
                 is AmplifyResult.Error -> handleResetPasswordError(result.error)
-                is AmplifyResult.Success -> handlePasswordResetComplete()
+                is AmplifyResult.Success -> handlePasswordResetComplete(username, password)
             }
         }.join()
     }
@@ -467,12 +468,17 @@ internal class AuthenticatorViewModel(
         }
     }
 
-    private suspend fun handlePasswordResetComplete() {
+    private suspend fun handlePasswordResetComplete(username: String? = null, password: String? = null) {
         logger.debug("Password reset complete")
         sendMessage(PasswordResetMessage)
-        moveTo(
-            stateFactory.newSignInState(this::signIn)
-        )
+        if (username != null && password != null) {
+            when (val result = authProvider.signIn(username, password)) {
+                is AmplifyResult.Error -> moveTo(stateFactory.newSignInState(this::signIn))
+                is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
+            }
+        } else {
+            moveTo(stateFactory.newSignInState(this::signIn))
+        }
     }
 
     private suspend fun handleResetPasswordError(error: AuthException) = handleAuthException(error)

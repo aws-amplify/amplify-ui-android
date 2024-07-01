@@ -424,8 +424,8 @@ internal class AuthenticatorViewModel(
 
     //endregion
     //region Password Reset
-
-    private suspend fun resetPassword(username: String) {
+    @VisibleForTesting
+    suspend fun resetPassword(username: String) {
         viewModelScope.launch {
             logger.debug("Initiating reset password")
             when (val result = authProvider.resetPassword(username)) {
@@ -435,7 +435,8 @@ internal class AuthenticatorViewModel(
         }.join()
     }
 
-    private suspend fun confirmResetPassword(username: String, password: String, code: String) {
+    @VisibleForTesting
+    suspend fun confirmResetPassword(username: String, password: String, code: String) {
         viewModelScope.launch {
             logger.debug("Confirming password reset")
             when (val result = authProvider.confirmResetPassword(username, password, code)) {

@@ -353,7 +353,9 @@ internal fun ChallengeView(
                                 verticalArrangement = Arrangement.spacedBy(5.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                InstructionMessage(livenessState.livenessCheckState.value)
+                                if (shouldDisplayInstruction(livenessState.livenessCheckState.value, livenessState.livenessSessionInfo?.challengeType!!)) {
+                                    InstructionMessage(livenessState.livenessCheckState.value)
+                                }
                                 if (livenessState.livenessCheckState.value.instructionId ==
                                     FaceDetector.FaceOvalPosition.TOO_FAR.instructionStringRes
                                 ) {
@@ -395,4 +397,13 @@ internal fun ChallengeView(
             }
         }
     }
+}
+
+private fun shouldDisplayInstruction(
+    livenessCheckState: LivenessCheckState,
+    challengeType: FaceLivenessChallengeType
+): Boolean {
+    return !(livenessCheckState ==
+            LivenessCheckState.Running.withFaceOvalPosition(FaceDetector.FaceOvalPosition.MATCHED) &&
+        challengeType == FaceLivenessChallengeType.FaceMovementChallenge)
 }

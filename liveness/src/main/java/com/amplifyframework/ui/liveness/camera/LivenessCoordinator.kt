@@ -35,11 +35,11 @@ import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
 import com.amplifyframework.predictions.aws.exceptions.AccessDeniedException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionNotFoundException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionTimeoutException
+import com.amplifyframework.predictions.aws.exceptions.FaceLivenessUnsupportedChallengeTypeException
 import com.amplifyframework.predictions.aws.models.ColorChallengeResponse
 import com.amplifyframework.predictions.aws.models.RgbColor
 import com.amplifyframework.predictions.aws.options.AWSFaceLivenessSessionOptions
 import com.amplifyframework.predictions.models.Challenge
-import com.amplifyframework.predictions.models.ChallengeType
 import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.BuildConfig
@@ -181,8 +181,8 @@ internal class LivenessCoordinator(
             videoWidth = TARGET_WIDTH.toFloat(),
             videoHeight = TARGET_HEIGHT.toFloat(),
             challengeVersions = listOf(
-                Challenge(ChallengeType.FaceMovementAndLightChallenge, "2.0.0"),
-                Challenge(ChallengeType.FaceMovementChallenge, "1.0.0")
+                Challenge.FaceMovementAndLightChallenge("2.0.0"),
+                Challenge.FaceMovementChallenge("1.0.0")
             ),
             region = region,
             preCheckViewEnabled = !disableStartView,
@@ -204,19 +204,21 @@ internal class LivenessCoordinator(
                 onChallengeComplete()
             },
             { error ->
-                val faceLivenessException = when (error) {
+                val (faceLivenessException, shouldStopLivenessSession) = when (error) {
                     is AccessDeniedException ->
-                        FaceLivenessDetectionException.AccessDeniedException(throwable = error)
+                        FaceLivenessDetectionException.AccessDeniedException(throwable = error) to false
                     is FaceLivenessSessionNotFoundException ->
-                        FaceLivenessDetectionException.SessionNotFoundException(throwable = error)
+                        FaceLivenessDetectionException.SessionNotFoundException(throwable = error) to false
                     is FaceLivenessSessionTimeoutException ->
-                        FaceLivenessDetectionException.SessionTimedOutException(throwable = error)
+                        FaceLivenessDetectionException.SessionTimedOutException(throwable = error) to false
+                    is FaceLivenessUnsupportedChallengeTypeException ->
+                        FaceLivenessDetectionException.UnsupportedChallengeTypeException(throwable = error) to true
                     else -> FaceLivenessDetectionException(
                         error.message ?: "Unknown error.",
                         error.recoverySuggestion, error
-                    )
+                    ) to false
                 }
-                processSessionError(faceLivenessException, false)
+                processSessionError(faceLivenessException, shouldStopLivenessSession)
             }
         )
     }

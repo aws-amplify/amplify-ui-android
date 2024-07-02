@@ -291,7 +291,7 @@ internal fun ChallengeView(
                     )
                 }
 
-                if (livenessState.runningFreshness) {
+                if (livenessState.faceMatched) {
                     if (livenessState.livenessSessionInfo?.challengeType ==
                         FaceLivenessChallengeType.FaceMovementAndLightChallenge) {
                         FreshnessChallenge(
@@ -307,12 +307,12 @@ internal fun ChallengeView(
                                 )
                             },
                             onComplete = {
-                                livenessCoordinator.processFreshnessChallengeComplete()
+                                livenessCoordinator.processLivenessCheckComplete()
                             }
                         )
                     } else {
                         LaunchedEffect(key) {
-                            livenessCoordinator.processFreshnessChallengeComplete()
+                            livenessCoordinator.processLivenessCheckComplete()
                         }
                     }
                 }

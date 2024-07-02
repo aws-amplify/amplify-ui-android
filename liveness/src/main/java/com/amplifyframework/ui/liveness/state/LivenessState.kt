@@ -53,7 +53,7 @@ internal data class LivenessState(
     var livenessCheckState = mutableStateOf<LivenessCheckState>(
         LivenessCheckState.Initial()
     )
-    var runningFreshness by mutableStateOf(false)
+    var faceMatched by mutableStateOf(false)
     var faceGuideRect: RectF? by mutableStateOf(null)
     var faceMatchPercentage: Float by mutableStateOf(0.25f)
     var initialFaceDistanceCheckPassed by mutableStateOf(false)
@@ -98,7 +98,7 @@ internal data class LivenessState(
         faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
-        runningFreshness = false
+        faceMatched = false
         if (stopLivenessSession) {
             livenessSessionInfo?.stopSession(webSocketCloseCode?.code)
         }
@@ -117,11 +117,11 @@ internal data class LivenessState(
         readyToSendFinalEvents = true
     }
 
-    fun onFreshnessComplete() {
+    fun onLivenessChallengeComplete() {
         val faceGuideRect = this.faceGuideRect
         readyForOval = false
         this.faceGuideRect = null
-        runningFreshness = false
+        faceMatched = false
         if (faceMatchOvalEnd == null) {
             faceMatchOvalEnd = Date().time
         }
@@ -143,14 +143,15 @@ internal data class LivenessState(
             is LivenessCheckState.Error -> false
             is LivenessCheckState.Initial, is LivenessCheckState.Running -> {
                 /**
-                 * Start freshness check if the face has matched oval (we know this if faceMatchOvalStart is not null)
-                 * We trigger this in onFrameAvailable instead of onFrameFaceUpdate in the event the user moved the face
-                 * away from the camera. We want to run this check on every frame if the challenge is in process.
+                 * Start the challenge checks once the face has matched oval (we know this if faceMatchOvalStart is
+                 * not null). We trigger this in onFrameAvailable instead of onFrameFaceUpdate in the event the user
+                 * moved the face away from the camera. We want to run this check on every frame if the challenge is
+                 * in process.
                  */
-                if (!runningFreshness &&
+                if (!faceMatched &&
                     faceMatchOvalStart?.let { (Date().time - it) > 1000 } == true
                 ) {
-                    runningFreshness = true
+                    faceMatched = true
                 }
                 true
             }

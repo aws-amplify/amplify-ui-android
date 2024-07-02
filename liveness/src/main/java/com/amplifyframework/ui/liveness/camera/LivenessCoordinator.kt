@@ -77,9 +77,6 @@ internal class LivenessCoordinator(
 
     private val analysisExecutor = Executors.newSingleThreadExecutor()
 
-    private var attemptCount: Int = 0
-    private var latestAttemptTimeStamp: Long = System.currentTimeMillis()
-
     val livenessState = LivenessState(
         sessionId = sessionId,
         context = context,
@@ -266,8 +263,8 @@ internal class LivenessCoordinator(
         )
     }
 
-    fun processFreshnessChallengeComplete() {
-        livenessState.onFreshnessComplete()
+    fun processLivenessCheckComplete() {
+        livenessState.onLivenessChallengeComplete()
         stopEncoder { livenessState.onFullChallengeComplete() }
     }
 
@@ -317,5 +314,7 @@ internal class LivenessCoordinator(
         const val TARGET_ENCODE_KEYFRAME_INTERVAL = 1 // webm muxer only flushes to file on keyframe
         val TARGET_RESOLUTION_SIZE = Size(TARGET_WIDTH, TARGET_HEIGHT)
         const val ATTEMPT_COUNT_RESET_INTERVAL_MS = 300_000L
+        var attemptCount = 0
+        var latestAttemptTimeStamp: Long = System.currentTimeMillis()
     }
 }

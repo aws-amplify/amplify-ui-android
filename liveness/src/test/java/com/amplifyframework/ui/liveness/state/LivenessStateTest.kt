@@ -248,23 +248,23 @@ internal class LivenessStateTest {
     }
 
     @Test
-    fun `freshness stops running on freshness complete`() {
-        livenessState.onFreshnessComplete()
-        assertFalse(livenessState.runningFreshness)
+    fun `liveness challenge execution stops running on challenge completion`() {
+        livenessState.onLivenessChallengeComplete()
+        assertFalse(livenessState.faceMatched)
     }
 
     @Test
-    fun `state is success after freshness completes and no errors occur`() {
+    fun `state is success after challenge completes and no errors occur`() {
         livenessState.faceGuideRect = mockk(relaxed = true)
-        livenessState.onFreshnessComplete()
+        livenessState.onLivenessChallengeComplete()
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Success)
     }
 
     @Test
-    fun `state is error after freshness completes and an error occurs`() {
+    fun `state is error after challenge completes and an error occurs`() {
         livenessState.faceGuideRect = mockk(relaxed = true)
         livenessState.onError(false, WebSocketCloseCode.RUNTIME_ERROR)
-        livenessState.onFreshnessComplete()
+        livenessState.onLivenessChallengeComplete()
         assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
     }
 

@@ -58,7 +58,7 @@ dependencies {
     // or
 
     // Use this to use published version of Amplify UI
-    implementation "com.amplifyframework.ui:liveness:$amplifyUIVersion"
+    implementation "com.amplifyframework.ui:liveness:$LivenessVersion"
 
     implementation "com.amplifyframework:core-kotlin:$amplifyVersion"
     implementation "com.amplifyframework:aws-api:$amplifyVersion"

@@ -7,7 +7,7 @@ import_from_git(
 )
 
 # When testing against local changes, comment out the above and use the line below instead.
-# import '~/github/amplify-ci-support/src/fastlane/release_actions/fastlane/AndroidAppsFastfile'
+# import '~/github/aws-amplify/amplify-ci-support/src/fastlane/release_actions/fastlane/AndroidAppsFastfile'
 
 platform :android do |options|
   override_lane :build_parameters do

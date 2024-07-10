@@ -52,7 +52,6 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
-internal typealias OnMuxedSegment = (bytes: ByteArray, timestamp: Long) -> Unit
 internal typealias OnChallengeComplete = () -> Unit
 internal typealias OnFreshnessColorDisplayed = (
     currentColor: RgbColor,
@@ -69,6 +68,7 @@ internal class LivenessCoordinator(
     private val region: String,
     private val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     disableStartView: Boolean,
+    livenessMuxer: LivenessMuxer,
     private val onChallengeComplete: OnChallengeComplete,
     val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -85,11 +85,16 @@ internal class LivenessCoordinator(
         this::processFinalEventsSent
     )
 
+    val targetFps = when(livenessMuxer) {
+        is LivenessFragmentedMp4Muxer -> 15
+        is LivenessWebMMuxer -> 24
+    }
+
     private val preview = Preview.Builder().apply {
         Camera2Interop.Extender(this).apply {
             setCaptureRequestOption(
                 CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,
-                Range(TARGET_FPS_MIN, TARGET_FPS_MAX)
+                Range(targetFps, targetFps)
             )
         }
         setTargetResolution(TARGET_RESOLUTION_SIZE)
@@ -101,7 +106,7 @@ internal class LivenessCoordinator(
         Camera2Interop.Extender(this).apply {
             setCaptureRequestOption(
                 CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE,
-                Range(TARGET_FPS_MIN, TARGET_FPS_MAX)
+                Range(targetFps, targetFps)
             )
         }
         setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
@@ -112,12 +117,13 @@ internal class LivenessCoordinator(
 
     private val encoder = LivenessVideoEncoder.create(
         context = context,
+        livenessMuxer = livenessMuxer,
         width = TARGET_WIDTH,
         height = TARGET_HEIGHT,
         bitrate = TARGET_ENCODE_BITRATE,
-        framerate = TARGET_FPS_MAX,
+        framerate = targetFps,
         keyframeInterval = TARGET_ENCODE_KEYFRAME_INTERVAL,
-        onMuxedSegment = { bytes, time ->
+        sendMuxedSegmentHandler = { bytes, time ->
             livenessState.livenessSessionInfo?.sendVideoEvent(VideoEvent(bytes, Date(time)))
         }
     ) ?: throw IllegalStateException("Failed to start the encoder.")
@@ -287,8 +293,6 @@ internal class LivenessCoordinator(
         }
 
     companion object {
-        const val TARGET_FPS_MIN = 24
-        const val TARGET_FPS_MAX = 24
         const val TARGET_WIDTH = 480
         const val TARGET_HEIGHT = 640
         const val TARGET_ASPECT_RATIO = TARGET_WIDTH.toFloat() / TARGET_HEIGHT

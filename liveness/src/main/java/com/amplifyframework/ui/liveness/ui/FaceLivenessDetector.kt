@@ -51,12 +51,15 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.amplifyframework.annotations.InternalAmplifyApi
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
 import com.amplifyframework.core.Consumer
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
+import com.amplifyframework.ui.liveness.camera.LivenessMuxer
+import com.amplifyframework.ui.liveness.camera.LivenessWebMMuxerImpl
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
@@ -64,6 +67,16 @@ import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
 import com.amplifyframework.ui.liveness.util.hasCameraPermission
 import kotlinx.coroutines.launch
+
+/**
+ * Key class to be used that detects any changes in FaceLivenessDetector composable
+ */
+internal data class LivenessComposeKey(
+    val sessionId: String,
+    val region: String,
+    val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
+    val muxer: LivenessMuxer
+)
 
 /**
  * @param sessionId of challenge
@@ -82,8 +95,30 @@ fun FaceLivenessDetector(
     onComplete: Action,
     onError: Consumer<FaceLivenessDetectionException>
 ) {
+    InternalFaceLivenessDetector(
+        sessionId,
+        region,
+        credentialsProvider,
+        disableStartView,
+        onComplete = onComplete,
+        onError = onError
+    )
+}
+
+
+@InternalAmplifyApi
+@Composable
+fun InternalFaceLivenessDetector(
+    sessionId: String,
+    region: String,
+    credentialsProvider: AWSCredentialsProvider<AWSCredentials>? = null,
+    disableStartView: Boolean = false,
+    livenessMuxer: LivenessMuxer = LivenessWebMMuxerImpl(),
+    onComplete: Action,
+    onError: Consumer<FaceLivenessDetectionException>
+) {
     val scope = rememberCoroutineScope()
-    val key = Triple(sessionId, region, credentialsProvider)
+    val key = LivenessComposeKey(sessionId, region, credentialsProvider, livenessMuxer)
     var isFinished by remember(key) { mutableStateOf(false) }
     val currentOnComplete by rememberUpdatedState(onComplete)
     val currentOnError by rememberUpdatedState(onError)
@@ -122,6 +157,7 @@ fun FaceLivenessDetector(
                 region,
                 credentialsProvider = credentialsProvider,
                 disableStartView,
+                livenessMuxer,
                 onChallengeComplete = {
                     scope.launch {
                         // if we are already finished, we already provided a result in complete or failed
@@ -154,6 +190,7 @@ internal fun ChallengeView(
     region: String,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     disableStartView: Boolean,
+    muxer: LivenessMuxer,
     onChallengeComplete: OnChallengeComplete,
     onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -174,6 +211,7 @@ internal fun ChallengeView(
                 region,
                 credentialsProvider,
                 disableStartView,
+                muxer,
                 onChallengeComplete = { currentOnChallengeComplete() },
                 onChallengeFailed = { currentOnChallengeFailed.accept(it) }
             )

@@ -37,5 +37,25 @@ fun LivenessScreen(
                 }
             }
         )
+
+//        // Experimental h264 / fragmented mp4 support requiring internal opt-in
+//        InternalFaceLivenessDetector(
+//            sessionId = sessionId,
+//            region = "us-east-1",
+//            disableStartView = false,
+//            muxer = LivenessFragmentedMp4MuxerImpl(),
+//            onComplete = {
+//                viewModel.fetchSessionResult(sessionId)
+//                onChallengeComplete()
+//            },
+//            onError = {
+//                if (it is FaceLivenessDetectionException.UserCancelledException) {
+//                    onBack()
+//                } else {
+//                    viewModel.reportErrorResult(it)
+//                    onChallengeComplete()
+//                }
+//            }
+//        )
     }
 }

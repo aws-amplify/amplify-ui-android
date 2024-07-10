@@ -78,4 +78,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+
+    // only added for internal testing with experimental h264/fragmented mp4 support
+    implementation("androidx.media3:media3-muxer:1.4.0-beta01")
+    implementation("com.google.guava:guava:33.2.0-android")
 }

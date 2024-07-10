@@ -26,23 +26,22 @@ import android.util.Log
 import androidx.annotation.WorkerThread
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.util.isKeyFrame
-import java.io.File
 
 internal class LivenessVideoEncoder private constructor(
+    private val context: Context,
     width: Int,
     height: Int,
     bitrate: Int,
     private val frameRate: Int,
     private val keyframeInterval: Int,
-    private val outputFile: File,
-    private val onMuxedSegment: OnMuxedSegment
+    private val livenessMuxer: LivenessMuxer,
+    private val sendMuxedSegmentHandler: SendMuxedSegmentHandler
 ) {
 
     companion object {
 
         const val TAG = "LivenessVideoEncoder"
-        const val LOGGING_ENABLED = false
-        const val MIME_TYPE = "video/x-vnd.on2.vp8"
+        const val LOGGING_ENABLED = true
 
         fun create(
             context: Context,
@@ -51,41 +50,32 @@ internal class LivenessVideoEncoder private constructor(
             bitrate: Int,
             framerate: Int,
             keyframeInterval: Int,
-            onMuxedSegment: OnMuxedSegment
+            livenessMuxer: LivenessMuxer,
+            sendMuxedSegmentHandler: SendMuxedSegmentHandler
         ): LivenessVideoEncoder? {
             return try {
                 LivenessVideoEncoder(
+                    context,
                     width,
                     height,
                     bitrate,
                     framerate,
                     keyframeInterval,
-                    createTempOutputFile(context),
-                    onMuxedSegment
+                    livenessMuxer,
+                    sendMuxedSegmentHandler
                 )
             } catch (e: Exception) {
                 null
             }
         }
-
-        private fun createTempOutputFile(context: Context) = File(
-            File(
-                context.cacheDir,
-                "amplify_liveness_temp"
-            ).apply {
-                if (exists()) {
-                    deleteRecursively()
-                }
-
-                if (!exists()) {
-                    mkdir()
-                }
-            },
-            "${System.currentTimeMillis()}"
-        )
     }
 
-    private val format = MediaFormat.createVideoFormat(MIME_TYPE, width, height).apply {
+    private val mimeType = when(livenessMuxer) {
+        is LivenessFragmentedMp4Muxer -> "video/avc"
+        is LivenessWebMMuxer -> "video/x-vnd.on2.vp8"
+    }
+
+    private val format = MediaFormat.createVideoFormat(mimeType, width, height).apply {
         setInteger(
             MediaFormat.KEY_COLOR_FORMAT,
             MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
@@ -97,7 +87,7 @@ internal class LivenessVideoEncoder private constructor(
 
     private val encoderHandler = Handler(HandlerThread(TAG).apply { start() }.looper)
 
-    private val encoder = MediaCodec.createEncoderByType(MIME_TYPE).apply {
+    private val encoder = MediaCodec.createEncoderByType(mimeType).apply {
         configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         setCallback(
             object : MediaCodec.Callback() {
@@ -116,6 +106,7 @@ internal class LivenessVideoEncoder private constructor(
                 }
 
                 override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
+                    // TODO: We need to handle when an encoder fails and return earlier
                 }
             },
             encoderHandler
@@ -124,7 +115,7 @@ internal class LivenessVideoEncoder private constructor(
     val inputSurface = encoder.createInputSurface()
 
     private var encoding = false
-    private var livenessMuxer: LivenessMuxer? = null
+    private var muxing = false
     private val logger = Amplify.Logging.forNamespace("Liveness")
 
     init {
@@ -135,7 +126,7 @@ internal class LivenessVideoEncoder private constructor(
     Older versions of Android do not request KEY_I_FRAME_INTERVAL with WebM.
     We must manually request a new keyframe at a desired interval
      */
-    var framesSinceSyncRequest = 0
+    private var framesSinceSyncRequest = 0
 
     @WorkerThread
 
@@ -153,18 +144,12 @@ internal class LivenessVideoEncoder private constructor(
                     }
 
                     if (info.isKeyFrame()) {
-                        if (livenessMuxer == null) {
+                        if (!muxing) {
+                            muxing = true
                             try {
-                                val muxer = LivenessMuxer(
-                                    outputFile,
-                                    encoder.outputFormat,
-                                    onMuxedSegment
-                                )
-                                livenessMuxer = muxer
+                                livenessMuxer.start(context, encoder.outputFormat, sendMuxedSegmentHandler)
                             } catch (e: Exception) {
-                                // This is likely an unrecoverable error, such as file creation failing.
-                                // However, if it fails, we will allow another attempt at the next keyframe.
-                                logger.error("Failed to create liveness muxer", e)
+                                logger.error("Failed to start liveness muxer", e)
                             }
                         }
                         framesSinceSyncRequest = 0 // reset keyframe request on keyframe receipt
@@ -172,10 +157,10 @@ internal class LivenessVideoEncoder private constructor(
                         framesSinceSyncRequest += 1
 
                         /*
-                        Older versions of Android do not request KEY_I_FRAME_INTERVAL with WebM.
-                        We manually request a new keyframe when we have processed the expected
-                        number of frames before our next expected keyframe.
-                         */
+                            Older versions of Android do not request KEY_I_FRAME_INTERVAL with WebM.
+                            We manually request a new keyframe when we have processed the expected
+                            number of frames before our next expected keyframe.
+                             */
                         if (framesSinceSyncRequest >= (frameRate * keyframeInterval)) {
                             encoder.setParameters(
                                 Bundle().apply {
@@ -185,7 +170,7 @@ internal class LivenessVideoEncoder private constructor(
                             framesSinceSyncRequest = 0 // reset keyframe request
                         }
                     }
-                    livenessMuxer?.write(byteBuffer, info)
+                    livenessMuxer.write(byteBuffer, info)
                 }
             }
             encoder.releaseOutputBuffer(outputBufferId, false)
@@ -215,8 +200,7 @@ internal class LivenessVideoEncoder private constructor(
     fun stop(onComplete: () -> Unit) {
         encoderHandler.post {
             encoding = false
-            livenessMuxer?.stop()
-            livenessMuxer = null
+            livenessMuxer.stop()
             if (LOGGING_ENABLED) {
                 Log.i(TAG, "Stopping encoder")
             }
@@ -230,8 +214,7 @@ internal class LivenessVideoEncoder private constructor(
                 Log.i(TAG, "Destroying encoder")
             }
             try {
-                livenessMuxer?.stop()
-                livenessMuxer = null
+                livenessMuxer.stop()
             } catch (e: Exception) {
                 // muxer likely already stopped
             }

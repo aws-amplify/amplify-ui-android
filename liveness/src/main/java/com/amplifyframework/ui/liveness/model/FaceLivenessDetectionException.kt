@@ -48,7 +48,7 @@ open class FaceLivenessDetectionException(
     class UnsupportedChallengeTypeException(
         message: String = "Received an unsupported ChallengeType from the backend.",
         recoverySuggestion: String = "Verify that the Challenges configured in your backend are supported by " +
-                "this library.",
+            "this library.",
         throwable: Throwable? = null
     ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 

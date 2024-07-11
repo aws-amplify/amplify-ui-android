@@ -249,7 +249,8 @@ internal fun ChallengeView(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (livenessState.livenessSessionInfo?.challengeType ==
-                        FaceLivenessChallengeType.FaceMovementAndLightChallenge) {
+                        FaceLivenessChallengeType.FaceMovementAndLightChallenge
+                    ) {
                         PhotosensitivityView {
                             showPhotosensitivityAlert.value = true
                         }
@@ -293,7 +294,8 @@ internal fun ChallengeView(
 
                 if (livenessState.faceMatched) {
                     if (livenessState.livenessSessionInfo?.challengeType ==
-                        FaceLivenessChallengeType.FaceMovementAndLightChallenge) {
+                        FaceLivenessChallengeType.FaceMovementAndLightChallenge
+                    ) {
                         FreshnessChallenge(
                             key,
                             modifier = Modifier.fillMaxSize(),
@@ -353,7 +355,11 @@ internal fun ChallengeView(
                                 verticalArrangement = Arrangement.spacedBy(5.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                if (shouldDisplayInstruction(livenessState.livenessCheckState.value, livenessState.livenessSessionInfo?.challengeType!!)) {
+                                if (shouldDisplayInstruction(
+                                        livenessState.livenessCheckState.value,
+                                        livenessState.livenessSessionInfo?.challengeType!!
+                                    )
+                                ) {
                                     InstructionMessage(livenessState.livenessCheckState.value)
                                 }
                                 if (livenessState.livenessCheckState.value.instructionId ==
@@ -403,7 +409,11 @@ private fun shouldDisplayInstruction(
     livenessCheckState: LivenessCheckState,
     challengeType: FaceLivenessChallengeType
 ): Boolean {
-    return !(livenessCheckState ==
-            LivenessCheckState.Running.withFaceOvalPosition(FaceDetector.FaceOvalPosition.MATCHED) &&
-        challengeType == FaceLivenessChallengeType.FaceMovementChallenge)
+    return !(
+        livenessCheckState ==
+            LivenessCheckState.Running.withFaceOvalPosition(
+                FaceDetector.FaceOvalPosition.MATCHED
+            ) &&
+            challengeType == FaceLivenessChallengeType.FaceMovementChallenge
+        )
 }

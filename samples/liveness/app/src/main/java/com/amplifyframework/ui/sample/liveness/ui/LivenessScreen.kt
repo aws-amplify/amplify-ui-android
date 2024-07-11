@@ -43,7 +43,7 @@ fun LivenessScreen(
 //            sessionId = sessionId,
 //            region = "us-east-1",
 //            disableStartView = false,
-//            muxer = LivenessFragmentedMp4MuxerImpl(),
+//            livenessMuxer = LivenessFragmentedMp4MuxerImpl(),
 //            onComplete = {
 //                viewModel.fetchSessionResult(sessionId)
 //                onChallengeComplete()

@@ -18,6 +18,7 @@ package com.amplifyframework.ui.liveness.camera
 import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
+import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.os.Bundle
 import android.os.Handler
@@ -29,9 +30,9 @@ import com.amplifyframework.ui.liveness.util.isKeyFrame
 import java.io.File
 
 internal class LivenessVideoEncoder private constructor(
-    width: Int,
-    height: Int,
-    bitrate: Int,
+    private val width: Int,
+    private val height: Int,
+    private val bitrate: Int,
     private val frameRate: Int,
     private val keyframeInterval: Int,
     private val outputFile: File,
@@ -42,7 +43,8 @@ internal class LivenessVideoEncoder private constructor(
 
         const val TAG = "LivenessVideoEncoder"
         const val LOGGING_ENABLED = false
-        const val MIME_TYPE = "video/x-vnd.on2.vp8"
+        const val VP8_MIME_TYPE = "video/x-vnd.on2.vp8"
+        const val VP9_MIME_TYPE = "video/x-vnd.on2.vp9"
 
         fun create(
             context: Context,
@@ -85,19 +87,22 @@ internal class LivenessVideoEncoder private constructor(
         )
     }
 
-    private val format = MediaFormat.createVideoFormat(MIME_TYPE, width, height).apply {
-        setInteger(
-            MediaFormat.KEY_COLOR_FORMAT,
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
-        )
-        setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
-        setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
-        setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, keyframeInterval)
+    // There are some known bugs with VP8 encoding on certain devices.
+    // This first checks to see if VP9 is supported. If so, VP9 will be attempted instead.
+    // This change is not intended for production at the moment. Special care may be needed to set VP8 as the default
+    // and only attempt to use VP9 on certain devices with known VP8 issues. VP9 stability is unknown.
+    // The liveness service is currently not allowing VP9 to be passed, although it looks like a relatively minor change
+    private val mimeType = if (hasVP9Encoder()) {
+        VP9_MIME_TYPE
+    } else {
+        VP8_MIME_TYPE
     }
+
+    private val format = createMediaFormat(mimeType)
 
     private val encoderHandler = Handler(HandlerThread(TAG).apply { start() }.looper)
 
-    private val encoder = MediaCodec.createEncoderByType(MIME_TYPE).apply {
+    private val encoder = MediaCodec.createEncoderByType(mimeType).apply {
         configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         setCallback(
             object : MediaCodec.Callback() {
@@ -242,5 +247,27 @@ internal class LivenessVideoEncoder private constructor(
             }
             encoder.release()
         }
+    }
+
+    private fun createMediaFormat(mimeType: String): MediaFormat {
+        return MediaFormat.createVideoFormat(mimeType, width, height).apply {
+            setInteger(
+                MediaFormat.KEY_COLOR_FORMAT,
+                MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
+            )
+            setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
+            setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
+            setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, keyframeInterval)
+        }
+    }
+
+    // Attempt to see if VP9 Encoder is included on the device.
+    // Google documentation is vague on support as VP9 Encoding support is blank in this URL:
+    // https://developer.android.com/media/platform/supported-formats#video-codecs
+    private fun hasVP9Encoder(): Boolean {
+        return MediaCodecList(MediaCodecList.REGULAR_CODECS)
+            .codecInfos.filter { it.isEncoder }
+            .filter { it.supportedTypes.contains(VP9_MIME_TYPE) }
+            .any { it.getCapabilitiesForType(VP9_MIME_TYPE).isFormatSupported(createMediaFormat(VP9_MIME_TYPE)) }
     }
 }

@@ -133,6 +133,7 @@ internal class LivenessVideoEncoder private constructor(
     private val logger = Amplify.Logging.forNamespace("Liveness")
 
     init {
+        logger.debug("Encoder mimeType selected: $mimeType")
         encoder.start()
     }
 

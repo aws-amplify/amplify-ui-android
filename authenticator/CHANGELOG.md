@@ -1,3 +1,12 @@
+## [Release 1.2.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.1)
+
+### Fixes
+* fix(authenticator): Do not show empty user verification screen by @mattcreaser in https://github.com/aws-amplify/amplify-ui-android/pull/143
+* feat(authenticator): Upgrade to Gen2 Amplify version by @mattcreaser in https://github.com/aws-amplify/amplify-ui-android/pull/148
+
+
+[See all changes between 1.2.0 and 1.2.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.2.0...release_authenticator_v1.2.1)
+
 ## [Release 1.2.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.0)
 
 ### Features

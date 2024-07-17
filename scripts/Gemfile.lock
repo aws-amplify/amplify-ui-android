@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/aws-amplify/amplify-ci-support
-  revision: a9fba40726da12b662c750010598e42ea071fafb
+  revision: c673e6a2f0759b95edae5840afd952b15abf7032
   branch: android/fastlane-actions
   glob: src/fastlane/release_actions/*.gemspec
   specs:
@@ -18,19 +18,19 @@ GEM
     artifactory (3.0.17)
     atomos (0.1.3)
     aws-eventstream (1.3.0)
-    aws-partitions (1.950.0)
-    aws-sdk-core (3.200.0)
+    aws-partitions (1.956.0)
+    aws-sdk-core (3.201.1)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.651.0)
       aws-sigv4 (~> 1.8)
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-kms (1.87.0)
-      aws-sdk-core (~> 3, >= 3.199.0)
-      aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.155.0)
-      aws-sdk-core (~> 3, >= 3.199.0)
+    aws-sdk-kms (1.88.0)
+      aws-sdk-core (~> 3, >= 3.201.0)
+      aws-sigv4 (~> 1.5)
+    aws-sdk-s3 (1.156.0)
+      aws-sdk-core (~> 3, >= 3.201.0)
       aws-sdk-kms (~> 1)
-      aws-sigv4 (~> 1.8)
+      aws-sigv4 (~> 1.5)
     aws-sigv4 (1.8.0)
       aws-eventstream (~> 1, >= 1.0.2)
     babosa (1.0.4)
@@ -46,7 +46,7 @@ GEM
     domain_name (0.6.20240107)
     dotenv (2.8.1)
     emoji_regex (3.2.3)
-    excon (0.110.0)
+    excon (0.111.0)
     faraday (1.10.3)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -163,7 +163,7 @@ GEM
     json (2.7.2)
     jwt (2.8.2)
       base64
-    mini_magick (4.13.1)
+    mini_magick (4.13.2)
     mini_mime (1.1.5)
     multi_json (1.15.0)
     multipart-post (2.4.1)
@@ -180,7 +180,7 @@ GEM
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
     retriable (3.1.2)
-    rexml (3.2.9)
+    rexml (3.3.2)
       strscan
     rouge (2.0.7)
     ruby2_keywords (0.0.5)
@@ -206,13 +206,12 @@ GEM
     uber (0.1.0)
     unicode-display_width (2.5.0)
     word_wrap (1.0.0)
-    xcodeproj (1.24.0)
+    xcodeproj (1.19.0)
       CFPropertyList (>= 2.3.3, < 4.0)
       atomos (~> 0.1.3)
       claide (>= 1.0.2, < 2.0)
       colored2 (~> 3.1)
       nanaimo (~> 0.3.0)
-      rexml (~> 3.2.4)
     xcpretty (0.3.0)
       rouge (~> 2.0.7)
     xcpretty-travis-formatter (1.0.1)
@@ -220,12 +219,14 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  arm64-darwin-22
 
 DEPENDENCIES
   addressable (>= 2.8.0)
   fastlane
   fastlane-plugin-release_actions!
   fastlane-plugin-semantic_release
+  rexml (>= 3.3.2)
 
 BUNDLED WITH
    2.3.7

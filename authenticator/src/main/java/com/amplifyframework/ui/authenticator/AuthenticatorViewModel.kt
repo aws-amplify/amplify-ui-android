@@ -573,7 +573,12 @@ internal class AuthenticatorViewModel(
     private suspend fun handleSignedIn() {
         logger.debug("Log in successful, getting current user")
         when (val result = authProvider.getCurrentUser()) {
-            is AmplifyResult.Error -> handleGeneralFailure(result.error)
+            is AmplifyResult.Error -> {
+                logger.error(result.error.toString())
+                signOut()
+                moveTo(AuthenticatorStep.SignIn)
+            }
+
             is AmplifyResult.Success -> moveTo(stateFactory.newSignedInState(result.data, this::signOut))
         }
     }

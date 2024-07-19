@@ -126,7 +126,7 @@ class AuthenticatorViewModelTest {
             authProvider.fetchAuthSession()
             authProvider.getCurrentUser()
         }
-        viewModel.currentStep shouldBe AuthenticatorStep.Error
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
     @Test

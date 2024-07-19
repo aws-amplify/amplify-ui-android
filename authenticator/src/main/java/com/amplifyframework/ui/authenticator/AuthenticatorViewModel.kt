@@ -575,6 +575,7 @@ internal class AuthenticatorViewModel(
         when (val result = authProvider.getCurrentUser()) {
             is AmplifyResult.Error -> {
                 logger.error(result.error.toString())
+                logger.error("Error while attempting to get current user, signing out.")
                 signOut()
                 moveTo(AuthenticatorStep.SignIn)
             }

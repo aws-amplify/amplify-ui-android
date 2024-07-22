@@ -10,7 +10,7 @@ on:
         - Authenticator
         - Liveness
       release_tag:
-        description: 'Release Tag'
+        description: 'Previous Release Tag'
         required: false
         type: string
 env:
@@ -53,6 +53,7 @@ jobs:
       env:
         RELEASE_MANAGER_TOKEN: ${{secrets.GITHUB_TOKEN}}
         RELEASE_TAG: ${{ github.event.inputs.release_tag }}
+        COMPONENT: ${{ github.event.inputs.component }}
       run: |
         cd scripts
         bundle exec fastlane android create_next_release_pr release_tag:"$RELEASE_TAG" base_branch:"$BASE_BRANCH" release_component_target:"$COMPONENT"

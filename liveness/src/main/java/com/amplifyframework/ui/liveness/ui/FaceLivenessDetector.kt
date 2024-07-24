@@ -56,6 +56,7 @@ import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
 import com.amplifyframework.core.Consumer
 import com.amplifyframework.predictions.models.FaceLivenessChallengeType
+import com.amplifyframework.predictions.models.FaceLivenessSession
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
@@ -248,9 +249,7 @@ internal fun ChallengeView(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (livenessState.livenessSessionInfo?.challengeType ==
-                        FaceLivenessChallengeType.FaceMovementAndLightChallenge
-                    ) {
+                    if (isFaceMovementAndLightChallenge(livenessState.livenessSessionInfo)) {
                         PhotosensitivityView {
                             showPhotosensitivityAlert.value = true
                         }
@@ -293,9 +292,7 @@ internal fun ChallengeView(
                 }
 
                 if (livenessState.faceMatched) {
-                    if (livenessState.livenessSessionInfo?.challengeType ==
-                        FaceLivenessChallengeType.FaceMovementAndLightChallenge
-                    ) {
+                    if (isFaceMovementAndLightChallenge(livenessState.livenessSessionInfo)) {
                         FreshnessChallenge(
                             key,
                             modifier = Modifier.fillMaxSize(),
@@ -357,7 +354,7 @@ internal fun ChallengeView(
                             ) {
                                 if (shouldDisplayInstruction(
                                         livenessState.livenessCheckState.value,
-                                        livenessState.livenessSessionInfo?.challengeType!!
+                                        livenessState.livenessSessionInfo?.challengeType
                                     )
                                 ) {
                                     InstructionMessage(livenessState.livenessCheckState.value)
@@ -405,15 +402,19 @@ internal fun ChallengeView(
     }
 }
 
+private fun isFaceMovementAndLightChallenge(livenessSessionInfo: FaceLivenessSession?): Boolean =
+    livenessSessionInfo?.challengeType == FaceLivenessChallengeType.FaceMovementAndLightChallenge
+
 private fun shouldDisplayInstruction(
     livenessCheckState: LivenessCheckState,
-    challengeType: FaceLivenessChallengeType
-): Boolean {
-    return !(
-        livenessCheckState ==
-            LivenessCheckState.Running.withFaceOvalPosition(
-                FaceDetector.FaceOvalPosition.MATCHED
-            ) &&
-            challengeType == FaceLivenessChallengeType.FaceMovementChallenge
-        )
-}
+    challengeType: FaceLivenessChallengeType?
+): Boolean =
+    if (challengeType == null) {
+        true
+    } else if (livenessCheckState == LivenessCheckState.Running.withFaceOvalPosition(FaceDetector.FaceOvalPosition.MATCHED) &&
+        challengeType == FaceLivenessChallengeType.FaceMovementChallenge
+    ) {
+        false
+    } else {
+        true
+    }

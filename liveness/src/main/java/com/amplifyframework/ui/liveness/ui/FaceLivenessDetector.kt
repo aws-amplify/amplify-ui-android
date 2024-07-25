@@ -411,7 +411,8 @@ private fun shouldDisplayInstruction(
 ): Boolean =
     if (challengeType == null) {
         true
-    } else if (livenessCheckState == LivenessCheckState.Running.withFaceOvalPosition(FaceDetector.FaceOvalPosition.MATCHED) &&
+    } else if (livenessCheckState ==
+        LivenessCheckState.Running.withFaceOvalPosition(FaceDetector.FaceOvalPosition.MATCHED) &&
         challengeType == FaceLivenessChallengeType.FaceMovementChallenge
     ) {
         false

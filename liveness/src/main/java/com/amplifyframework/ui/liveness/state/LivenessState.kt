@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.amplifyframework.predictions.aws.models.ColorChallenge
-import com.amplifyframework.predictions.aws.models.ColorChallengeType
 import com.amplifyframework.predictions.aws.models.FaceTargetChallenge
 import com.amplifyframework.predictions.aws.models.FaceTargetChallengeResponse
 import com.amplifyframework.predictions.aws.models.InitialFaceDetected
@@ -47,7 +46,6 @@ internal data class LivenessState(
     val context: Context,
     val disableStartView: Boolean,
     val onCaptureReady: () -> Unit,
-    val onFaceDistanceCheckPassed: () -> Unit,
     val onSessionError: (FaceLivenessDetectionException, Boolean) -> Unit,
     val onFinalEventsSent: () -> Unit,
 ) {
@@ -55,7 +53,7 @@ internal data class LivenessState(
     var livenessCheckState = mutableStateOf<LivenessCheckState>(
         LivenessCheckState.Initial()
     )
-    var runningFreshness by mutableStateOf(false)
+    var faceMatched by mutableStateOf(false)
     var faceGuideRect: RectF? by mutableStateOf(null)
     var faceMatchPercentage: Float by mutableStateOf(0.25f)
     var initialFaceDistanceCheckPassed by mutableStateOf(false)
@@ -78,7 +76,7 @@ internal data class LivenessState(
     @VisibleForTesting
     var readyToSendFinalEvents = false
 
-    var livenessSessionInfo: FaceLivenessSession? = null
+    var livenessSessionInfo: FaceLivenessSession? by mutableStateOf(null)
     var faceTargetChallenge: FaceTargetChallenge? by mutableStateOf(null)
     var colorChallenge: ColorChallenge? = null
 
@@ -100,7 +98,7 @@ internal data class LivenessState(
         faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
-        runningFreshness = false
+        faceMatched = false
         if (stopLivenessSession) {
             livenessSessionInfo?.stopSession(webSocketCloseCode?.code)
         }
@@ -112,7 +110,6 @@ internal data class LivenessState(
             .filterIsInstance<FaceTargetChallenge>().firstOrNull()
         colorChallenge = faceLivenessSession.challenges
             .filterIsInstance<ColorChallenge>().firstOrNull()
-        livenessCheckState.value = LivenessCheckState.Running()
         readyForOval = true
     }
 
@@ -120,11 +117,11 @@ internal data class LivenessState(
         readyToSendFinalEvents = true
     }
 
-    fun onFreshnessComplete() {
+    fun onLivenessChallengeComplete() {
         val faceGuideRect = this.faceGuideRect
         readyForOval = false
         this.faceGuideRect = null
-        runningFreshness = false
+        faceMatched = false
         if (faceMatchOvalEnd == null) {
             faceMatchOvalEnd = Date().time
         }
@@ -146,15 +143,15 @@ internal data class LivenessState(
             is LivenessCheckState.Error -> false
             is LivenessCheckState.Initial, is LivenessCheckState.Running -> {
                 /**
-                 * Start freshness check if the face has matched oval (we know this if faceMatchOvalStart is not null)
-                 * We trigger this in onFrameAvailable instead of onFrameFaceUpdate in the event the user moved the face
-                 * away from the camera. We want to run this check on every frame if the challenge is in process.
+                 * Start the challenge checks once the face has matched oval (we know this if faceMatchOvalStart is
+                 * not null). We trigger this in onFrameAvailable instead of onFrameFaceUpdate in the event the user
+                 * moved the face away from the camera. We want to run this check on every frame if the challenge is
+                 * in process.
                  */
-                if (!runningFreshness && colorChallenge?.challengeType ==
-                    ColorChallengeType.SEQUENTIAL &&
+                if (!faceMatched &&
                     faceMatchOvalStart?.let { (Date().time - it) > 1000 } == true
                 ) {
-                    runningFreshness = true
+                    faceMatched = true
                 }
                 true
             }
@@ -164,7 +161,7 @@ internal data class LivenessState(
 
                     livenessSessionInfo!!.sendChallengeResponseEvent(
                         FaceTargetChallengeResponse(
-                            colorChallenge!!.challengeId,
+                            livenessSessionInfo!!.challengeId,
                             livenessCheckState.faceGuideRect,
                             Date(faceMatchOvalStart!!),
                             Date(faceMatchOvalEnd!!)
@@ -230,7 +227,6 @@ internal data class LivenessState(
                     LivenessCheckState.Initial.withMoveFaceFurtherAwayMessage()
             } else {
                 initialFaceDistanceCheckPassed = true
-                onFaceDistanceCheckPassed()
             }
         }
 
@@ -240,7 +236,7 @@ internal data class LivenessState(
                 onCaptureReady()
                 livenessSessionInfo!!.sendChallengeResponseEvent(
                     InitialFaceDetected(
-                        colorChallenge!!.challengeId,
+                        livenessSessionInfo!!.challengeId,
                         face.faceRect,
                         Date(face.timestamp)
                     )
@@ -314,6 +310,7 @@ internal data class LivenessState(
     }
 
     fun onStartViewComplete() {
+        livenessCheckState.value = LivenessCheckState.Running()
         showingStartView = false
     }
 }

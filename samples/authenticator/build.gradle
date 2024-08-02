@@ -1,7 +1,7 @@
 buildscript {
     ext {
         compose_version = '1.5.4'
-        AuthenticatorVersion = '1.2.2'
+        AuthenticatorVersion = '1.2.3'
     }
     repositories {
         google()

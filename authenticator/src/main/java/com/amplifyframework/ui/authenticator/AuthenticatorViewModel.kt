@@ -35,6 +35,7 @@ import com.amplifyframework.auth.cognito.exceptions.service.UserNotConfirmedExce
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotFoundException
 import com.amplifyframework.auth.cognito.exceptions.service.UsernameExistsException
 import com.amplifyframework.auth.exceptions.NotAuthorizedException
+import com.amplifyframework.auth.exceptions.SessionExpiredException
 import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.auth.result.AuthResetPasswordResult
@@ -573,7 +574,17 @@ internal class AuthenticatorViewModel(
     private suspend fun handleSignedIn() {
         logger.debug("Log in successful, getting current user")
         when (val result = authProvider.getCurrentUser()) {
-            is AmplifyResult.Error -> handleGeneralFailure(result.error)
+            is AmplifyResult.Error -> {
+                if (result.error is SessionExpiredException) {
+                    logger.error(result.error.toString())
+                    logger.error("Current signed in user session has expired, signing out.")
+                    signOut()
+                    moveTo(AuthenticatorStep.SignIn)
+                } else {
+                    handleGeneralFailure(result.error)
+                }
+            }
+
             is AmplifyResult.Success -> moveTo(stateFactory.newSignedInState(result.data, this::signOut))
         }
     }

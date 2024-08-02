@@ -20,6 +20,7 @@ import aws.smithy.kotlin.runtime.http.HttpException
 import com.amplifyframework.auth.AuthUserAttributeKey.email
 import com.amplifyframework.auth.AuthUserAttributeKey.emailVerified
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.exceptions.SessionExpiredException
 import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.step.AuthNextResetPasswordStep
@@ -127,6 +128,21 @@ class AuthenticatorViewModelTest {
             authProvider.getCurrentUser()
         }
         viewModel.currentStep shouldBe AuthenticatorStep.Error
+    }
+
+    @Test
+    fun `getCurrentUser error with session expired exception during start results in SignIn state`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
+        coEvery { authProvider.getCurrentUser() } returns AmplifyResult.Error(SessionExpiredException())
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            authProvider.fetchAuthSession()
+            authProvider.getCurrentUser()
+        }
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
     @Test

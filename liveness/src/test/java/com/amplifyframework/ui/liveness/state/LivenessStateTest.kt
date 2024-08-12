@@ -124,13 +124,13 @@ internal class LivenessStateTest {
 
     @Test
     fun `beginning state is running`() {
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Running)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
     }
 
     @Test
     fun `state is error after on error`() {
         livenessState.onError(true, WebSocketCloseCode.RUNTIME_ERROR)
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Error)
     }
 
     @Test
@@ -237,7 +237,7 @@ internal class LivenessStateTest {
     fun `challenge runs after retrieving session info`() {
         val faceLivenessSession = mockk<FaceLivenessSession>(relaxed = true)
         livenessState.onLivenessSessionReady(faceLivenessSession)
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Running)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
         assertTrue(livenessState.readyForOval)
     }
 
@@ -257,7 +257,7 @@ internal class LivenessStateTest {
     fun `state is success after challenge completes and no errors occur`() {
         livenessState.faceGuideRect = mockk(relaxed = true)
         livenessState.onLivenessChallengeComplete()
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Success)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Success)
     }
 
     @Test
@@ -265,25 +265,25 @@ internal class LivenessStateTest {
         livenessState.faceGuideRect = mockk(relaxed = true)
         livenessState.onError(false, WebSocketCloseCode.RUNTIME_ERROR)
         livenessState.onLivenessChallengeComplete()
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Error)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Error)
     }
 
     @Test
     fun `stop processing frames if in error state`() {
-        livenessState.livenessCheckState.value = LivenessCheckState.Error
+        livenessState.livenessCheckState = LivenessCheckState.Error
         assertFalse(livenessState.onFrameAvailable())
     }
 
     @Test
     fun `keep processing frames if not in success or error state`() {
-        livenessState.livenessCheckState.value = LivenessCheckState.Running.withMoveFaceMessage()
+        livenessState.livenessCheckState = LivenessCheckState.Running.withMoveFaceMessage()
         assertTrue(livenessState.onFrameAvailable())
     }
 
     @Test
     fun `final events are sent when ready to send final events`() {
         val faceGuideRect = mockk<RectF>(relaxed = true)
-        livenessState.livenessCheckState.value = LivenessCheckState.Success(faceGuideRect)
+        livenessState.livenessCheckState = LivenessCheckState.Success(faceGuideRect)
         livenessState.readyToSendFinalEvents = true
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
         val sendVideoEvent = mockk<(VideoEvent) -> Unit>(relaxed = true)
@@ -310,16 +310,16 @@ internal class LivenessStateTest {
     @Test
     fun `state is initial if no face found before running`() {
         livenessState.onFrameFaceCountUpdate(0)
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Initial)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Initial)
     }
 
     @Test
     fun `state is running if no face found during challenges`() {
         livenessState.initialLocalFaceFound = true
-        livenessState.livenessCheckState.value =
+        livenessState.livenessCheckState =
             LivenessCheckState.Running.withMultipleFaceMessage()
         livenessState.onFrameFaceCountUpdate(0)
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Running)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
     }
 
     @Test
@@ -331,15 +331,15 @@ internal class LivenessStateTest {
     @Test
     fun `state is initial if multiple faces detected before running`() {
         livenessState.onFrameFaceCountUpdate(2)
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Initial)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Initial)
     }
 
     @Test
     fun `state is running if multiple faces found during challenges`() {
         livenessState.initialLocalFaceFound = true
-        livenessState.livenessCheckState.value = LivenessCheckState.Running.withMoveFaceMessage()
+        livenessState.livenessCheckState = LivenessCheckState.Running.withMoveFaceMessage()
         livenessState.onFrameFaceCountUpdate(2)
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Running)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
     }
 
     @Test
@@ -349,7 +349,7 @@ internal class LivenessStateTest {
         val rightEye = FaceDetector.Landmark(75f, 40f)
         val mouth = FaceDetector.Landmark(40f, 80f)
         livenessState.onFrameFaceUpdate(faceRect, leftEye, rightEye, mouth)
-        assertTrue(livenessState.livenessCheckState.value is LivenessCheckState.Running)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
     }
 
     @Test

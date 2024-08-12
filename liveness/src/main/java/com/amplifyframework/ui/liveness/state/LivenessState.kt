@@ -50,7 +50,7 @@ internal data class LivenessState(
     val onFinalEventsSent: () -> Unit,
 ) {
     var videoViewportSize: VideoViewportSize? by mutableStateOf(null)
-    var livenessCheckState = mutableStateOf<LivenessCheckState>(
+    var livenessCheckState by mutableStateOf<LivenessCheckState>(
         LivenessCheckState.Initial()
     )
     var faceMatched by mutableStateOf(false)
@@ -87,14 +87,14 @@ internal data class LivenessState(
     }
 
     fun onError(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode) {
-        livenessCheckState.value = LivenessCheckState.Error
+        livenessCheckState = LivenessCheckState.Error
         onDestroy(stopLivenessSession, webSocketCloseCode)
     }
 
     // Cleans up state when challenge is completed or cancelled.
     // We only send webSocketCloseCode if error encountered.
     fun onDestroy(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
-        livenessCheckState.value = LivenessCheckState.Error
+        livenessCheckState = LivenessCheckState.Error
         faceOvalMatchTimer?.cancel()
         readyForOval = false
         faceGuideRect = null
@@ -126,7 +126,7 @@ internal data class LivenessState(
             faceMatchOvalEnd = Date().time
         }
 
-        livenessCheckState.value = if (faceGuideRect != null) {
+        livenessCheckState = if (faceGuideRect != null) {
             LivenessCheckState.Success(faceGuideRect)
         } else {
             LivenessCheckState.Error
@@ -139,7 +139,7 @@ internal data class LivenessState(
     fun onFrameAvailable(): Boolean {
         if (showingStartView) return false
 
-        return when (val livenessCheckState = livenessCheckState.value) {
+        return when (val livenessCheckState = livenessCheckState) {
             is LivenessCheckState.Error -> false
             is LivenessCheckState.Initial, is LivenessCheckState.Running -> {
                 /**
@@ -183,10 +183,10 @@ internal data class LivenessState(
         }
         when (faceCount) {
             0 -> {
-                if (!initialLocalFaceFound || livenessCheckState.value is LivenessCheckState.Initial) {
-                    livenessCheckState.value = LivenessCheckState.Initial.withMoveFaceMessage()
-                } else if (livenessCheckState.value is LivenessCheckState.Running) {
-                    livenessCheckState.value = LivenessCheckState.Running.withMoveFaceMessage()
+                if (!initialLocalFaceFound || livenessCheckState is LivenessCheckState.Initial) {
+                    livenessCheckState = LivenessCheckState.Initial.withMoveFaceMessage()
+                } else if (livenessCheckState is LivenessCheckState.Running) {
+                    livenessCheckState = LivenessCheckState.Running.withMoveFaceMessage()
                 }
             }
             1 -> {
@@ -195,10 +195,10 @@ internal data class LivenessState(
                 }
             }
             else -> {
-                if (!initialLocalFaceFound || livenessCheckState.value is LivenessCheckState.Initial) {
-                    livenessCheckState.value = LivenessCheckState.Initial.withMultipleFaceMessage()
-                } else if (livenessCheckState.value is LivenessCheckState.Running) {
-                    livenessCheckState.value = LivenessCheckState.Running.withMultipleFaceMessage()
+                if (!initialLocalFaceFound || livenessCheckState is LivenessCheckState.Initial) {
+                    livenessCheckState = LivenessCheckState.Initial.withMultipleFaceMessage()
+                } else if (livenessCheckState is LivenessCheckState.Running) {
+                    livenessCheckState = LivenessCheckState.Running.withMultipleFaceMessage()
                 }
             }
         }
@@ -223,7 +223,7 @@ internal data class LivenessState(
                 LivenessCoordinator.TARGET_WIDTH, LivenessCoordinator.TARGET_HEIGHT
             )
             if (faceDistance >= FaceDetector.INITIAL_FACE_DISTANCE_THRESHOLD) {
-                livenessCheckState.value =
+                livenessCheckState =
                     LivenessCheckState.Initial.withMoveFaceFurtherAwayMessage()
             } else {
                 initialFaceDistanceCheckPassed = true
@@ -274,11 +274,11 @@ internal data class LivenessState(
                 faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
 
             if (detectedFaceMatchedOval) {
-                livenessCheckState.value = LivenessCheckState.Running.withFaceOvalPosition(
+                livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(
                     FaceDetector.FaceOvalPosition.MATCHED
                 )
             } else {
-                livenessCheckState.value = LivenessCheckState.Running.withFaceOvalPosition(
+                livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(
                     faceOvalPosition
                 )
             }
@@ -310,7 +310,7 @@ internal data class LivenessState(
     }
 
     fun onStartViewComplete() {
-        livenessCheckState.value = LivenessCheckState.Running()
+        livenessCheckState = LivenessCheckState.Running()
         showingStartView = false
     }
 }

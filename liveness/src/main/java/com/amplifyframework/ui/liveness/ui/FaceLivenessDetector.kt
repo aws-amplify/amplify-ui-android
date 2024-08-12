@@ -249,7 +249,7 @@ internal fun ChallengeView(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (isFaceMovementAndLightChallenge(livenessState.livenessSessionInfo)) {
+                    if (livenessState.livenessSessionInfo.isFaceMovementAndLightChallenge()) {
                         PhotosensitivityView {
                             showPhotosensitivityAlert.value = true
                         }
@@ -292,7 +292,7 @@ internal fun ChallengeView(
                 }
 
                 if (livenessState.faceMatched) {
-                    if (isFaceMovementAndLightChallenge(livenessState.livenessSessionInfo)) {
+                    if (livenessState.livenessSessionInfo.isFaceMovementAndLightChallenge()) {
                         FreshnessChallenge(
                             key,
                             modifier = Modifier.fillMaxSize(),
@@ -353,13 +353,13 @@ internal fun ChallengeView(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 if (shouldDisplayInstruction(
-                                        livenessState.livenessCheckState.value,
+                                        livenessState.livenessCheckState,
                                         livenessState.livenessSessionInfo?.challengeType
                                     )
                                 ) {
-                                    InstructionMessage(livenessState.livenessCheckState.value)
+                                    InstructionMessage(livenessState.livenessCheckState)
                                 }
-                                if (livenessState.livenessCheckState.value.instructionId ==
+                                if (livenessState.livenessCheckState.instructionId ==
                                     FaceDetector.FaceOvalPosition.TOO_FAR.instructionStringRes
                                 ) {
                                     val scaledOvalRect = livenessState.faceGuideRect?.let {
@@ -392,7 +392,7 @@ internal fun ChallengeView(
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                InstructionMessage(livenessState.livenessCheckState.value)
+                                InstructionMessage(livenessState.livenessCheckState)
                             }
                         }
                     }
@@ -402,8 +402,8 @@ internal fun ChallengeView(
     }
 }
 
-private fun isFaceMovementAndLightChallenge(livenessSessionInfo: FaceLivenessSession?): Boolean =
-    livenessSessionInfo?.challengeType == FaceLivenessChallengeType.FaceMovementAndLightChallenge
+private fun FaceLivenessSession?.isFaceMovementAndLightChallenge(): Boolean =
+    this?.challengeType == FaceLivenessChallengeType.FaceMovementAndLightChallenge
 
 private fun shouldDisplayInstruction(
     livenessCheckState: LivenessCheckState,

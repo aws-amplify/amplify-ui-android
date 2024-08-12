@@ -45,6 +45,7 @@ import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
+import com.amplifyframework.ui.liveness.state.AttemptCounter
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
@@ -75,6 +76,7 @@ internal class LivenessCoordinator(
     val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
 
+    private val attemptCounter = AttemptCounter()
     private val analysisExecutor = Executors.newSingleThreadExecutor()
 
     val livenessState = LivenessState(
@@ -163,16 +165,8 @@ internal class LivenessCoordinator(
     }
 
     private fun startLivenessSession() {
-        livenessState.livenessCheckState.value = LivenessCheckState.Initial.withConnectingMessage()
-
-        if (System.currentTimeMillis() - latestAttemptTimeStamp > ATTEMPT_COUNT_RESET_INTERVAL_MS) {
-            // Reset interval has lapsed so reset the attemptCount
-            attemptCount = 1
-        } else {
-            attemptCount += 1
-        }
-
-        latestAttemptTimeStamp = System.currentTimeMillis()
+        livenessState.livenessCheckState = LivenessCheckState.Initial.withConnectingMessage()
+        attemptCounter.countAttempt()
 
         val faceLivenessSessionInformation = FaceLivenessSessionInformation(
             videoWidth = TARGET_WIDTH.toFloat(),
@@ -183,7 +177,7 @@ internal class LivenessCoordinator(
             ),
             region = region,
             preCheckViewEnabled = !disableStartView,
-            attemptCount = attemptCount
+            attemptCount = attemptCounter.getCount()
         )
 
         val faceLivenessSessionOptions = AWSFaceLivenessSessionOptions.builder().apply {
@@ -313,8 +307,5 @@ internal class LivenessCoordinator(
         const val TARGET_ENCODE_BITRATE = (1024 * 1024 * .6).toInt()
         const val TARGET_ENCODE_KEYFRAME_INTERVAL = 1 // webm muxer only flushes to file on keyframe
         val TARGET_RESOLUTION_SIZE = Size(TARGET_WIDTH, TARGET_HEIGHT)
-        const val ATTEMPT_COUNT_RESET_INTERVAL_MS = 300_000L
-        var attemptCount = 0
-        var latestAttemptTimeStamp: Long = System.currentTimeMillis()
     }
 }

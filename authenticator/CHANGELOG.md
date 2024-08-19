@@ -1,3 +1,10 @@
+## [Release 1.2.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.2)
+
+### Bug Fixes
+- automatically sign in after password reset succeeds ([#162](https://github.com/aws-amplify/amplify-ui-android/issues/162))
+
+[See all changes between 1.2.1 and 1.2.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.2.1...release_authenticator_v1.2.2)
+
 ## [Release 1.2.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.1)
 
 ### Fixes

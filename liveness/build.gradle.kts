@@ -10,6 +10,7 @@ android {
             cmake {
                 cppFlags += "-std=c++17"
                 arguments += "-DCMAKE_VERBOSE_MAKEFILE=ON"
+                arguments += "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
             }
         }
         buildConfigField(
@@ -38,6 +39,9 @@ android {
     androidResources {
         noCompress += "tflite"
     }
+
+    // use non beta/rc ndk version once available
+    ndkVersion = "27.0.11902837-rc2"
 }
 
 dependencies {

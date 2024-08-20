@@ -222,7 +222,7 @@ internal data class LivenessState(
                 leftEye, rightEye, mouth,
                 LivenessCoordinator.TARGET_WIDTH, LivenessCoordinator.TARGET_HEIGHT
             )
-            if (faceDistance >= FaceDetector.INITIAL_FACE_DISTANCE_THRESHOLD) {
+            if (faceDistance >= faceTargetChallenge!!.faceTargetMatching.faceDistanceThresholdMin) {
                 livenessCheckState =
                     LivenessCheckState.Initial.withMoveFaceFurtherAwayMessage()
             } else {

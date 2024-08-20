@@ -55,6 +55,8 @@ import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
 import com.amplifyframework.core.Consumer
+import com.amplifyframework.predictions.models.FaceLivenessChallengeType
+import com.amplifyframework.predictions.models.FaceLivenessSession
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
@@ -247,8 +249,10 @@ internal fun ChallengeView(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    PhotosensitivityView {
-                        showPhotosensitivityAlert.value = true
+                    if (livenessState.livenessSessionInfo.isFaceMovementAndLightChallenge()) {
+                        PhotosensitivityView {
+                            showPhotosensitivityAlert.value = true
+                        }
                     }
 
                     InstructionMessage(LivenessCheckState.Initial.withStartViewMessage())
@@ -277,7 +281,6 @@ internal fun ChallengeView(
                     }
                 }
             } else {
-
                 livenessState.faceGuideRect?.let {
                     FaceGuide(
                         modifier = Modifier
@@ -288,23 +291,29 @@ internal fun ChallengeView(
                     )
                 }
 
-                if (livenessState.runningFreshness) {
-                    FreshnessChallenge(
-                        key,
-                        modifier = Modifier.fillMaxSize(),
-                        colors = livenessState.colorChallenge!!.challengeColors,
-                        onColorDisplayed = { currentColor, previousColor, sequenceNumber, colorStart ->
-                            livenessCoordinator.processColorDisplayed(
-                                currentColor,
-                                previousColor,
-                                sequenceNumber,
-                                colorStart
-                            )
-                        },
-                        onComplete = {
-                            livenessCoordinator.processFreshnessChallengeComplete()
+                if (livenessState.faceMatched) {
+                    if (livenessState.livenessSessionInfo.isFaceMovementAndLightChallenge()) {
+                        FreshnessChallenge(
+                            key,
+                            modifier = Modifier.fillMaxSize(),
+                            colors = livenessState.colorChallenge!!.challengeColors,
+                            onColorDisplayed = { currentColor, previousColor, sequenceNumber, colorStart ->
+                                livenessCoordinator.processColorDisplayed(
+                                    currentColor,
+                                    previousColor,
+                                    sequenceNumber,
+                                    colorStart
+                                )
+                            },
+                            onComplete = {
+                                livenessCoordinator.processLivenessCheckComplete()
+                            }
+                        )
+                    } else {
+                        LaunchedEffect(key) {
+                            livenessCoordinator.processLivenessCheckComplete()
                         }
-                    )
+                    }
                 }
 
                 livenessState.faceGuideRect?.let {
@@ -343,8 +352,14 @@ internal fun ChallengeView(
                                 verticalArrangement = Arrangement.spacedBy(5.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                InstructionMessage(livenessState.livenessCheckState.value)
-                                if (livenessState.livenessCheckState.value.instructionId ==
+                                if (shouldDisplayInstruction(
+                                        livenessState.livenessCheckState,
+                                        livenessState.livenessSessionInfo?.challengeType
+                                    )
+                                ) {
+                                    InstructionMessage(livenessState.livenessCheckState)
+                                }
+                                if (livenessState.livenessCheckState.instructionId ==
                                     FaceDetector.FaceOvalPosition.TOO_FAR.instructionStringRes
                                 ) {
                                     val scaledOvalRect = livenessState.faceGuideRect?.let {
@@ -377,7 +392,7 @@ internal fun ChallengeView(
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                InstructionMessage(livenessState.livenessCheckState.value)
+                                InstructionMessage(livenessState.livenessCheckState)
                             }
                         }
                     }
@@ -386,3 +401,21 @@ internal fun ChallengeView(
         }
     }
 }
+
+private fun FaceLivenessSession?.isFaceMovementAndLightChallenge(): Boolean =
+    this?.challengeType == FaceLivenessChallengeType.FaceMovementAndLightChallenge
+
+private fun shouldDisplayInstruction(
+    livenessCheckState: LivenessCheckState,
+    challengeType: FaceLivenessChallengeType?
+): Boolean =
+    if (challengeType == null) {
+        true
+    } else if (livenessCheckState ==
+        LivenessCheckState.Running.withFaceOvalPosition(FaceDetector.FaceOvalPosition.MATCHED) &&
+        challengeType == FaceLivenessChallengeType.FaceMovementChallenge
+    ) {
+        false
+    } else {
+        true
+    }

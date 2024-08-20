@@ -35,14 +35,17 @@ import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
 import com.amplifyframework.predictions.aws.exceptions.AccessDeniedException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionNotFoundException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionTimeoutException
+import com.amplifyframework.predictions.aws.exceptions.FaceLivenessUnsupportedChallengeTypeException
 import com.amplifyframework.predictions.aws.models.ColorChallengeResponse
 import com.amplifyframework.predictions.aws.models.RgbColor
 import com.amplifyframework.predictions.aws.options.AWSFaceLivenessSessionOptions
+import com.amplifyframework.predictions.models.Challenge
 import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
+import com.amplifyframework.ui.liveness.state.AttemptCounter
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
@@ -68,21 +71,21 @@ internal class LivenessCoordinator(
     private val sessionId: String,
     private val region: String,
     private val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
-    disableStartView: Boolean,
+    private val disableStartView: Boolean,
     private val onChallengeComplete: OnChallengeComplete,
     val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
 
+    private val attemptCounter = AttemptCounter()
     private val analysisExecutor = Executors.newSingleThreadExecutor()
 
     val livenessState = LivenessState(
-        sessionId,
-        context,
-        disableStartView,
-        this::processCaptureReady,
-        this::startLivenessSession,
-        this::processSessionError,
-        this::processFinalEventsSent
+        sessionId = sessionId,
+        context = context,
+        disableStartView = disableStartView,
+        onCaptureReady = this::processCaptureReady,
+        onSessionError = this::processSessionError,
+        onFinalEventsSent = this::processFinalEventsSent
     )
 
     private val preview = Preview.Builder().apply {
@@ -137,6 +140,7 @@ internal class LivenessCoordinator(
     private var disconnectEventReceived = false
 
     init {
+        startLivenessSession()
         MainScope().launch {
             getCameraProvider(context).apply {
                 if (lifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
@@ -161,13 +165,19 @@ internal class LivenessCoordinator(
     }
 
     private fun startLivenessSession() {
-        livenessState.livenessCheckState.value = LivenessCheckState.Initial.withConnectingMessage()
+        livenessState.livenessCheckState = LivenessCheckState.Initial.withConnectingMessage()
+        attemptCounter.countAttempt()
 
         val faceLivenessSessionInformation = FaceLivenessSessionInformation(
-            TARGET_WIDTH.toFloat(),
-            TARGET_HEIGHT.toFloat(),
-            "FaceMovementAndLightChallenge_1.0.0",
-            region
+            videoWidth = TARGET_WIDTH.toFloat(),
+            videoHeight = TARGET_HEIGHT.toFloat(),
+            challengeVersions = listOf(
+                Challenge.FaceMovementAndLightChallenge("2.0.0"),
+                Challenge.FaceMovementChallenge("1.0.0")
+            ),
+            region = region,
+            preCheckViewEnabled = !disableStartView,
+            attemptCount = attemptCounter.getCount()
         )
 
         val faceLivenessSessionOptions = AWSFaceLivenessSessionOptions.builder().apply {
@@ -185,19 +195,21 @@ internal class LivenessCoordinator(
                 onChallengeComplete()
             },
             { error ->
-                val faceLivenessException = when (error) {
+                val (faceLivenessException, shouldStopLivenessSession) = when (error) {
                     is AccessDeniedException ->
-                        FaceLivenessDetectionException.AccessDeniedException(throwable = error)
+                        FaceLivenessDetectionException.AccessDeniedException(throwable = error) to false
                     is FaceLivenessSessionNotFoundException ->
-                        FaceLivenessDetectionException.SessionNotFoundException(throwable = error)
+                        FaceLivenessDetectionException.SessionNotFoundException(throwable = error) to false
                     is FaceLivenessSessionTimeoutException ->
-                        FaceLivenessDetectionException.SessionTimedOutException(throwable = error)
+                        FaceLivenessDetectionException.SessionTimedOutException(throwable = error) to false
+                    is FaceLivenessUnsupportedChallengeTypeException ->
+                        FaceLivenessDetectionException.UnsupportedChallengeTypeException(throwable = error) to true
                     else -> FaceLivenessDetectionException(
                         error.message ?: "Unknown error.",
                         error.recoverySuggestion, error
-                    )
+                    ) to false
                 }
-                processSessionError(faceLivenessException, false)
+                processSessionError(faceLivenessException, shouldStopLivenessSession)
             }
         )
     }
@@ -245,8 +257,8 @@ internal class LivenessCoordinator(
         )
     }
 
-    fun processFreshnessChallengeComplete() {
-        livenessState.onFreshnessComplete()
+    fun processLivenessCheckComplete() {
+        livenessState.onLivenessChallengeComplete()
         stopEncoder { livenessState.onFullChallengeComplete() }
     }
 

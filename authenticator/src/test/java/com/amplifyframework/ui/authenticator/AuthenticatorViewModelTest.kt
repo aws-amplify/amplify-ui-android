@@ -20,6 +20,7 @@ import aws.smithy.kotlin.runtime.http.HttpException
 import com.amplifyframework.auth.AuthUserAttributeKey.email
 import com.amplifyframework.auth.AuthUserAttributeKey.emailVerified
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.cognito.exceptions.service.LimitExceededException
 import com.amplifyframework.auth.exceptions.SessionExpiredException
 import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.result.AuthResetPasswordResult
@@ -33,6 +34,7 @@ import com.amplifyframework.ui.authenticator.util.AmplifyResult.Error
 import com.amplifyframework.ui.authenticator.util.AmplifyResult.Success
 import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
+import com.amplifyframework.ui.authenticator.util.LimitExceededMessage
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
 import com.amplifyframework.ui.testing.CoroutineTestRule
 import io.kotest.matchers.shouldBe
@@ -489,6 +491,18 @@ class AuthenticatorViewModelTest {
         viewModel.resetPassword("username")
         viewModel.confirmResetPassword("username", "password", "code")
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+    }
+
+    @Test
+    fun `Password reset results in limit exceeded message`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.resetPassword(any()) } returns Error(LimitExceededException(null))
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+
+        viewModel.shouldEmitMessage<LimitExceededMessage> {
+            viewModel.resetPassword("username")
+        }
     }
 //endregion
 //region helpers

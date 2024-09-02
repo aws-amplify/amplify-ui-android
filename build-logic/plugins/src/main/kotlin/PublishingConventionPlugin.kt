@@ -148,7 +148,7 @@ class PublishingConventionPlugin : Plugin<Project> {
         get() = URI.create(
             getPropertyOrDefault(
                 "RELEASE_REPOSITORY_URL",
-                "https://maven.pkg.github.com/traderepublic/tr-android-dependencies"
+                "https://maven.pkg.github.com/traderepublic/amplify-ui-android"
             )
         )
 
@@ -156,7 +156,7 @@ class PublishingConventionPlugin : Plugin<Project> {
         get() = URI.create(
             getPropertyOrDefault(
                 "SNAPSHOT_REPOSITORY_URL",
-                "https://maven.pkg.github.com/traderepublic/tr-android-dependencies"
+                "https://maven.pkg.github.com/traderepublic/amplify-ui-android"
             )
         )
 

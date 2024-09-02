@@ -92,6 +92,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     unitTests {
                         isIncludeAndroidResources = true
                     }
+
+                    packaging {
+                        resources.excludes.add("META-INF/*")
+                    }
                 }
 
                 buildConfigField("String", "VERSION_NAME", "\"$sdkVersionName\"")
@@ -108,7 +112,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             // dependencies (Apache's httpcore and httpclient), both of which include
             // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
             packaging {
-                resources.excludes += setOf("META-INF/DEPENDENCIES", "META-INF/LICENSE*")
+                resources.excludes.add("META-INF/*")
             }
 
             buildFeatures {

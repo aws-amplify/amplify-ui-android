@@ -7,15 +7,13 @@ on:
         description: Component to release
         required: true
         options: 
-        - Authenticator
         - Liveness
       release_tag:
         description: 'Previous Release Tag'
         required: false
         type: string
 env:
-  GIT_USER_NAME: amplify-android-dev+ghops
-  GIT_USER_EMAIL: amplify-android-dev+ghops@amazon.com
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BASE_BRANCH: ${{ github.ref_name }}
 jobs:
   create_pr_for_next_release:

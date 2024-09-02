@@ -13,8 +13,8 @@ on:
         required: false
         type: string
 env:
-  GIT_USER_NAME: traderepublic
-  GIT_USER_EMAIL: git@traderepublic.com
+  GIT_USER_NAME: neonbot
+  GIT_USER_EMAIL: neonbot@neontrading.com
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BASE_BRANCH: ${{ github.ref_name }}
 jobs:

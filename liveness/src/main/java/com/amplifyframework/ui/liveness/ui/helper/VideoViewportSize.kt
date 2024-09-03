@@ -26,7 +26,7 @@ import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
  * @param viewportPixelSize The size (in pixels) of the video, once scaled to "fitCenter" within the container
  * @param viewportDpSize The size (in dp) of the video, once scaled to "fitCenter" within the container.
  */
-internal data class VideoViewportSize(
+data class VideoViewportSize(
     val containerSize: IntSize,
     val viewportPixelSize: IntSize,
     val viewportDpSize: DpSize

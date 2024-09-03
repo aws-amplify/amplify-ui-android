@@ -34,7 +34,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 import org.tensorflow.lite.Interpreter
 
-internal class FaceDetector(private val livenessState: LivenessState) {
+class FaceDetector(private val livenessState: LivenessState) {
     private val anchors = generateAnchors()
 
     fun getBoundingBoxes(
@@ -427,8 +427,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
     }
 
     private class Anchor(val xCenter: Float, val yCenter: Float, val h: Float, val w: Float)
-    internal class Landmark(val x: Float, val y: Float)
-    internal class Detection(
+    class Landmark(val x: Float, val y: Float)
+    class Detection(
         val location: RectF,
         val leftEye: Landmark,
         val rightEye: Landmark,

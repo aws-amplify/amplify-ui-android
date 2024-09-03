@@ -118,10 +118,6 @@ class PublishingConventionPlugin : Plugin<Project> {
             repositories {
                 maven {
                     url = if (isReleaseBuild) releaseRepositoryUrl else snapshotRepositoryUrl
-                    credentials {
-                        username = sonatypeUsername
-                        password = sonatypePassword
-                    }
                 }
             }
         }

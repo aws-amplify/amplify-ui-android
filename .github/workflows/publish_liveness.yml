@@ -1,4 +1,4 @@
-name: Publish package to GitHub Packages
+name: Publish liveness package
 
 on:
   release:
@@ -23,7 +23,7 @@ jobs:
           gradle-version: current
 
       - name: Publish package
-        run: gradle -Pversion=${{ github.event.release.tag_name }} build publish
+        run: gradle -Pversion=${{ github.event.release.tag_name }} :liveness:build :liveness:publish
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

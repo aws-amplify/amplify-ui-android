@@ -7,6 +7,60 @@ public final class com/amplifyframework/ui/liveness/BuildConfig {
 	public fun <init> ()V
 }
 
+public final class com/amplifyframework/ui/liveness/ml/FaceDetector {
+	public static final field $stable I
+	public static final field Companion Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Companion;
+	public static final field H_SCALE F
+	public static final field INITIAL_FACE_DISTANCE_THRESHOLD F
+	public static final field NUM_BOXES I
+	public static final field NUM_COORDS I
+	public static final field W_SCALE F
+	public static final field X_SCALE F
+	public static final field Y_SCALE F
+	public fun <init> (Lcom/amplifyframework/ui/liveness/state/LivenessState;)V
+	public final fun generateBoundingBoxFromLandmarks (FLcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;)Landroid/graphics/RectF;
+	public final fun getBoundingBoxes ([[[F[[[F)Ljava/util/List;
+}
+
+public final class com/amplifyframework/ui/liveness/ml/FaceDetector$Companion {
+	public final fun calculateFaceDistance (Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;II)F
+	public final fun calculateFaceMatchPercentage (Landroid/graphics/RectF;Landroid/graphics/RectF;Lcom/amplifyframework/predictions/aws/models/FaceTargetMatchingParameters;F)F
+	public final fun calculateFaceOvalPosition (Landroid/graphics/RectF;Landroid/graphics/RectF;Lcom/amplifyframework/predictions/aws/models/FaceTargetMatchingParameters;)Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+	public final fun intersectionOverUnion (Landroid/graphics/RectF;Landroid/graphics/RectF;)F
+	public final fun loadModel (Landroid/content/Context;)Lorg/tensorflow/lite/Interpreter;
+}
+
+public final class com/amplifyframework/ui/liveness/ml/FaceDetector$Detection {
+	public static final field $stable I
+	public fun <init> (Landroid/graphics/RectF;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;F)V
+	public final fun getLeftEar ()Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;
+	public final fun getLeftEye ()Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;
+	public final fun getLocation ()Landroid/graphics/RectF;
+	public final fun getMouth ()Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;
+	public final fun getNose ()Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;
+	public final fun getRightEar ()Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;
+	public final fun getRightEye ()Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;
+	public final fun getScore ()F
+}
+
+public final class com/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition : java/lang/Enum {
+	public static final field MATCHED Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+	public static final field TOO_CLOSE Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+	public static final field TOO_FAR Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+	public static final field TOO_FAR_LEFT Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+	public static final field TOO_FAR_RIGHT Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+	public final fun getInstructionStringRes ()I
+	public static fun valueOf (Ljava/lang/String;)Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+	public static fun values ()[Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;
+}
+
+public final class com/amplifyframework/ui/liveness/ml/FaceDetector$Landmark {
+	public static final field $stable I
+	public fun <init> (FF)V
+	public final fun getX ()F
+	public final fun getY ()F
+}
+
 public class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
 	public static final field $stable I
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
@@ -49,6 +103,112 @@ public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionE
 	public fun <init> ()V
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public abstract class com/amplifyframework/ui/liveness/model/LivenessCheckState {
+	public static final field $stable I
+	public synthetic fun <init> (Ljava/lang/Integer;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/Integer;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getInstructionId ()Ljava/lang/Integer;
+	public final fun isActionable ()Z
+}
+
+public final class com/amplifyframework/ui/liveness/model/LivenessCheckState$Error : com/amplifyframework/ui/liveness/model/LivenessCheckState {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Error;
+}
+
+public final class com/amplifyframework/ui/liveness/model/LivenessCheckState$Initial : com/amplifyframework/ui/liveness/model/LivenessCheckState {
+	public static final field $stable I
+	public static final field Companion Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Initial$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Integer;Z)V
+	public synthetic fun <init> (Ljava/lang/Integer;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/LivenessCheckState$Initial$Companion {
+	public final fun withConnectingMessage ()Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Initial;
+	public final fun withMoveFaceFurtherAwayMessage ()Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Initial;
+	public final fun withMoveFaceMessage ()Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Initial;
+	public final fun withMultipleFaceMessage ()Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Initial;
+	public final fun withStartViewMessage ()Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Initial;
+}
+
+public final class com/amplifyframework/ui/liveness/model/LivenessCheckState$Running : com/amplifyframework/ui/liveness/model/LivenessCheckState {
+	public static final field $stable I
+	public static final field Companion Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Running$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Integer;)V
+	public synthetic fun <init> (Ljava/lang/Integer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/LivenessCheckState$Running$Companion {
+	public final fun withFaceOvalPosition (Lcom/amplifyframework/ui/liveness/ml/FaceDetector$FaceOvalPosition;)Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Running;
+	public final fun withMoveFaceMessage ()Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Running;
+	public final fun withMultipleFaceMessage ()Lcom/amplifyframework/ui/liveness/model/LivenessCheckState$Running;
+}
+
+public final class com/amplifyframework/ui/liveness/model/LivenessCheckState$Success : com/amplifyframework/ui/liveness/model/LivenessCheckState {
+	public static final field $stable I
+	public fun <init> (Landroid/graphics/RectF;)V
+	public final fun getFaceGuideRect ()Landroid/graphics/RectF;
+}
+
+public final class com/amplifyframework/ui/liveness/state/LivenessState {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/String;Landroid/content/Context;ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Landroid/content/Context;
+	public final fun component3 ()Z
+	public final fun component4 ()Lkotlin/jvm/functions/Function0;
+	public final fun component5 ()Lkotlin/jvm/functions/Function0;
+	public final fun component6 ()Lkotlin/jvm/functions/Function2;
+	public final fun component7 ()Lkotlin/jvm/functions/Function0;
+	public final fun copy (Ljava/lang/String;Landroid/content/Context;ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;)Lcom/amplifyframework/ui/liveness/state/LivenessState;
+	public static synthetic fun copy$default (Lcom/amplifyframework/ui/liveness/state/LivenessState;Ljava/lang/String;Landroid/content/Context;ZLkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)Lcom/amplifyframework/ui/liveness/state/LivenessState;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColorChallenge ()Lcom/amplifyframework/predictions/aws/models/ColorChallenge;
+	public final fun getContext ()Landroid/content/Context;
+	public final fun getDisableStartView ()Z
+	public final fun getFaceGuideRect ()Landroid/graphics/RectF;
+	public final fun getFaceMatchPercentage ()F
+	public final fun getFaceTargetChallenge ()Lcom/amplifyframework/predictions/aws/models/FaceTargetChallenge;
+	public final fun getInitialFaceDistanceCheckPassed ()Z
+	public final fun getInitialLocalFaceFound ()Z
+	public final fun getLivenessCheckState ()Landroidx/compose/runtime/MutableState;
+	public final fun getLivenessSessionInfo ()Lcom/amplifyframework/predictions/models/FaceLivenessSession;
+	public final fun getOnCaptureReady ()Lkotlin/jvm/functions/Function0;
+	public final fun getOnFaceDistanceCheckPassed ()Lkotlin/jvm/functions/Function0;
+	public final fun getOnFinalEventsSent ()Lkotlin/jvm/functions/Function0;
+	public final fun getOnSessionError ()Lkotlin/jvm/functions/Function2;
+	public final fun getRunningFreshness ()Z
+	public final fun getSessionId ()Ljava/lang/String;
+	public final fun getShowingStartView ()Z
+	public final fun getVideoViewportSize ()Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;
+	public fun hashCode ()I
+	public final fun onDestroy (ZLcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;)V
+	public static synthetic fun onDestroy$default (Lcom/amplifyframework/ui/liveness/state/LivenessState;ZLcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;ILjava/lang/Object;)V
+	public final fun onError (ZLcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;)V
+	public final fun onFrameAvailable ()Z
+	public final fun onFrameFaceCountUpdate (I)V
+	public final fun onFrameFaceUpdate (Landroid/graphics/RectF;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Landmark;)Z
+	public final fun onFreshnessComplete ()V
+	public final fun onFullChallengeComplete ()V
+	public final fun onLivenessSessionReady (Lcom/amplifyframework/predictions/models/FaceLivenessSession;)V
+	public final fun onStartViewComplete ()V
+	public final fun setColorChallenge (Lcom/amplifyframework/predictions/aws/models/ColorChallenge;)V
+	public final fun setFaceGuideRect (Landroid/graphics/RectF;)V
+	public final fun setFaceMatchPercentage (F)V
+	public final fun setFaceTargetChallenge (Lcom/amplifyframework/predictions/aws/models/FaceTargetChallenge;)V
+	public final fun setInitialFaceDistanceCheckPassed (Z)V
+	public final fun setInitialLocalFaceFound (Z)V
+	public final fun setLivenessCheckState (Landroidx/compose/runtime/MutableState;)V
+	public final fun setLivenessSessionInfo (Lcom/amplifyframework/predictions/models/FaceLivenessSession;)V
+	public final fun setRunningFreshness (Z)V
+	public final fun setShowingStartView (Z)V
+	public final fun setVideoViewportSize (Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;)V
+	public fun toString ()Ljava/lang/String;
+	public final fun updateVideoViewportSize (Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;)V
 }
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$CancelChallengeButtonKt {
@@ -108,8 +268,17 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Reco
 	public final fun getLambda-3$liveness_release ()Lkotlin/jvm/functions/Function2;
 }
 
+public final class com/amplifyframework/ui/liveness/ui/FaceGuideKt {
+	public static final fun FaceGuide-ww6aTOc (Landroidx/compose/ui/Modifier;Landroid/graphics/RectF;Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;JLandroidx/compose/runtime/Composer;II)V
+}
+
 public final class com/amplifyframework/ui/liveness/ui/FaceLivenessDetectorKt {
+	public static final fun ChallengeView (Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLkotlin/jvm/functions/Function0;Lcom/amplifyframework/core/Consumer;Landroidx/compose/runtime/Composer;I)V
 	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class com/amplifyframework/ui/liveness/ui/InstructionMessageKt {
+	public static final fun InstructionMessage (Lcom/amplifyframework/ui/liveness/model/LivenessCheckState;Landroidx/compose/runtime/Composer;I)V
 }
 
 public final class com/amplifyframework/ui/liveness/ui/LivenessColorScheme {
@@ -123,5 +292,37 @@ public final class com/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defau
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defaults;
 	public final fun getDarkColorScheme ()Landroidx/compose/material3/ColorScheme;
 	public final fun getLightColorScheme ()Landroidx/compose/material3/ColorScheme;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/helper/VideoViewportSize {
+	public static final field $stable I
+	public static final field Companion Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize$Companion;
+	public synthetic fun <init> (JJJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-YbymL2g ()J
+	public final fun component2-YbymL2g ()J
+	public final fun component3-MYxV2XQ ()J
+	public final fun copy-DiEohAw (JJJ)Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;
+	public static synthetic fun copy-DiEohAw$default (Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;JJJILjava/lang/Object;)Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContainerSize-YbymL2g ()J
+	public final fun getScaledBoundingRect (Landroid/graphics/RectF;)Landroid/graphics/RectF;
+	public final fun getViewportDpSize-MYxV2XQ ()J
+	public final fun getViewportPixelSize-YbymL2g ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/helper/VideoViewportSize$Companion {
+	public final fun create-viCIZxY (JLandroidx/compose/ui/unit/Density;)Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;
+}
+
+public final class com/amplifyframework/ui/liveness/util/WebSocketCloseCode : java/lang/Enum {
+	public static final field CANCELED Lcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;
+	public static final field DISPOSED Lcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;
+	public static final field RUNTIME_ERROR Lcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;
+	public static final field TIMEOUT Lcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;
+	public final fun getCode ()I
+	public static fun valueOf (Ljava/lang/String;)Lcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;
+	public static fun values ()[Lcom/amplifyframework/ui/liveness/util/WebSocketCloseCode;
 }
 

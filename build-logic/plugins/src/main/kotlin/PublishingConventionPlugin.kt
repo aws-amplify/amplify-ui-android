@@ -118,6 +118,10 @@ class PublishingConventionPlugin : Plugin<Project> {
             repositories {
                 maven {
                     url = if (isReleaseBuild) releaseRepositoryUrl else snapshotRepositoryUrl
+                    credentials {
+                        username = System.getenv("GITHUB_ACTOR")
+                        password = System.getenv("GITHUB_TOKEN")
+                    }
                 }
             }
         }

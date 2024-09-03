@@ -148,7 +148,7 @@ fun FaceLivenessDetector(
 }
 
 @Composable
-internal fun ChallengeView(
+fun ChallengeView(
     key: Any,
     sessionId: String,
     region: String,

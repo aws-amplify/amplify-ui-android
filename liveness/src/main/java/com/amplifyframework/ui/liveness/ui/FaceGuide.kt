@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.liveness.ui.helper.VideoViewportSize
 
 @Composable
-internal fun FaceGuide(
+fun FaceGuide(
     modifier: Modifier,
     faceGuideRect: RectF?,
     videoViewportSize: VideoViewportSize,

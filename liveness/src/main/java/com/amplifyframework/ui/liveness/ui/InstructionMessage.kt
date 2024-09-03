@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 
-@Composable internal fun InstructionMessage(
+@Composable fun InstructionMessage(
     livenessCheckState: LivenessCheckState
 ) {
     val instructionText = livenessCheckState.instructionId?.let { stringResource(it) } ?: return

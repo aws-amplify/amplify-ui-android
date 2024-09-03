@@ -119,8 +119,6 @@ class PublishingConventionPlugin : Plugin<Project> {
                 maven {
                     name = "ossrh-staging-api"
                     url = if (isReleaseBuild) releaseRepositoryUrl else snapshotRepositoryUrl
-                    println("System.getenv(\"GITHUB_ACTOR\") = ${System.getenv("GITHUB_ACTOR")}")
-                    println("System.getenv(\"GITHUB_TOKEN\") = ${System.getenv("GITHUB_TOKEN")}")
                     credentials {
                         username = System.getenv("GITHUB_ACTOR")
                         password = System.getenv("GITHUB_TOKEN")

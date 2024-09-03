@@ -119,10 +119,6 @@ class PublishingConventionPlugin : Plugin<Project> {
                 maven {
                     name = "ossrh-staging-api"
                     url = if (isReleaseBuild) releaseRepositoryUrl else snapshotRepositoryUrl
-                    credentials {
-                        username = sonatypeUsername
-                        password = sonatypePassword
-                    }
                 }
             }
         }

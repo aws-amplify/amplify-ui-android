@@ -1,3 +1,10 @@
+## [Release 1.3.1](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.1)
+
+### Bug Fixes
+- **liveness:** Make liveness classes public
+
+[See all changes between 1.3.0 and 1.3.1](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.0...release_liveness_v1.3.1)
+
 ## [Release 1.2.6](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.6)
 
 ## Bug Fixes

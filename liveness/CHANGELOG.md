@@ -1,3 +1,10 @@
+## [Release 1.3.4](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.4)
+
+### Bug Fixes
+- **liveness:** Fix packaging resources
+
+[See all changes between 1.3.3 and 1.3.4](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.3...release_liveness_v1.3.4)
+
 ## [Release 1.3.3](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.3)
 
 ### Bug Fixes

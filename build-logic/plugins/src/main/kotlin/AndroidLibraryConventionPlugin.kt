@@ -112,7 +112,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             // dependencies (Apache's httpcore and httpclient), both of which include
             // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
             packaging {
-                resources.excludes.add("META-INF/*")
+                resources.excludes.add("META-INF/DEPENDENCIES")
             }
 
             buildFeatures {

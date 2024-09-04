@@ -92,10 +92,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     unitTests {
                         isIncludeAndroidResources = true
                     }
-
-                    packaging {
-                        resources.excludes.add("META-INF/*")
-                    }
                 }
 
                 buildConfigField("String", "VERSION_NAME", "\"$sdkVersionName\"")
@@ -113,6 +109,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
             packaging {
                 resources.excludes.add("META-INF/DEPENDENCIES")
+                resources.excludes.add("META-INF/LICENSE*.*")
             }
 
             buildFeatures {

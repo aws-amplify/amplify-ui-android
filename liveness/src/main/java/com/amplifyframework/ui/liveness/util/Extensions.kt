@@ -28,7 +28,7 @@ import androidx.core.content.ContextCompat
 internal fun MediaCodec.BufferInfo.isKeyFrame() =
     flags.and(MediaCodec.BUFFER_FLAG_KEY_FRAME) != 0
 
-internal fun Context.hasCameraPermission() =
+fun Context.hasCameraPermission() =
     ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
         PackageManager.PERMISSION_GRANTED
 

@@ -52,7 +52,7 @@ internal fun nextFrameMillis(): State<Long> {
 }
 
 @Composable
-internal fun FreshnessChallenge(
+fun FreshnessChallenge(
     key: Any,
     modifier: Modifier,
     colors: List<ColorDisplayInformation>,

@@ -62,7 +62,7 @@ internal typealias OnFreshnessColorDisplayed = (
 ) -> Unit
 
 @SuppressLint("UnsafeOptInUsageError")
-internal class LivenessCoordinator(
+class LivenessCoordinator(
     val context: Context,
     lifecycleOwner: LifecycleOwner,
     private val sessionId: String,
@@ -132,7 +132,7 @@ internal class LivenessCoordinator(
             )
         }
 
-    val previewTextureView = PreviewTextureView(context, renderer)
+    val previewTextureView = PreviewTextureView(context).render(renderer)
 
     private var disconnectEventReceived = false
 
@@ -188,10 +188,13 @@ internal class LivenessCoordinator(
                 val faceLivenessException = when (error) {
                     is AccessDeniedException ->
                         FaceLivenessDetectionException.AccessDeniedException(throwable = error)
+
                     is FaceLivenessSessionNotFoundException ->
                         FaceLivenessDetectionException.SessionNotFoundException(throwable = error)
+
                     is FaceLivenessSessionTimeoutException ->
                         FaceLivenessDetectionException.SessionTimedOutException(throwable = error)
+
                     else -> FaceLivenessDetectionException(
                         error.message ?: "Unknown error.",
                         error.recoverySuggestion, error

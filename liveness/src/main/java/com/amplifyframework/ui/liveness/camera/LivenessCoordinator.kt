@@ -58,9 +58,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-internal typealias OnMuxedSegment = (bytes: ByteArray, timestamp: Long) -> Unit
-internal typealias OnChallengeComplete = () -> Unit
-internal typealias OnFreshnessColorDisplayed = (
+typealias OnMuxedSegment = (bytes: ByteArray, timestamp: Long) -> Unit
+typealias OnChallengeComplete = () -> Unit
+typealias OnFreshnessColorDisplayed = (
     currentColor: RgbColor,
     previousColor: RgbColor,
     sequenceNumber: Int,

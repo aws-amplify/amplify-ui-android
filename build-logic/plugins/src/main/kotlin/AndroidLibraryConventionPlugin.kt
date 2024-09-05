@@ -31,15 +31,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 @Suppress("LocalVariableName")
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        with(target.pluginManager) {
-            apply("com.android.library")
-            apply("org.jetbrains.kotlin.android")
-            apply("amplify.android.ktlint")
-        }
-
         val POM_GROUP: String by target
 
         with(target) {
+            with(pluginManager) {
+                val libs = libs()
+                apply(libs.plugins.androidLibrary)
+                apply(libs.plugins.kotlinAndroid)
+                apply("amplify.android.ktlint")
+            }
+
             group = POM_GROUP
             extensions.configure<LibraryExtension> {
                 configureAndroid(this)

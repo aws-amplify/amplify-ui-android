@@ -24,7 +24,7 @@ import org.gradle.kotlin.dsl.configure
 class KoverConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("org.jetbrains.kotlinx.kover")
+            pluginManager.apply(libs().plugins.kover)
 
             extensions.configure<KoverReportExtension> {
                 defaults {

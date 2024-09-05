@@ -45,7 +45,7 @@ class PublishingConventionPlugin : Plugin<Project> {
 
     // Configure the publishing block in the android extension
     private fun Project.configureAndroidPublishing() {
-        pluginManager.withPlugin("com.android.library") {
+        pluginManager.withPlugin(libs().plugins.androidLibrary) {
             extensions.configure<LibraryExtension> {
                 publishing {
                     singleVariant("release") {

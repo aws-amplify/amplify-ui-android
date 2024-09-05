@@ -24,9 +24,11 @@ import org.jlleitschuh.gradle.ktlint.KtlintExtension
  */
 class KtLintConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        target.pluginManager.apply("org.jlleitschuh.gradle.ktlint")
-        target.extensions.configure<KtlintExtension> {
-            android.set(true)
+        with(target) {
+            pluginManager.apply(libs().plugins.ktlint)
+            extensions.configure<KtlintExtension> {
+                android.set(true)
+            }
         }
     }
 }

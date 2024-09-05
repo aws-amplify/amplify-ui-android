@@ -68,7 +68,7 @@ internal typealias OnFreshnessColorDisplayed = (
 ) -> Unit
 
 @SuppressLint("UnsafeOptInUsageError")
-internal class LivenessCoordinator(
+class LivenessCoordinator(
     val context: Context,
     private val lifecycleOwner: LifecycleOwner,
     private val sessionId: String,
@@ -139,7 +139,7 @@ internal class LivenessCoordinator(
             )
         }
 
-    val previewTextureView = PreviewTextureView(context, renderer)
+    val previewTextureView = PreviewTextureView(context).render(renderer)
 
     private var disconnectEventReceived = false
 

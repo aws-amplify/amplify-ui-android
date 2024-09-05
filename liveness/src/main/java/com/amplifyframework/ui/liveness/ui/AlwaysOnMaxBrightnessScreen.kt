@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.amplifyframework.ui.liveness.util.findActivity
 
 @Composable
-internal fun AlwaysOnMaxBrightnessScreen() {
+fun AlwaysOnMaxBrightnessScreen() {
     val context = LocalContext.current
     DisposableEffect(Unit) {
         val activity = context.findActivity() ?: return@DisposableEffect onDispose {}

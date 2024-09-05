@@ -7,6 +7,35 @@ public final class com/amplifyframework/ui/liveness/BuildConfig {
 	public fun <init> ()V
 }
 
+public final class com/amplifyframework/ui/liveness/camera/LivenessCoordinator {
+	public static final field $stable I
+	public static final field Companion Lcom/amplifyframework/ui/liveness/camera/LivenessCoordinator$Companion;
+	public static final field TARGET_ASPECT_RATIO F
+	public static final field TARGET_ENCODE_BITRATE I
+	public static final field TARGET_ENCODE_KEYFRAME_INTERVAL I
+	public static final field TARGET_FPS_MAX I
+	public static final field TARGET_FPS_MIN I
+	public static final field TARGET_HEIGHT I
+	public static final field TARGET_WIDTH I
+	public fun <init> (Landroid/content/Context;Landroidx/lifecycle/LifecycleOwner;Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLkotlin/jvm/functions/Function0;Lcom/amplifyframework/core/Consumer;)V
+	public final fun destroy (Landroid/content/Context;)V
+	public final fun getContext ()Landroid/content/Context;
+	public final fun getLivenessState ()Lcom/amplifyframework/ui/liveness/state/LivenessState;
+	public final fun getOnChallengeFailed ()Lcom/amplifyframework/core/Consumer;
+	public final fun getPreviewTextureView ()Lcom/amplifyframework/ui/liveness/camera/PreviewTextureView;
+	public final fun processColorDisplayed (Lcom/amplifyframework/predictions/aws/models/RgbColor;Lcom/amplifyframework/predictions/aws/models/RgbColor;IJ)V
+	public final fun processFreshnessChallengeComplete ()V
+}
+
+public final class com/amplifyframework/ui/liveness/camera/LivenessCoordinator$Companion {
+	public final fun getTARGET_RESOLUTION_SIZE ()Landroid/util/Size;
+}
+
+public final class com/amplifyframework/ui/liveness/camera/PreviewTextureView : android/view/TextureView {
+	public static final field $stable I
+	public fun <init> (Landroid/content/Context;)V
+}
+
 public final class com/amplifyframework/ui/liveness/ml/FaceDetector {
 	public static final field $stable I
 	public static final field Companion Lcom/amplifyframework/ui/liveness/ml/FaceDetector$Companion;
@@ -211,6 +240,10 @@ public final class com/amplifyframework/ui/liveness/state/LivenessState {
 	public final fun updateVideoViewportSize (Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;)V
 }
 
+public final class com/amplifyframework/ui/liveness/ui/AlwaysOnMaxBrightnessScreenKt {
+	public static final fun AlwaysOnMaxBrightnessScreen (Landroidx/compose/runtime/Composer;I)V
+}
+
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$CancelChallengeButtonKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$CancelChallengeButtonKt;
 	public static field lambda-1 Lkotlin/jvm/functions/Function2;
@@ -277,6 +310,10 @@ public final class com/amplifyframework/ui/liveness/ui/FaceLivenessDetectorKt {
 	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Landroidx/compose/runtime/Composer;II)V
 }
 
+public final class com/amplifyframework/ui/liveness/ui/FreshnessChallengeKt {
+	public static final fun FreshnessChallenge (Ljava/lang/Object;Landroidx/compose/ui/Modifier;Ljava/util/List;Lkotlin/jvm/functions/Function4;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;I)V
+}
+
 public final class com/amplifyframework/ui/liveness/ui/InstructionMessageKt {
 	public static final fun InstructionMessage (Lcom/amplifyframework/ui/liveness/model/LivenessCheckState;Landroidx/compose/runtime/Composer;I)V
 }
@@ -292,6 +329,10 @@ public final class com/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defau
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defaults;
 	public final fun getDarkColorScheme ()Landroidx/compose/material3/ColorScheme;
 	public final fun getLightColorScheme ()Landroidx/compose/material3/ColorScheme;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/LockPortraitOrientationKt {
+	public static final fun LockPortraitOrientation (Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)V
 }
 
 public final class com/amplifyframework/ui/liveness/ui/helper/VideoViewportSize {
@@ -314,6 +355,10 @@ public final class com/amplifyframework/ui/liveness/ui/helper/VideoViewportSize 
 
 public final class com/amplifyframework/ui/liveness/ui/helper/VideoViewportSize$Companion {
 	public final fun create-viCIZxY (JLandroidx/compose/ui/unit/Density;)Lcom/amplifyframework/ui/liveness/ui/helper/VideoViewportSize;
+}
+
+public final class com/amplifyframework/ui/liveness/util/ExtensionsKt {
+	public static final fun hasCameraPermission (Landroid/content/Context;)Z
 }
 
 public final class com/amplifyframework/ui/liveness/util/WebSocketCloseCode : java/lang/Enum {

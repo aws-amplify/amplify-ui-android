@@ -28,7 +28,7 @@ import com.amplifyframework.ui.liveness.util.findActivity
 
 @SuppressLint("SourceLockedOrientationActivity")
 @Composable
-internal fun LockPortraitOrientation(content: @Composable (resetOrientation: () -> Unit) -> Unit) {
+fun LockPortraitOrientation(content: @Composable (resetOrientation: () -> Unit) -> Unit) {
     val context = LocalContext.current
     val activity = context.findActivity() ?: return content {}
     val originalOrientation by rememberSaveable { mutableStateOf(activity.requestedOrientation) }

@@ -30,6 +30,7 @@ import com.amplifyframework.auth.cognito.exceptions.service.CodeMismatchExceptio
 import com.amplifyframework.auth.cognito.exceptions.service.CodeValidationException
 import com.amplifyframework.auth.cognito.exceptions.service.InvalidParameterException
 import com.amplifyframework.auth.cognito.exceptions.service.InvalidPasswordException
+import com.amplifyframework.auth.cognito.exceptions.service.LimitExceededException
 import com.amplifyframework.auth.cognito.exceptions.service.PasswordResetRequiredException
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotConfirmedException
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotFoundException
@@ -71,6 +72,7 @@ import com.amplifyframework.ui.authenticator.util.CodeSentMessage
 import com.amplifyframework.ui.authenticator.util.ExpiredCodeMessage
 import com.amplifyframework.ui.authenticator.util.InvalidConfigurationException
 import com.amplifyframework.ui.authenticator.util.InvalidLoginMessage
+import com.amplifyframework.ui.authenticator.util.LimitExceededMessage
 import com.amplifyframework.ui.authenticator.util.MissingConfigurationException
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
 import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
@@ -560,6 +562,7 @@ internal class AuthenticatorViewModel(
             is CodeDeliveryFailureException -> sendMessage(CannotSendCodeMessage(error))
             is CodeExpiredException -> sendMessage(ExpiredCodeMessage(error))
             is CodeValidationException -> sendMessage(UnknownErrorMessage(error))
+            is LimitExceededException -> sendMessage(LimitExceededMessage(error))
             is UnknownException -> {
                 if (error.isConnectivityIssue()) {
                     sendMessage(NetworkErrorMessage(error))

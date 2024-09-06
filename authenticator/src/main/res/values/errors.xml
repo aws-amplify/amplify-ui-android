@@ -21,5 +21,6 @@
     <string name="amplify_ui_authenticator_error_send_code">Could not send confirmation code</string>
     <string name="amplify_ui_authenticator_error_expired_code">Code has expired</string>
     <string name="amplify_ui_authenticator_error_network">Please check your connectivity</string>
+    <string name="amplify_ui_authenticator_error_limit_exceeded">You\'ve reached the request limit. Please try again later.</string>
     <string name="amplify_ui_authenticator_error_unknown">Sorry, something went wrong</string>
 </resources>

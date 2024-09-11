@@ -121,3 +121,10 @@ internal class ExpiredCodeMessage(
 internal class NetworkErrorMessage(
     override val cause: AuthException
 ) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network), AuthenticatorMessage.Error
+
+/**
+ * User tried an action too many times.
+ */
+internal class LimitExceededMessage(
+    override val cause: AuthException
+) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_limit_exceeded), AuthenticatorMessage.Error

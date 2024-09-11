@@ -15,13 +15,13 @@ platform :android do |options|
     UI.message("Building version groups for amplify-ui-android from #{project_root}")
     {
       repo: 'aws-amplify/amplify-ui-android',
-      product_name: 'Amplify UI Liveness Android',
+      product_name: 'Amplify UI Android',
       releases: [
         {
           release_tag_prefix: 'release_liveness_v',
           gradle_properties_path: "#{project_root}/liveness/gradle.properties",
           doc_files_to_update: [],
-          release_title: 'Amplify UI Liveness Android',
+          release_title: 'Amplify UI Android Liveness',
           changelog_path: "#{project_root}/liveness/CHANGELOG.md",
           component_name: "Liveness",
           top_level_docs_to_update: ["#{project_root}/README.md"],
@@ -33,12 +33,12 @@ platform :android do |options|
           release_tag_prefix: 'release_authenticator_v',
           gradle_properties_path: "#{project_root}/authenticator/gradle.properties",
           doc_files_to_update: ["#{project_root}/authenticator/README.md"],
-          release_title: 'Amplify UI Authenticator Android',
+          release_title: 'Amplify UI Android Authenticator',
           changelog_path: "#{project_root}/authenticator/CHANGELOG.md",
           component_name: "Authenticator",
           top_level_docs_to_update: ["#{project_root}/README.md"],
           sample_build_files_to_update: ["#{project_root}/samples/authenticator/build.gradle"],
-          changelog_include_scopes: [],
+          changelog_include_scopes: ["Authenticator", "authenticator", "all"],
           changelog_ignore_scopes: ["liveness", "Liveness"]
         }
       ]

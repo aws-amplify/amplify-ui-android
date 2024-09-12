@@ -29,11 +29,12 @@ val amplifyInternalMarkers = listOf(
 class ComponentConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply("amplify.android.library")
-            pluginManager.apply("amplify.android.publishing")
-            pluginManager.apply("amplify.android.kover")
-            pluginManager.apply("amplify.android.api.validator")
-            pluginManager.apply("amplify.android.licenses")
+            val libs = libs()
+            pluginManager.apply(libs.plugins.conventions.androidLibrary)
+            pluginManager.apply(libs.plugins.conventions.publishing)
+            pluginManager.apply(libs.plugins.conventions.kover)
+            pluginManager.apply(libs.plugins.conventions.apiValidator)
+            pluginManager.apply(libs.plugins.conventions.licenses)
 
             tasks.withType<KotlinCompile>().configureEach {
                 kotlinOptions {

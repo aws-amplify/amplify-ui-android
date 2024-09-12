@@ -82,6 +82,8 @@ abstract class GenerateTypeSafeCatalogTask : DefaultTask() {
         val catalogs = project.extensions.getByType<VersionCatalogsExtension>()
         val catalog = catalogs.named(catalogName.get())
 
+        val pluginExtension = project.extensions.getByType<GradlePluginDevelopmentExtension>()
+
         val generatedCode = buildString {
             appendLine("package com.example.catalog")
             appendLine()
@@ -141,7 +143,16 @@ abstract class GenerateTypeSafeCatalogTask : DefaultTask() {
                 appendLine("    val ${alias.toCamelCase()}: Provider<PluginDependency>")
                 appendLine("        get() = catalog.findPlugin(\"$alias\").orElseThrowIllegalArgs(\"$alias\", \"Plugin\")")
             }
+            appendLine("    val conventions = ConventionPlugins()")
             appendLine("}")
+            appendLine()
+
+            appendLine("class ConventionPlugins {")
+            pluginExtension.plugins.forEach { pluginDeclaration ->
+                appendLine("    val ${pluginDeclaration.name}: String = \"${pluginDeclaration.id}\"")
+            }
+            appendLine("}")
+            appendLine()
         }
 
         val outputFile = outputDir.get().file("GeneratedCatalog.kt").asFile

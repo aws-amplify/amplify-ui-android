@@ -38,7 +38,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 val libs = libs()
                 apply(libs.plugins.androidLibrary)
                 apply(libs.plugins.kotlinAndroid)
-                apply("amplify.android.ktlint")
+                apply(libs.plugins.conventions.ktlint)
             }
 
             group = POM_GROUP

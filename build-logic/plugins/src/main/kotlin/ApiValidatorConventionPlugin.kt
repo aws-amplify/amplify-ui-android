@@ -25,7 +25,8 @@ import org.gradle.kotlin.dsl.configure
 class ApiValidatorConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply(libs().plugins.binaryCompatibility)
+            val libs = libs()
+            pluginManager.apply(libs.plugins.binaryCompatibility)
 
             extensions.configure<ApiValidationExtension> {
                 // Ignore anything marked with an internal API marker

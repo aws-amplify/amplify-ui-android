@@ -24,7 +24,8 @@ import org.gradle.kotlin.dsl.configure
 class LicensesConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            pluginManager.apply(libs().plugins.licensee)
+            val libs = libs()
+            pluginManager.apply(libs.plugins.licensee)
 
             extensions.configure<app.cash.licensee.LicenseeExtension> {
                 allow("Apache-2.0")

@@ -69,6 +69,11 @@ gradlePlugin {
     }
 }
 
+// This task generates a type-safe wrapper for a Gradle VersionCatalog in the build-logic project. This allows our
+// convention plugins to apply other plugins (or specify dependencies) in a type-safe way, similar to how Gradle
+// generates a type-safe wrapper for the version catalog in the main project.
+// This is directly inspired by this commit in the nowinandroid app, which we've augmented by adding generated accessors
+// for our own plugins as well: https://github.com/android/nowinandroid/commit/ec525b77f42d72e5549094db610317584fe6bae7
 abstract class GenerateTypeSafeCatalogTask : DefaultTask() {
 
     @get:Input

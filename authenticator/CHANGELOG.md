@@ -1,3 +1,10 @@
+## [Release 1.3.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.3.0)
+
+### Features
+- **authenticator:** Add default error string for LimitExceededException ([#182](https://github.com/aws-amplify/amplify-ui-android/issues/182))
+
+[See all changes between 1.2.3 and 1.3.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.2.3...release_authenticator_v1.3.0)
+
 ## [Release 1.2.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.3)
 
 ### Bug Fixes

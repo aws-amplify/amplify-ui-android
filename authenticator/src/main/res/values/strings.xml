@@ -26,7 +26,13 @@
     <string name="amplify_ui_authenticator_step2_content">Open the Authenticator app and scan the QR code or enter the key to get your verification code</string>
     <string name="amplify_ui_authenticator_step3_title">Step 3: Verify your code</string>
     <string name="amplify_ui_authenticator_step3_content">Enter the 6 digit code from your Authenticator app</string>
+    <!--MFA Setup Screen -->
+    <string name="amplify_ui_authenticator_mfa_setup_description">Set up your preferred method now and use it for secure sign-ins in the future</string>
+    <!--Email MFA Setup Screen -->
+    <string name="amplify_ui_authenticator_email_setup_description">Enter your email you wish to setup for Two-Factor Auth</string>
+
     <!-- MFA Selection Screen -->
     <string name="amplify_ui_authenticator_mfa_sms">Text Message (SMS)</string>
     <string name="amplify_ui_authenticator_mfa_totp">Authenticator App (TOTP)</string>
+    <string name="amplify_ui_authenticator_mfa_email">Email Message</string>
 </resources>

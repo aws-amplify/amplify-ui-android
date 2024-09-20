@@ -47,6 +47,8 @@ import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.AttemptCounter
 import com.amplifyframework.ui.liveness.state.LivenessState
+import com.amplifyframework.ui.liveness.ui.Camera
+import com.amplifyframework.ui.liveness.ui.ChallengeOptions
 import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
 import java.util.concurrent.Executors
@@ -67,11 +69,12 @@ internal typealias OnFreshnessColorDisplayed = (
 @SuppressLint("UnsafeOptInUsageError")
 internal class LivenessCoordinator(
     val context: Context,
-    lifecycleOwner: LifecycleOwner,
+    private val lifecycleOwner: LifecycleOwner,
     private val sessionId: String,
     private val region: String,
     private val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     private val disableStartView: Boolean,
+    private val challengeOptions: ChallengeOptions,
     private val onChallengeComplete: OnChallengeComplete,
     val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -141,24 +144,40 @@ internal class LivenessCoordinator(
 
     init {
         startLivenessSession()
+        if (challengeOptions.hasOneCameraConfigured()) {
+            launchCamera(challengeOptions.faceMovementAndLight.camera)
+        } else {
+            livenessState.loadingCameraPreview = true
+        }
+    }
+
+    private fun launchCamera(camera: Camera) {
         MainScope().launch {
             getCameraProvider(context).apply {
                 if (lifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
                     unbindAll()
-                    if (this.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
+
+                    val (chosenCamera, orientation) = when (camera) {
+                        Camera.Front -> Pair(CameraSelector.DEFAULT_FRONT_CAMERA, "front")
+                        Camera.Back -> Pair(CameraSelector.DEFAULT_BACK_CAMERA, "back")
+                    }
+
+                    if (this.hasCamera(chosenCamera)) {
                         bindToLifecycle(
                             lifecycleOwner,
-                            CameraSelector.DEFAULT_FRONT_CAMERA,
+                            chosenCamera,
                             preview,
                             analysis
                         )
                     } else {
+                        livenessState.loadingCameraPreview = false
                         val faceLivenessException = FaceLivenessDetectionException(
-                            "A front facing camera is required but no front facing camera detected.",
-                            "Enable a front facing camera."
+                            "A $orientation facing camera is required but no $orientation facing camera detected.",
+                            "Enable a $orientation facing camera."
                         )
                         processSessionError(faceLivenessException, true)
                     }
+                    livenessState.loadingCameraPreview = false
                 }
             }
         }
@@ -189,7 +208,13 @@ internal class LivenessCoordinator(
             faceLivenessSessionInformation,
             faceLivenessSessionOptions,
             BuildConfig.LIVENESS_VERSION_NAME,
-            { livenessState.onLivenessSessionReady(it) },
+            {
+                livenessState.onLivenessSessionReady(it)
+                if (!challengeOptions.hasOneCameraConfigured()) {
+                    val foundChallenge = challengeOptions.getOptions(it.challengeType)
+                    launchCamera(foundChallenge.camera)
+                }
+            },
             {
                 disconnectEventReceived = true
                 onChallengeComplete()

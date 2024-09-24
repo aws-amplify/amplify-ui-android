@@ -221,6 +221,45 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
+    fun `SMS MFA Code next step shows the SignInConfirmMfa screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE)
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmMfa
+    }
+
+    @Test
+    fun `Custom Challenge next step shows the SignInConfirmCustomAuth screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_CUSTOM_CHALLENGE)
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmCustomAuth
+    }
+
+    @Test
+    fun `New Password next step shows the SignInConfirmNewPassword screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_NEW_PASSWORD)
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmNewPassword
+    }
+
+    @Test
     fun `MFA selection next step shows error if allowedMFATypes is null`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.signIn(any(), any()) } returns Success(

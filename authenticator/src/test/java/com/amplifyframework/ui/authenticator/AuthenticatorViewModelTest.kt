@@ -260,6 +260,34 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
+    fun `Confirm SignUp next step, get error from resendSignUpCode, stays in SignIn screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_UP)
+        )
+        coEvery { authProvider.resendSignUpCode(any()) } returns AmplifyResult.Error(mockAuthException())
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+    }
+
+    @Test
+    fun `Confirm SignUp next step shows the SignUpConfirm screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_UP)
+        )
+        coEvery { authProvider.resendSignUpCode(any()) } returns Success(mockk())
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignUpConfirm
+    }
+
+    @Test
     fun `MFA selection next step shows error if allowedMFATypes is null`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.signIn(any(), any()) } returns Success(

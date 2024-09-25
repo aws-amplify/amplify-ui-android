@@ -48,6 +48,7 @@ fun SignInContinueWithMfaSelection(
             label = {
                 when (it) {
                     MFAType.SMS.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_sms)
+                    MFAType.EMAIL.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_email)
                     else -> context.getString(R.string.amplify_ui_authenticator_mfa_totp)
                 }
             },

@@ -77,6 +77,22 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
     }
 
     @Test
+    fun `Submits Email MFA type`() {
+        val onSubmit = mockk<(String) -> Unit>(relaxed = true)
+        setContent {
+            SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState(onSubmit = onSubmit))
+        }
+        signInContinueWithMfaSelection {
+            selectMfaType(MFAType.EMAIL)
+            hasMfaTypeSelected(MFAType.EMAIL)
+            clickSubmitButton()
+        }
+        verify {
+            onSubmit(MFAType.EMAIL.challengeResponse)
+        }
+    }
+
+    @Test
     fun `moves back to sign in`() {
         val onMoveTo = mockk<(AuthenticatorInitialStep) -> Unit>(relaxed = true)
         setContent {

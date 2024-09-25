@@ -133,7 +133,7 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
-    fun `getCurrentUser error with session expired exception during start results in SignIn state`() = runTest {
+    fun `getCurrentUser error with session expired exception during start results in being signed out`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
         coEvery { authProvider.getCurrentUser() } returns AmplifyResult.Error(SessionExpiredException())
 
@@ -143,8 +143,8 @@ class AuthenticatorViewModelTest {
         coVerify(exactly = 1) {
             authProvider.fetchAuthSession()
             authProvider.getCurrentUser()
+            authProvider.signOut()
         }
-        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
     @Test

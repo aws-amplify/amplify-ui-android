@@ -46,7 +46,9 @@ import com.amplifyframework.ui.authenticator.SignInConfirmCustomState
 import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
 import com.amplifyframework.ui.authenticator.SignInConfirmNewPasswordState
 import com.amplifyframework.ui.authenticator.SignInConfirmTotpCodeState
+import com.amplifyframework.ui.authenticator.SignInContinueWithEmailSetupState
 import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSelectionState
+import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSetupSelectionState
 import com.amplifyframework.ui.authenticator.SignInContinueWithTotpSetupState
 import com.amplifyframework.ui.authenticator.SignInState
 import com.amplifyframework.ui.authenticator.SignUpConfirmState
@@ -66,6 +68,8 @@ import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
  * @param signInConfirmMfaContent The content to show for the [SignInConfirmMfaState].
  * @param signInConfirmCustomContent The content to show for the [SignInConfirmCustomState].
  * @param signInConfirmNewPasswordContent The content to show for the [SignInConfirmNewPasswordState].
+ * @param signInContinueWithMfaSetupSelectionContent The content to show for the [SignInContinueWithMfaSetupSelectionState]
+ * @param signInContinueWithEmailSetupContent The content to show for the [SignInContinueWithEmailSetupState]
  * @param signInConfirmTotpCodeContent The content to show for the [SignInConfirmTotpCodeState].
  * @param signInContinueWithTotpSetupContent The content to show for the [SignInContinueWithTotpSetupState].
  * @param signUpContent The content to show for the [SignUpState].
@@ -96,6 +100,12 @@ fun Authenticator(
     },
     signInContinueWithTotpSetupContent: @Composable (state: SignInContinueWithTotpSetupState) -> Unit = {
         SignInContinueWithTotpSetup(it)
+    },
+    signInContinueWithEmailSetupContent: @Composable (state: SignInContinueWithEmailSetupState) -> Unit = {
+        SignInContinueWithEmailSetup(it)
+    },
+    signInContinueWithMfaSetupSelectionContent: @Composable (state: SignInContinueWithMfaSetupSelectionState) -> Unit = {
+        SignInContinueWithMfaSetupSelection(it)
     },
     signInContinueWithMfaSelectionContent: @Composable (state: SignInContinueWithMfaSelectionState) -> Unit = {
         SignInContinueWithMfaSelection(it)
@@ -140,6 +150,8 @@ fun Authenticator(
                         )
                         is SignInConfirmTotpCodeState -> signInConfirmTotpCodeContent(targetState)
                         is SignInContinueWithTotpSetupState -> signInContinueWithTotpSetupContent(targetState)
+                        is SignInContinueWithEmailSetupState -> signInContinueWithEmailSetupContent(targetState)
+                        is SignInContinueWithMfaSetupSelectionState -> signInContinueWithMfaSetupSelectionContent(targetState)
                         is SignInContinueWithMfaSelectionState -> signInContinueWithMfaSelectionContent(targetState)
                         is SignUpState -> signUpContent(targetState)
                         is PasswordResetState -> passwordResetContent(targetState)

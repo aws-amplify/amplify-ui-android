@@ -82,6 +82,22 @@ internal class StepStateFactory(
         onMoveTo = onMoveTo
     )
 
+    fun newSignInContinueWithMfaSetupSelectionState(
+        allowedMfaTypes: Set<MFAType>,
+        onSubmit: suspend (selection: String) -> Unit
+    ) = SignInContinueWithMfaSetupSelectionStateImpl(
+        allowedMfaTypes = allowedMfaTypes,
+        onSubmit = onSubmit,
+        onMoveTo = onMoveTo
+    )
+
+    fun newSignInContinueWithEmailSetupState(
+        onSubmit: suspend (email: String) -> Unit
+    ) = SignInContinueWithEmailSetupStateImpl(
+        onSubmit = onSubmit,
+        onMoveTo = onMoveTo
+    )
+
     fun newSignInContinueWithMfaSelectionState(
         allowedMfaTypes: Set<MFAType>,
         onSubmit: suspend (selection: String) -> Unit

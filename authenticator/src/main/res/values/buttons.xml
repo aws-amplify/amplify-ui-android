@@ -16,6 +16,7 @@
 <resources>
     <!-- Buttons -->
     <string name="amplify_ui_authenticator_button_submit">Submit</string>
+    <string name="amplify_ui_authenticator_button_continue">Continue</string>
     <string name="amplify_ui_authenticator_button_signin">Sign In</string>
     <string name="amplify_ui_authenticator_button_change_password">Change Password</string>
     <string name="amplify_ui_authenticator_button_signup">Create Account</string>

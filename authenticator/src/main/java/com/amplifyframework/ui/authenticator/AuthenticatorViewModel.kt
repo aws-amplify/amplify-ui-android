@@ -379,7 +379,7 @@ internal class AuthenticatorViewModel(
         when (val nextStep = result.nextStep.signInStep) {
             AuthSignInStep.DONE -> checkVerificationMechanisms()
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE,
-            AuthSignInStep.CONFIRM_SIGN_IN_WITH_EMAIL_MFA_CODE -> moveTo(
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_OTP -> moveTo(
                 stateFactory.newSignInMfaState(
                     result.nextStep.codeDeliveryDetails
                 ) { confirmationCode -> confirmSignIn(username, password, confirmationCode) }

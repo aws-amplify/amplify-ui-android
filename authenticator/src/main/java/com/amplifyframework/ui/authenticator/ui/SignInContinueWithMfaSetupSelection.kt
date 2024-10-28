@@ -35,6 +35,8 @@ import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import kotlinx.coroutines.launch
 
+private val MFA_SELECTION_ORDER = setOf(MFAType.TOTP, MFAType.EMAIL)
+
 @Composable
 fun SignInContinueWithMfaSetupSelection(
     state: SignInContinueWithMfaSetupSelectionState,
@@ -60,7 +62,7 @@ fun SignInContinueWithMfaSetupSelection(
             modifier = Modifier.padding(bottom = 16.dp),
             text = stringResource(R.string.amplify_ui_authenticator_mfa_setup_description)
         )
-        val items = remember { state.allowedMfaTypes.map { it.challengeResponse } }
+        val items = remember { MFA_SELECTION_ORDER.intersect(state.allowedMfaTypes).map { it.challengeResponse } }
         RadioGroup(
             items = items,
             selected = fieldState.content,

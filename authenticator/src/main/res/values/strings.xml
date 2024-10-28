@@ -15,7 +15,8 @@
 
 <resources>
     <!-- Confirmation Code Screen -->
-    <string name="amplify_ui_authenticator_confirmation_code_sent">A confirmation code has been sent to <b>%s</b>.</string>
+    <string name="amplify_ui_authenticator_confirmation_code_sent_email">Enter the verification code sent to your email to complete this sign-in.</string>
+    <string name="amplify_ui_authenticator_confirmation_code_sent_phone">Enter the verification code sent to your phone to complete this sign-in.</string>
     <string name="amplify_ui_authenticator_confirmation_code_sent_unknown">A confirmation code has been sent.</string>
     <!-- TOTP Code Screen -->
     <string name="amplify_ui_authenticator_enter_totp_code">Please enter the code from your registered Authenticator app</string>
@@ -27,9 +28,9 @@
     <string name="amplify_ui_authenticator_step3_title">Step 3: Verify your code</string>
     <string name="amplify_ui_authenticator_step3_content">Enter the 6 digit code from your Authenticator app</string>
     <!--MFA Setup Screen -->
-    <string name="amplify_ui_authenticator_mfa_setup_description">Set up your preferred method now and use it for secure sign-ins in the future</string>
+    <string name="amplify_ui_authenticator_mfa_setup_description">Select your preferred way to verify your identity when using two-factor authentication (2FA). This will be your default method for added account security.</string>
     <!--Email MFA Setup Screen -->
-    <string name="amplify_ui_authenticator_email_setup_description">Enter your email you wish to setup for Two-Factor Auth</string>
+    <string name="amplify_ui_authenticator_email_setup_description">Enter the email address you want to use for two-factor authentication (2FA). This email will receive verification codes when you sign in.</string>
 
     <!-- MFA Selection Screen -->
     <string name="amplify_ui_authenticator_mfa_sms">Text Message (SMS)</string>

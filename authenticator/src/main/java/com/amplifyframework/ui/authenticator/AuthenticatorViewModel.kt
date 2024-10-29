@@ -616,7 +616,6 @@ internal class AuthenticatorViewModel(
                     logger.error(result.error.toString())
                     logger.error("Current signed in user session has expired, signing out.")
                     signOut()
-                    moveTo(AuthenticatorStep.SignIn)
                 } else {
                     handleGeneralFailure(result.error)
                 }

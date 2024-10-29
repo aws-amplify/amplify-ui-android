@@ -38,7 +38,7 @@ fun SignInConfirmCustom(
     state: SignInConfirmCustomState,
     modifier: Modifier = Modifier,
     headerContent: @Composable (state: SignInConfirmCustomState) -> Unit = {
-        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin_confirm_custom_challenge))
+        AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_signin_confirm_mfa))
     },
     footerContent: @Composable (state: SignInConfirmCustomState) -> Unit = { SignInConfirmCustomFooter(it) },
     deliveryDetailsContent: @Composable (details: AuthCodeDeliveryDetails?) -> Unit = { DeliveryDetails(it) }

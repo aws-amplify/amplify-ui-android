@@ -14,22 +14,22 @@ import org.junit.Test
 class SignInContinueWithMfaSelectionTest : ComposeTest() {
 
     @Test
-    fun `title is Select your preferred Two-Factor Auth method`() {
+    fun `title is Choose your two-factor authentication method`() {
         setContent {
             SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
         }
         signInContinueWithMfaSelection {
-            hasTitle("Select your preferred Two-Factor Auth method")
+            hasTitle("Choose your two-factor authentication method")
         }
     }
 
     @Test
-    fun `Submit button label is Submit`() {
+    fun `Continue button label is Continue`() {
         setContent {
             SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
         }
         signInContinueWithMfaSelection {
-            hasSubmitButton("Submit")
+            hasSubmitButton("Continue")
         }
     }
 

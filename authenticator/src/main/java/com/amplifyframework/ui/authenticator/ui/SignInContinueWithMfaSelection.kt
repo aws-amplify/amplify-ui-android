@@ -3,6 +3,7 @@ package com.amplifyframework.ui.authenticator.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,6 +43,10 @@ fun SignInContinueWithMfaSelection(
             .padding(horizontal = 16.dp)
     ) {
         headerContent(state)
+        Text(
+            modifier = Modifier.padding(bottom = 16.dp),
+            text = stringResource(R.string.amplify_ui_authenticator_mfa_selection_description)
+        )
         val items = remember { MFA_SELECTION_ORDER.intersect(state.allowedMfaTypes).map { it.challengeResponse } }
         RadioGroup(
             items = items,

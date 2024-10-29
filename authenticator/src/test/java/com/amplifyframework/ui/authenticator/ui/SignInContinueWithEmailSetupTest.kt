@@ -33,7 +33,7 @@ class SignInContinueWithEmailSetupTest : ComposeTest() {
         }
 
         signInContinueWithEmailSetup {
-            hasTitle("Setup Two-Factor Auth method")
+            hasTitle("Add Email for Two-Factor Authentication")
         }
     }
 

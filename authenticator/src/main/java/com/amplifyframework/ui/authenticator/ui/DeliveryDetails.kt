@@ -34,11 +34,11 @@ internal fun DeliveryDetails(
 ) {
     val content = when (details?.deliveryMedium) {
         AuthCodeDeliveryDetails.DeliveryMedium.EMAIL -> annotatedStringResource(
-            R.string.amplify_ui_authenticator_confirmation_code_sent_email,
+            R.string.amplify_ui_authenticator_confirmation_code_sent,
             details.destination
         )
         AuthCodeDeliveryDetails.DeliveryMedium.SMS -> annotatedStringResource(
-            R.string.amplify_ui_authenticator_confirmation_code_sent_phone,
+            R.string.amplify_ui_authenticator_confirmation_code_sent,
             details.destination
         )
         else -> annotatedStringResource(R.string.amplify_ui_authenticator_confirmation_code_sent_unknown)

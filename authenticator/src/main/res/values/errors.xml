@@ -18,7 +18,7 @@
     <string name="amplify_ui_authenticator_error_invalid_signin">Username or Password is incorrect</string>
     <!-- General Errors -->
     <string name="amplify_ui_authenticator_error_cannot_reset_password">User password cannot be reset in the current state</string>
-    <string name="amplify_ui_authenticator_error_send_code">Could not send confirmation code</string>
+    <string name="amplify_ui_authenticator_error_send_code">Could not send verification code</string>
     <string name="amplify_ui_authenticator_error_expired_code">Code has expired</string>
     <string name="amplify_ui_authenticator_error_network">Please check your connectivity</string>
     <string name="amplify_ui_authenticator_error_limit_exceeded">You\'ve reached the request limit. Please try again later.</string>

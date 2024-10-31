@@ -104,7 +104,8 @@ fun Authenticator(
     signInContinueWithEmailSetupContent: @Composable (state: SignInContinueWithEmailSetupState) -> Unit = {
         SignInContinueWithEmailSetup(it)
     },
-    signInContinueWithMfaSetupSelectionContent: @Composable (state: SignInContinueWithMfaSetupSelectionState) -> Unit = {
+    signInContinueWithMfaSetupSelectionContent: @Composable (state: SignInContinueWithMfaSetupSelectionState) ->
+    Unit = {
         SignInContinueWithMfaSetupSelection(it)
     },
     signInContinueWithMfaSelectionContent: @Composable (state: SignInContinueWithMfaSelectionState) -> Unit = {
@@ -151,7 +152,8 @@ fun Authenticator(
                         is SignInConfirmTotpCodeState -> signInConfirmTotpCodeContent(targetState)
                         is SignInContinueWithTotpSetupState -> signInContinueWithTotpSetupContent(targetState)
                         is SignInContinueWithEmailSetupState -> signInContinueWithEmailSetupContent(targetState)
-                        is SignInContinueWithMfaSetupSelectionState -> signInContinueWithMfaSetupSelectionContent(targetState)
+                        is SignInContinueWithMfaSetupSelectionState ->
+                            signInContinueWithMfaSetupSelectionContent(targetState)
                         is SignInContinueWithMfaSelectionState -> signInContinueWithMfaSelectionContent(targetState)
                         is SignUpState -> signUpContent(targetState)
                         is PasswordResetState -> passwordResetContent(targetState)

@@ -23,7 +23,7 @@ import com.amplifyframework.ui.testing.ComposeTest
 fun ComposeTest.signInContinueWithEmailSetup(func: SignInContinueWithEmailSetupRobot.() -> Unit) =
     SignInContinueWithEmailSetupRobot(composeTestRule).func()
 
-class SignInContinueWithEmailSetupRobot (composeTestRule: ComposeTestRule) : ScreenLevelRobot(composeTestRule) {
+class SignInContinueWithEmailSetupRobot(composeTestRule: ComposeTestRule) : ScreenLevelRobot(composeTestRule) {
     fun hasSubmitButton(expected: String) = assertExists(TestTags.SignInConfirmButton, expected)
 
     fun setEmail(email: String) = setFieldContent(FieldKey.Email, email)

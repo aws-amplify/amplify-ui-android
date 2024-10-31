@@ -15,5 +15,5 @@
 
 <resources>
     <string name="amplify_ui_authenticator_message_password_reset">Password has been reset</string>
-    <string name="amplify_ui_authenticator_message_code_sent">Confirmation code sent</string>
+    <string name="amplify_ui_authenticator_message_code_sent">Verification code sent</string>
 </resources>

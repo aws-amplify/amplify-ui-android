@@ -64,7 +64,7 @@ Add a dependency on Amplify Authenticator to your application's `dependencies` b
 
 ```kotlin
 dependencies {
-    implementation("com.amplifyframework.ui:authenticator:1.3.0")
+    implementation("com.amplifyframework.ui:authenticator:1.4.0")
 }
 ```
 

@@ -15,11 +15,13 @@
 
 package com.amplifyframework.ui.authenticator.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.ui.authenticator.R
+import kotlin.reflect.KClass
 
 /**
  * Messages that may be displayed in the Authenticator UI.
@@ -52,9 +54,7 @@ interface AuthenticatorMessage {
     }
 }
 
-internal abstract class AuthenticatorMessageImpl(
-    private val resource: Int
-) : AuthenticatorMessage {
+internal abstract class AuthenticatorMessageImpl(protected val resource: Int) : AuthenticatorMessage {
 
     override val message: String
         @Composable
@@ -83,48 +83,63 @@ internal object CodeSentMessage :
 /**
  * The user cannot reset their password because their account is in an invalid state.
  */
-internal class UnableToResetPasswordMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_cannot_reset_password), AuthenticatorMessage.Error
+internal class UnableToResetPasswordMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_cannot_reset_password),
+    AuthenticatorMessage.Error
+
+// Avoid recomputing the same error message multiple times
+private val cachedErrorMessages = mutableMapOf<KClass<out AuthException>, String>()
 
 /**
  * An unknown error occurred.
  */
-internal class UnknownErrorMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_unknown), AuthenticatorMessage.Error
+internal class UnknownErrorMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_unknown),
+    AuthenticatorMessage.Error {
+    @SuppressLint("DiscouragedApi")
+    override fun message(context: Context): String {
+        return cachedErrorMessages.getOrPut(cause::class) {
+            // Check if the customer application has defined a specific string for this Exception type. If not, return
+            // the generic error message.
+            val resourceName = cause.toResourceName()
+            val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+            val message = if (resourceId != 0) context.getString(resourceId) else super.message(context)
+            return message
+        }
+    }
+}
 
 /**
  * The username or password were incorrect.
  */
-internal class InvalidLoginMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_invalid_signin), AuthenticatorMessage.Error
+internal class InvalidLoginMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_invalid_signin),
+    AuthenticatorMessage.Error
 
 /**
  * The server could not send a confirmation code to the user.
  */
-internal class CannotSendCodeMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_send_code), AuthenticatorMessage.Error
+internal class CannotSendCodeMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_send_code),
+    AuthenticatorMessage.Error
 
 /**
  * The entered confirmation code has expired.
  */
-internal class ExpiredCodeMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_expired_code), AuthenticatorMessage.Error
+internal class ExpiredCodeMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_expired_code),
+    AuthenticatorMessage.Error
 
 /**
  * The device may not have connectivity.
  */
-internal class NetworkErrorMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network), AuthenticatorMessage.Error
+internal class NetworkErrorMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network),
+    AuthenticatorMessage.Error
 
 /**
  * User tried an action too many times.
  */
-internal class LimitExceededMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_limit_exceeded), AuthenticatorMessage.Error
+internal class LimitExceededMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_limit_exceeded),
+    AuthenticatorMessage.Error

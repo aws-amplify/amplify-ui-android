@@ -17,7 +17,7 @@ package com.amplifyframework.ui.authenticator.strings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.amplifyframework.auth.AuthException
@@ -27,8 +27,13 @@ import com.amplifyframework.ui.authenticator.forms.FieldError
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.PasswordError
 import com.amplifyframework.ui.authenticator.locals.LocalStringResolver
+import com.amplifyframework.ui.authenticator.util.toResourceName
+import kotlin.reflect.KClass
 
 internal open class StringResolver {
+    // Avoid recomputing the same error message for each type of exception
+    private val cachedErrorMessages = mutableMapOf<KClass<out AuthException>, String>()
+
     @Composable
     @ReadOnlyComposable
     open fun label(config: FieldConfig): String {
@@ -41,54 +46,49 @@ internal open class StringResolver {
 
     @Composable
     @ReadOnlyComposable
-    private fun title(config: FieldConfig): String {
-        return config.label ?: when (config.key) {
-            FieldKey.ConfirmPassword -> stringResource(R.string.amplify_ui_authenticator_field_label_password_confirm)
-            FieldKey.ConfirmationCode -> stringResource(R.string.amplify_ui_authenticator_field_label_confirmation_code)
-            FieldKey.Password -> stringResource(R.string.amplify_ui_authenticator_field_label_password)
-            FieldKey.PhoneNumber -> stringResource(R.string.amplify_ui_authenticator_field_label_phone_number)
-            FieldKey.Email -> stringResource(R.string.amplify_ui_authenticator_field_label_email)
-            FieldKey.Username -> stringResource(R.string.amplify_ui_authenticator_field_label_username)
-            FieldKey.Birthdate -> stringResource(R.string.amplify_ui_authenticator_field_label_birthdate)
-            FieldKey.FamilyName -> stringResource(R.string.amplify_ui_authenticator_field_label_family_name)
-            FieldKey.GivenName -> stringResource(R.string.amplify_ui_authenticator_field_label_given_name)
-            FieldKey.MiddleName -> stringResource(R.string.amplify_ui_authenticator_field_label_middle_name)
-            FieldKey.Name -> stringResource(R.string.amplify_ui_authenticator_field_label_name)
-            FieldKey.Website -> stringResource(R.string.amplify_ui_authenticator_field_label_website)
-            FieldKey.PhoneNumber -> stringResource(R.string.amplify_ui_authenticator_field_label_phone_number)
-            FieldKey.Nickname -> stringResource(R.string.amplify_ui_authenticator_field_label_nickname)
-            FieldKey.PreferredUsername ->
-                stringResource(R.string.amplify_ui_authenticator_field_label_preferred_username)
-            FieldKey.Profile -> stringResource(R.string.amplify_ui_authenticator_field_label_profile)
-            FieldKey.VerificationAttribute ->
-                stringResource(R.string.amplify_ui_authenticator_field_label_verification_attribute)
-            else -> ""
+    private fun title(config: FieldConfig): String = config.label ?: when (config.key) {
+        FieldKey.ConfirmPassword -> stringResource(R.string.amplify_ui_authenticator_field_label_password_confirm)
+        FieldKey.ConfirmationCode -> stringResource(R.string.amplify_ui_authenticator_field_label_confirmation_code)
+        FieldKey.Password -> stringResource(R.string.amplify_ui_authenticator_field_label_password)
+        FieldKey.PhoneNumber -> stringResource(R.string.amplify_ui_authenticator_field_label_phone_number)
+        FieldKey.Email -> stringResource(R.string.amplify_ui_authenticator_field_label_email)
+        FieldKey.Username -> stringResource(R.string.amplify_ui_authenticator_field_label_username)
+        FieldKey.Birthdate -> stringResource(R.string.amplify_ui_authenticator_field_label_birthdate)
+        FieldKey.FamilyName -> stringResource(R.string.amplify_ui_authenticator_field_label_family_name)
+        FieldKey.GivenName -> stringResource(R.string.amplify_ui_authenticator_field_label_given_name)
+        FieldKey.MiddleName -> stringResource(R.string.amplify_ui_authenticator_field_label_middle_name)
+        FieldKey.Name -> stringResource(R.string.amplify_ui_authenticator_field_label_name)
+        FieldKey.Website -> stringResource(R.string.amplify_ui_authenticator_field_label_website)
+        FieldKey.PhoneNumber -> stringResource(R.string.amplify_ui_authenticator_field_label_phone_number)
+        FieldKey.Nickname -> stringResource(R.string.amplify_ui_authenticator_field_label_nickname)
+        FieldKey.PreferredUsername ->
+            stringResource(R.string.amplify_ui_authenticator_field_label_preferred_username)
+        FieldKey.Profile -> stringResource(R.string.amplify_ui_authenticator_field_label_profile)
+        FieldKey.VerificationAttribute ->
+            stringResource(R.string.amplify_ui_authenticator_field_label_verification_attribute)
+        else -> ""
+    }
+
+    @Composable
+    @ReadOnlyComposable
+    open fun hint(config: FieldConfig): String? = config.hint ?: when {
+        config.key == FieldKey.ConfirmPassword ->
+            stringResource(R.string.amplify_ui_authenticator_field_hint_password_confirm)
+        config is FieldConfig.Date -> "yyyy-mm-dd"
+        else -> {
+            val label = label(config)
+            stringResource(R.string.amplify_ui_authenticator_field_hint, label)
         }
     }
 
     @Composable
     @ReadOnlyComposable
-    open fun hint(config: FieldConfig): String? {
-        return config.hint ?: when {
-            config.key == FieldKey.ConfirmPassword ->
-                stringResource(R.string.amplify_ui_authenticator_field_hint_password_confirm)
-            config is FieldConfig.Date -> "yyyy-mm-dd"
-            else -> {
-                val label = label(config)
-                stringResource(R.string.amplify_ui_authenticator_field_hint, label)
-            }
-        }
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Composable
-    @ReadOnlyComposable
-    open fun error(config: FieldConfig, error: FieldError): String {
-        return when (error) {
-            is FieldError.InvalidPassword -> {
-                var errorText = stringResource(R.string.amplify_ui_authenticator_field_password_requirements)
-                error.errors.forEach {
-                    errorText += "\n" + when (it) {
+    open fun error(config: FieldConfig, error: FieldError): String = when (error) {
+        is FieldError.InvalidPassword -> {
+            var errorText = stringResource(R.string.amplify_ui_authenticator_field_password_requirements)
+            error.errors.forEach {
+                errorText += "\n" +
+                    when (it) {
                         is PasswordError.InvalidPasswordLength ->
                             pluralStringResource(
                                 id = R.plurals.amplify_ui_authenticator_field_password_too_short,
@@ -105,54 +105,56 @@ internal open class StringResolver {
                             stringResource(R.string.amplify_ui_authenticator_field_password_missing_lower)
                         else -> ""
                     }
-                }
-                errorText
             }
-            FieldError.PasswordsDoNotMatch ->
-                stringResource(R.string.amplify_ui_authenticator_field_warn_unmatched_password)
-            FieldError.MissingRequired -> {
-                val label = title(config)
-                stringResource(R.string.amplify_ui_authenticator_field_warn_empty, label)
-            }
-            FieldError.InvalidFormat -> {
-                val label = title(config)
-                stringResource(R.string.amplify_ui_authenticator_field_warn_invalid_format, label)
-            }
-            FieldError.FieldValueExists -> {
-                val label = title(config)
-                stringResource(R.string.amplify_ui_authenticator_field_warn_existing, label)
-            }
-            FieldError.ConfirmationCodeIncorrect -> {
-                stringResource(R.string.amplify_ui_authenticator_field_warn_incorrect_code)
-            }
-            is FieldError.Custom -> error.message
-            FieldError.NotFound -> {
-                val label = title(config)
-                stringResource(R.string.amplify_ui_authenticator_field_warn_not_found, label)
-            }
-            else -> ""
+            errorText
         }
+        FieldError.PasswordsDoNotMatch ->
+            stringResource(R.string.amplify_ui_authenticator_field_warn_unmatched_password)
+        FieldError.MissingRequired -> {
+            val label = title(config)
+            stringResource(R.string.amplify_ui_authenticator_field_warn_empty, label)
+        }
+        FieldError.InvalidFormat -> {
+            val label = title(config)
+            stringResource(R.string.amplify_ui_authenticator_field_warn_invalid_format, label)
+        }
+        FieldError.FieldValueExists -> {
+            val label = title(config)
+            stringResource(R.string.amplify_ui_authenticator_field_warn_existing, label)
+        }
+        FieldError.ConfirmationCodeIncorrect -> {
+            stringResource(R.string.amplify_ui_authenticator_field_warn_incorrect_code)
+        }
+        is FieldError.Custom -> error.message
+        FieldError.NotFound -> {
+            val label = title(config)
+            stringResource(R.string.amplify_ui_authenticator_field_warn_not_found, label)
+        }
+        else -> ""
     }
 
-    @Suppress("UNUSED_EXPRESSION")
     @Composable
     @ReadOnlyComposable
     open fun error(error: AuthException): String {
-        return when (error) {
-            else -> stringResource(R.string.amplify_ui_authenticator_error_unknown)
+        val context = LocalContext.current
+        return cachedErrorMessages.getOrPut(error::class) {
+            // Check if the customer application has defined a specific string for this Exception type. If not, return
+            // the generic error message.
+            val resourceName = error.toResourceName()
+            val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+            val message = if (resourceId != 0) context.getString(resourceId) else null
+            message ?: stringResource(R.string.amplify_ui_authenticator_error_unknown)
         }
     }
 
     companion object {
         @Composable
         @ReadOnlyComposable
-        fun label(config: FieldConfig) =
-            LocalStringResolver.current.label(config = config)
+        fun label(config: FieldConfig) = LocalStringResolver.current.label(config = config)
 
         @Composable
         @ReadOnlyComposable
-        fun hint(config: FieldConfig) =
-            LocalStringResolver.current.hint(config = config)
+        fun hint(config: FieldConfig) = LocalStringResolver.current.hint(config = config)
 
         @Composable
         @ReadOnlyComposable
@@ -161,7 +163,6 @@ internal open class StringResolver {
 
         @Composable
         @ReadOnlyComposable
-        fun error(error: AuthException) =
-            LocalStringResolver.current.error(error = error)
+        fun error(error: AuthException) = LocalStringResolver.current.error(error = error)
     }
 }

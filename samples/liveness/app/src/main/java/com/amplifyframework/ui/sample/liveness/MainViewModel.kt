@@ -79,11 +79,11 @@ class MainViewModel : ViewModel() {
                 _sessionId.value = sessionId
                 onComplete(sessionId)
             } catch (e: Exception) {
+                _fetchingSession.value = false
                 Log.e(MainActivity.TAG, "Failed to create Liveness session ID.", e)
                 _sessionId.value = null
                 onComplete(null)
             }
-            _fetchingSession.value = false
         }
     }
 

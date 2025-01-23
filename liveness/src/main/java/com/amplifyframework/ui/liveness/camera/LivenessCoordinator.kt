@@ -50,6 +50,7 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 internal typealias OnMuxedSegment = (bytes: ByteArray, timestamp: Long) -> Unit
@@ -137,6 +138,16 @@ internal class LivenessCoordinator(
     private var disconnectEventReceived = false
 
     init {
+        MainScope().launch {
+            delay(5_000)
+            if (!previewTextureView.hasReceivedUpdate) {
+                val faceLivenessException = FaceLivenessDetectionException(
+                    "The camera failed to open within the allowed time limit.",
+                    "Ensure the camera is available to use and that no other apps are using it."
+                )
+                processSessionError(faceLivenessException, true)
+            }
+        }
         MainScope().launch {
             getCameraProvider(context).apply {
                 if (lifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED) {

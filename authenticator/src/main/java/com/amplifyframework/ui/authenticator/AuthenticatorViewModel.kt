@@ -328,6 +328,35 @@ internal class AuthenticatorViewModel(
         moveTo(newState)
     }
 
+    private suspend fun handleMfaSetupSelectionRequired(
+        username: String,
+        password: String,
+        allowedMfaTypes: Set<MFAType>?
+    ) {
+        if (allowedMfaTypes.isNullOrEmpty()) {
+            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
+            return
+        }
+
+        moveTo(
+            stateFactory.newSignInContinueWithMfaSetupSelectionState(
+                allowedMfaTypes = allowedMfaTypes,
+                onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
+            )
+        )
+    }
+
+    private suspend fun handleEmailMfaSetupRequired(
+        username: String,
+        password: String
+    ) {
+        moveTo(
+            stateFactory.newSignInContinueWithEmailSetupState(
+                onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
+            )
+        )
+    }
+
     private suspend fun handleMfaSelectionRequired(
         username: String,
         password: String,
@@ -349,7 +378,8 @@ internal class AuthenticatorViewModel(
     private suspend fun handleSignInSuccess(username: String, password: String, result: AuthSignInResult) {
         when (val nextStep = result.nextStep.signInStep) {
             AuthSignInStep.DONE -> checkVerificationMechanisms()
-            AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE -> moveTo(
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE,
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_OTP -> moveTo(
                 stateFactory.newSignInMfaState(
                     result.nextStep.codeDeliveryDetails
                 ) { confirmationCode -> confirmSignIn(username, password, confirmationCode) }
@@ -373,6 +403,10 @@ internal class AuthenticatorViewModel(
             AuthSignInStep.CONFIRM_SIGN_UP -> handleUnconfirmedSignIn(username, password)
             AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION ->
                 handleMfaSelectionRequired(username, password, result.nextStep.allowedMFATypes)
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SETUP_SELECTION ->
+                handleMfaSetupSelectionRequired(username, password, result.nextStep.allowedMFATypes)
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_EMAIL_MFA_SETUP ->
+                handleEmailMfaSetupRequired(username, password)
             AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP ->
                 handleTotpSetupRequired(username, password, result.nextStep.totpSetupDetails)
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> moveTo(

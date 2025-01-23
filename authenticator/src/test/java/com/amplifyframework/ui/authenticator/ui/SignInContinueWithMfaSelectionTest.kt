@@ -14,22 +14,22 @@ import org.junit.Test
 class SignInContinueWithMfaSelectionTest : ComposeTest() {
 
     @Test
-    fun `title is Select your preferred Two-Factor Auth method`() {
+    fun `title is Choose your two-factor authentication method`() {
         setContent {
             SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
         }
         signInContinueWithMfaSelection {
-            hasTitle("Select your preferred Two-Factor Auth method")
+            hasTitle("Choose your two-factor authentication method")
         }
     }
 
     @Test
-    fun `Submit button label is Submit`() {
+    fun `Continue button label is Continue`() {
         setContent {
             SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
         }
         signInContinueWithMfaSelection {
-            hasSubmitButton("Submit")
+            hasSubmitButton("Continue")
         }
     }
 
@@ -73,6 +73,22 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
         }
         verify {
             onSubmit(MFAType.TOTP.challengeResponse)
+        }
+    }
+
+    @Test
+    fun `Submits Email MFA type`() {
+        val onSubmit = mockk<(String) -> Unit>(relaxed = true)
+        setContent {
+            SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState(onSubmit = onSubmit))
+        }
+        signInContinueWithMfaSelection {
+            selectMfaType(MFAType.EMAIL)
+            hasMfaTypeSelected(MFAType.EMAIL)
+            clickSubmitButton()
+        }
+        verify {
+            onSubmit(MFAType.EMAIL.challengeResponse)
         }
     }
 

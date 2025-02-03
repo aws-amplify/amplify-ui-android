@@ -27,6 +27,10 @@ ktlint {
     android.set(true)
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     compileOnly(libs.plugin.android.gradle)
     compileOnly(libs.plugin.binary.compatibility)

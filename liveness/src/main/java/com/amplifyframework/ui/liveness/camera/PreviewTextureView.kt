@@ -31,6 +31,7 @@ internal class PreviewTextureView(
 ) : TextureView(context) {
 
     private var surface: Surface? = null
+    internal var hasReceivedUpdate = false
 
     init {
         surfaceTextureListener = object : SurfaceTextureListener {
@@ -48,7 +49,11 @@ internal class PreviewTextureView(
                 }
             }
 
-            override fun onSurfaceTextureUpdated(surfaceTexture: SurfaceTexture) {}
+            override fun onSurfaceTextureUpdated(surfaceTexture: SurfaceTexture) {
+                if (!hasReceivedUpdate) {
+                    hasReceivedUpdate = true
+                }
+            }
 
             override fun onSurfaceTextureSizeChanged(
                 surfaceTexture: SurfaceTexture,

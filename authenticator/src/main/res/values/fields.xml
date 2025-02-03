@@ -28,7 +28,7 @@
     <string name="amplify_ui_authenticator_field_label_password_confirm">Confirm Password</string>
     <string name="amplify_ui_authenticator_field_label_new_password">New Password</string>
     <string name="amplify_ui_authenticator_field_label_new_password_confirm">Confirm New Password</string>
-    <string name="amplify_ui_authenticator_field_label_confirmation_code">Confirmation Code</string>
+    <string name="amplify_ui_authenticator_field_label_confirmation_code">Verification Code</string>
     <string name="amplify_ui_authenticator_field_label_phone_number">Phone Number</string>
     <string name="amplify_ui_authenticator_field_label_email">Email</string>
     <string name="amplify_ui_authenticator_field_label_birthdate">Birthdate</string>
@@ -68,5 +68,5 @@
     <string name="amplify_ui_authenticator_field_warn_unmatched_password">Passwords do not match</string>
 
     <!-- Confirmation code specific strings -->
-    <string name="amplify_ui_authenticator_field_warn_incorrect_code">Confirmation code is incorrect</string>
+    <string name="amplify_ui_authenticator_field_warn_incorrect_code">Verification code is incorrect</string>
 </resources>

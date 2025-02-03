@@ -76,6 +76,16 @@ abstract class AuthenticatorStep internal constructor() {
     object SignInContinueWithTotpSetup : AuthenticatorStep()
 
     /**
+     * The user has completed the initial Sign In step, and must register an email MFA to continue.
+     */
+    object SignInContinueWithEmailSetup : AuthenticatorStep()
+
+    /**
+     * The user has completed the initial Sign In step, but is required to setup a MFA type to continue.
+     */
+    object SignInContinueWithMfaSetupSelection : AuthenticatorStep()
+
+    /**
      * The user has completed the initial Sign In step,  and must select their desired MFA method to continue.
      */
     object SignInContinueWithMfaSelection : AuthenticatorStep()

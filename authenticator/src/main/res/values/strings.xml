@@ -15,8 +15,8 @@
 
 <resources>
     <!-- Confirmation Code Screen -->
-    <string name="amplify_ui_authenticator_confirmation_code_sent">A confirmation code has been sent to <b>%s</b>.</string>
-    <string name="amplify_ui_authenticator_confirmation_code_sent_unknown">A confirmation code has been sent.</string>
+    <string name="amplify_ui_authenticator_confirmation_code_sent">A verification code has been sent to <b>%s</b>.</string>
+    <string name="amplify_ui_authenticator_confirmation_code_sent_unknown">A verification code has been sent.</string>
     <!-- TOTP Code Screen -->
     <string name="amplify_ui_authenticator_enter_totp_code">Please enter the code from your registered Authenticator app</string>
     <!-- TOTP Setup Screen -->
@@ -26,7 +26,14 @@
     <string name="amplify_ui_authenticator_step2_content">Open the Authenticator app and scan the QR code or enter the key to get your verification code</string>
     <string name="amplify_ui_authenticator_step3_title">Step 3: Verify your code</string>
     <string name="amplify_ui_authenticator_step3_content">Enter the 6 digit code from your Authenticator app</string>
+    <!--MFA Setup Screen -->
+    <string name="amplify_ui_authenticator_mfa_setup_description">Select your preferred way to verify your identity when using two-factor authentication (2FA). This will be your default method for added account security.</string>
+    <!--Email MFA Setup Screen -->
+    <string name="amplify_ui_authenticator_email_setup_description">Enter the email address you want to use for two-factor authentication (2FA). This email will receive verification codes when you sign in.</string>
+
     <!-- MFA Selection Screen -->
+    <string name="amplify_ui_authenticator_mfa_selection_description">For added security, choose how you want to verify your identity for this sign-in. </string>
     <string name="amplify_ui_authenticator_mfa_sms">Text Message (SMS)</string>
     <string name="amplify_ui_authenticator_mfa_totp">Authenticator App (TOTP)</string>
+    <string name="amplify_ui_authenticator_mfa_email">Email Message</string>
 </resources>

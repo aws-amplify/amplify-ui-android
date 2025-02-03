@@ -230,6 +230,53 @@ interface SignInContinueWithTotpSetupState : AuthenticatorStepState {
 }
 
 /**
+ * The user has completed the initial Sign In step,  and must setup their desired MFA method to continue.
+ */
+@Stable
+interface SignInContinueWithMfaSetupSelectionState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * The set of [MFAType] that could be used to continue this sign in.
+     */
+    val allowedMfaTypes: Set<MFAType>
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Continue the user's sign in using the information entered into the [form].
+     */
+    suspend fun continueSignIn()
+}
+
+/**
+ * The user has completed the initial Sign In step,  and must setup email MFA method to continue.
+ */
+@Stable
+interface SignInContinueWithEmailSetupState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Continue the user's sign in using the information entered into the [form].
+     */
+    suspend fun continueSignIn()
+}
+
+/**
  * The user has completed the initial Sign In step,  and must select their desired MFA method to continue.
  */
 @Stable

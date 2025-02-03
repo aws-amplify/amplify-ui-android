@@ -1,3 +1,24 @@
+## [Release 1.4.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.0)
+
+### Features
+- **authenticator:** Add support for Email MFA ([#199](https://github.com/aws-amplify/amplify-ui-android/issues/199))
+
+[See all changes between 1.3.0 and 1.4.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.3.0...release_authenticator_v1.4.0)
+
+## [Release 1.3.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.3.0)
+
+### Features
+- **authenticator:** Add default error string for LimitExceededException ([#182](https://github.com/aws-amplify/amplify-ui-android/issues/182))
+
+[See all changes between 1.2.3 and 1.3.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.2.3...release_authenticator_v1.3.0)
+
+## [Release 1.2.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.3)
+
+### Bug Fixes
+- **authenticator:** fix signed in state when access token is expired ([#170](https://github.com/aws-amplify/amplify-ui-android/issues/170))
+
+[See all changes between 1.2.2 and 1.2.3](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.2.2...release_authenticator_v1.2.3)
+
 ## [Release 1.2.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.2)
 
 ### Bug Fixes

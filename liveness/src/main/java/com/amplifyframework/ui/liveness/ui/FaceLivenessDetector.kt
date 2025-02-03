@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +52,9 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
@@ -204,6 +208,17 @@ internal fun ChallengeView(
     } else {
         Color.Black
     }
+
+    LifecycleResumeEffect(key) {
+
+        onPauseOrDispose {
+            livenessCoordinator.processSessionError(
+                FaceLivenessDetectionException.UserCancelledException(),
+                true
+            )
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()

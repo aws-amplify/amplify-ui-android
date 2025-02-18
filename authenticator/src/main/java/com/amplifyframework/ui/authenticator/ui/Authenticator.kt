@@ -134,6 +134,7 @@ fun Authenticator(
         Box(modifier = modifier) {
             AnimatedContent(
                 targetState = stepState,
+                contentKey = { targetState -> targetState::class },
                 transitionSpec = { defaultTransition() },
                 label = "AuthenticatorContentTransition"
             ) { targetState ->

@@ -51,8 +51,14 @@ object LoadingState : AuthenticatorStepState {
  * @param error The error that occurred.
  */
 @Immutable
-data class ErrorState(val error: AuthException) : AuthenticatorStepState {
+data class ErrorState(
+    val error: AuthException,
+    private val onRetry: (suspend () -> Unit)? = null
+) : AuthenticatorStepState {
     override val step = AuthenticatorStep.Error
+    val canRetry = onRetry != null
+
+    suspend fun retry() = onRetry?.invoke()
 }
 
 /**

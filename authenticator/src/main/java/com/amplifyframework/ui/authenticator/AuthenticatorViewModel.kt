@@ -229,6 +229,15 @@ internal class AuthenticatorViewModel(
                 moveTo(newState)
             }
             AuthSignUpStep.DONE -> handleSignedUp(username, password)
+            else -> {
+                // Generic error for any other next steps that may be added in the future
+                val exception = AuthException(
+                    "Unsupported next step ${result.nextStep.signUpStep}.",
+                    "Authenticator does not support this Authentication flow, disable it to use Authenticator."
+                )
+                logger.error("Unsupported next step ${result.nextStep.signUpStep}", exception)
+                sendMessage(UnknownErrorMessage(exception))
+            }
         }
     }
 

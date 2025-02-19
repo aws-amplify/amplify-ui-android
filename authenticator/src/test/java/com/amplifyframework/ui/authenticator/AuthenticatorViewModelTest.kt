@@ -166,6 +166,27 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
+    fun `getCurrentUser error can be retried`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
+        coEvery { authProvider.getCurrentUser() } returns Error(mockAuthException()) andThen Success(mockAuthUser())
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        advanceUntilIdle()
+
+        val state = viewModel.stepState.value.shouldBeInstanceOf<ErrorState>()
+        state.retry()
+        advanceUntilIdle()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+        coVerify(exactly = 1) {
+            authProvider.fetchAuthSession()
+        }
+        coVerify(exactly = 2) {
+            authProvider.getCurrentUser()
+        }
+    }
+
+    @Test
     fun `when already signed in during start the initial state should be signed in`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
         coEvery { authProvider.getCurrentUser() } returns Success(mockAuthUser())

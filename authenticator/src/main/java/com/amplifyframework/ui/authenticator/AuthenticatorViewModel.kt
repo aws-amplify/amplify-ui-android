@@ -90,10 +90,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
 
-internal class AuthenticatorViewModel(
-    application: Application,
-    private val authProvider: AuthProvider
-) : AndroidViewModel(application) {
+internal class AuthenticatorViewModel(application: Application, private val authProvider: AuthProvider) :
+    AndroidViewModel(application) {
 
     // Constructor for compose viewModels provider
     constructor(application: Application) : this(application, RealAuthProvider())
@@ -363,10 +361,7 @@ internal class AuthenticatorViewModel(
         )
     }
 
-    private suspend fun handleEmailMfaSetupRequired(
-        username: String,
-        password: String
-    ) {
+    private suspend fun handleEmailMfaSetupRequired(username: String, password: String) {
         moveTo(
             stateFactory.newSignInContinueWithEmailSetupState(
                 onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
@@ -374,11 +369,7 @@ internal class AuthenticatorViewModel(
         )
     }
 
-    private suspend fun handleMfaSelectionRequired(
-        username: String,
-        password: String,
-        allowedMfaTypes: Set<MFAType>?
-    ) {
+    private suspend fun handleMfaSelectionRequired(username: String, password: String, allowedMfaTypes: Set<MFAType>?) {
         if (allowedMfaTypes.isNullOrEmpty()) {
             handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
             return
@@ -500,10 +491,7 @@ internal class AuthenticatorViewModel(
         }.join()
     }
 
-    private suspend fun handleResetPasswordSuccess(
-        username: String,
-        result: AuthResetPasswordResult
-    ) {
+    private suspend fun handleResetPasswordSuccess(username: String, result: AuthResetPasswordResult) {
         when (result.nextStep.resetPasswordStep) {
             AuthResetPasswordStep.DONE -> handlePasswordResetComplete()
             AuthResetPasswordStep.CONFIRM_RESET_PASSWORD_WITH_CODE -> {
@@ -634,7 +622,10 @@ internal class AuthenticatorViewModel(
                     logger.error("Current signed in user session has expired, signing out.")
                     signOut()
                 } else {
-                    handleGeneralFailure(result.error)
+                    handleRetryableGeneralFailure(
+                        error = result.error,
+                        onRetry = { viewModelScope.launch { handleSignedIn() }.join() }
+                    )
                 }
             }
 

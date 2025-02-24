@@ -52,33 +52,19 @@ import kotlinx.coroutines.flow.callbackFlow
  * An abstraction of the Amplify.Auth API that allows us to use coroutines with no exceptions
  */
 internal interface AuthProvider {
-    suspend fun signIn(
-        username: String,
-        password: String
-    ): AmplifyResult<AuthSignInResult>
+    suspend fun signIn(username: String, password: String): AmplifyResult<AuthSignInResult>
 
-    suspend fun confirmSignIn(
-        challengeResponse: String
-    ): AmplifyResult<AuthSignInResult>
+    suspend fun confirmSignIn(challengeResponse: String): AmplifyResult<AuthSignInResult>
 
-    suspend fun signUp(
-        username: String,
-        password: String,
-        options: AuthSignUpOptions
-    ): AmplifyResult<AuthSignUpResult>
+    suspend fun signUp(username: String, password: String, options: AuthSignUpOptions): AmplifyResult<AuthSignUpResult>
 
-    suspend fun confirmSignUp(
-        username: String,
-        code: String
-    ): AmplifyResult<AuthSignUpResult>
+    suspend fun confirmSignUp(username: String, code: String): AmplifyResult<AuthSignUpResult>
 
-    suspend fun resendSignUpCode(
-        username: String
-    ): AmplifyResult<AuthCodeDeliveryDetails>
+    suspend fun resendSignUpCode(username: String): AmplifyResult<AuthCodeDeliveryDetails>
 
-    suspend fun resetPassword(
-        username: String
-    ): AmplifyResult<AuthResetPasswordResult>
+    suspend fun autoSignIn(): AmplifyResult<AuthSignInResult>
+
+    suspend fun resetPassword(username: String): AmplifyResult<AuthResetPasswordResult>
 
     suspend fun confirmResetPassword(
         username: String,
@@ -92,10 +78,7 @@ internal interface AuthProvider {
 
     suspend fun fetchUserAttributes(): AmplifyResult<List<AuthUserAttribute>>
 
-    suspend fun confirmUserAttribute(
-        key: AuthUserAttributeKey,
-        confirmationCode: String
-    ): AmplifyResult<Unit>
+    suspend fun confirmUserAttribute(key: AuthUserAttributeKey, confirmationCode: String): AmplifyResult<Unit>
 
     suspend fun resendUserAttributeConfirmationCode(key: AuthUserAttributeKey): AmplifyResult<AuthCodeDeliveryDetails>
 
@@ -108,7 +91,9 @@ internal interface AuthProvider {
 
 internal sealed interface AuthConfigurationResult {
     data class Valid(val configuration: AmplifyAuthConfiguration) : AuthConfigurationResult
+
     data class Invalid(val message: String, val cause: Exception? = null) : AuthConfigurationResult
+
     object Missing : AuthConfigurationResult
 }
 
@@ -116,7 +101,6 @@ internal sealed interface AuthConfigurationResult {
  * The [AuthProvider] implementation that calls through to [Amplify.Auth]
  */
 internal class RealAuthProvider : AuthProvider {
-
     init {
         val cognitoPlugin = getCognitoPlugin()
         cognitoPlugin?.addToUserAgent(AWSCognitoAuthMetadataType.Authenticator, BuildConfig.VERSION_NAME)
@@ -139,24 +123,18 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
-    override suspend fun signUp(
-        username: String,
-        password: String,
-        options: AuthSignUpOptions
-    ) = suspendCoroutine { continuation ->
-        Amplify.Auth.signUp(
-            username,
-            password,
-            options,
-            { continuation.resume(AmplifyResult.Success(it)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun signUp(username: String, password: String, options: AuthSignUpOptions) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.signUp(
+                username,
+                password,
+                options,
+                { continuation.resume(AmplifyResult.Success(it)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
-    override suspend fun confirmSignUp(
-        username: String,
-        code: String
-    ) = suspendCoroutine { continuation ->
+    override suspend fun confirmSignUp(username: String, code: String) = suspendCoroutine { continuation ->
         Amplify.Auth.confirmSignUp(
             username,
             code,
@@ -165,9 +143,7 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
-    override suspend fun resendSignUpCode(
-        username: String
-    ) = suspendCoroutine { continuation ->
+    override suspend fun resendSignUpCode(username: String) = suspendCoroutine { continuation ->
         Amplify.Auth.resendSignUpCode(
             username,
             { continuation.resume(AmplifyResult.Success(it)) },
@@ -175,9 +151,14 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
-    override suspend fun resetPassword(
-        username: String
-    ) = suspendCoroutine { continuation ->
+    override suspend fun autoSignIn() = suspendCoroutine { continuation ->
+        Amplify.Auth.autoSignIn(
+            { continuation.resume(AmplifyResult.Success(it)) },
+            { continuation.resume(AmplifyResult.Error(it)) }
+        )
+    }
+
+    override suspend fun resetPassword(username: String) = suspendCoroutine { continuation ->
         Amplify.Auth.resetPassword(
             username,
             { continuation.resume(AmplifyResult.Success(it)) },
@@ -185,19 +166,16 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
-    override suspend fun confirmResetPassword(
-        username: String,
-        newPassword: String,
-        confirmationCode: String
-    ) = suspendCoroutine { continuation ->
-        Amplify.Auth.confirmResetPassword(
-            username,
-            newPassword,
-            confirmationCode,
-            { continuation.resume(AmplifyResult.Success(Unit)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun confirmResetPassword(username: String, newPassword: String, confirmationCode: String) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.confirmResetPassword(
+                username,
+                newPassword,
+                confirmationCode,
+                { continuation.resume(AmplifyResult.Success(Unit)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
     override suspend fun signOut() = suspendCoroutine { continuation ->
         Amplify.Auth.signOut { continuation.resume(it) }
@@ -217,27 +195,24 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
-    override suspend fun confirmUserAttribute(
-        key: AuthUserAttributeKey,
-        confirmationCode: String
-    ) = suspendCoroutine { continuation ->
-        Amplify.Auth.confirmUserAttribute(
-            key,
-            confirmationCode,
-            { continuation.resume(AmplifyResult.Success(Unit)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun confirmUserAttribute(key: AuthUserAttributeKey, confirmationCode: String) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.confirmUserAttribute(
+                key,
+                confirmationCode,
+                { continuation.resume(AmplifyResult.Success(Unit)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
-    override suspend fun resendUserAttributeConfirmationCode(
-        key: AuthUserAttributeKey
-    ) = suspendCoroutine { continuation ->
-        Amplify.Auth.resendUserAttributeConfirmationCode(
-            key,
-            { continuation.resume(AmplifyResult.Success(it)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun resendUserAttributeConfirmationCode(key: AuthUserAttributeKey) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.resendUserAttributeConfirmationCode(
+                key,
+                { continuation.resume(AmplifyResult.Success(it)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
     override suspend fun getCurrentUser() = suspendCoroutine { continuation ->
         Amplify.Auth.getCurrentUser(
@@ -282,13 +257,10 @@ internal class RealAuthProvider : AuthProvider {
         return AuthConfigurationResult.Valid(amplifyAuthConfiguration)
     }
 
-    private fun getCognitoPlugin(): AWSCognitoAuthPlugin? {
-        return try {
-            Amplify.Auth.getPlugin("awsCognitoAuthPlugin")
-                as AWSCognitoAuthPlugin
-        } catch (e: Throwable) {
-            null
-        }
+    private fun getCognitoPlugin(): AWSCognitoAuthPlugin? = try {
+        Amplify.Auth.getPlugin("awsCognitoAuthPlugin") as AWSCognitoAuthPlugin
+    } catch (e: Throwable) {
+        null
     }
 
     private fun getSignInMethod(attributes: List<UsernameAttribute>) = when {

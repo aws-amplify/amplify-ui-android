@@ -17,6 +17,7 @@ package com.amplifyframework.ui.authenticator
 
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthException
+import com.amplifyframework.auth.AuthFactorType
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
@@ -71,19 +72,12 @@ internal fun mockAuthException(
     cause = cause
 )
 
-internal fun mockAuthSession(
-    isSignedIn: Boolean = false
-) = AuthSession(isSignedIn)
+internal fun mockAuthSession(isSignedIn: Boolean = false) = AuthSession(isSignedIn)
 
-internal fun mockAuthUser(
-    userId: String = "userId",
-    username: String = "username"
-) = AuthUser(userId, username)
+internal fun mockAuthUser(userId: String = "userId", username: String = "username") = AuthUser(userId, username)
 
-internal fun mockSignInResult(
-    isSignedIn: Boolean = true,
-    nextSignInStep: AuthNextSignInStep = mockNextSignInStep()
-) = AuthSignInResult(isSignedIn, nextSignInStep)
+internal fun mockSignInResult(isSignedIn: Boolean = true, nextSignInStep: AuthNextSignInStep = mockNextSignInStep()) =
+    AuthSignInResult(isSignedIn, nextSignInStep)
 
 internal fun mockSignInResult(
     signInStep: AuthSignInStep = AuthSignInStep.DONE,
@@ -107,14 +101,18 @@ internal fun mockNextSignInStep(
     additionalInfo: Map<String, String> = emptyMap(),
     codeDeliveryDetails: AuthCodeDeliveryDetails? = null,
     totpSetupDetails: TOTPSetupDetails? = null,
-    allowedMFATypes: Set<MFAType>? = null
-) = AuthNextSignInStep(signInStep, additionalInfo, codeDeliveryDetails, totpSetupDetails, allowedMFATypes)
+    allowedMFATypes: Set<MFAType>? = null,
+    availableFactors: Set<AuthFactorType>? = null
+) = AuthNextSignInStep(
+    signInStep,
+    additionalInfo,
+    codeDeliveryDetails,
+    totpSetupDetails,
+    allowedMFATypes,
+    availableFactors
+)
 
-internal fun mockUserAttributes(
-    vararg attribute: Pair<AuthUserAttributeKey, String>
-) = attribute.map { AuthUserAttribute(it.first, it.second) }
+internal fun mockUserAttributes(vararg attribute: Pair<AuthUserAttributeKey, String>) =
+    attribute.map { AuthUserAttribute(it.first, it.second) }
 
-internal fun mockUser(
-    userId: String = "userId",
-    username: String = "username"
-) = AuthUser(userId, username)
+internal fun mockUser(userId: String = "userId", username: String = "username") = AuthUser(userId, username)

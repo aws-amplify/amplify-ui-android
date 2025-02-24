@@ -27,6 +27,7 @@ import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.step.AuthNextResetPasswordStep
 import com.amplifyframework.auth.result.step.AuthResetPasswordStep
 import com.amplifyframework.auth.result.step.AuthSignInStep
+import com.amplifyframework.auth.result.step.AuthSignUpStep
 import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
@@ -438,6 +439,22 @@ class AuthenticatorViewModelTest {
 
         // Assert step does not change
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+    }
+
+//endregion
+//region sign up tests
+
+    @Test
+    fun `user can autoSignIn after sign up`() = runTest {
+        val result = mockSignUpResult(nextStep = mockNextSignUpStep(signUpStep = AuthSignUpStep.COMPLETE_AUTO_SIGN_IN))
+        coEvery { authProvider.signUp("username", "password", any()) } returns Success(result)
+        coEvery { authProvider.autoSignIn() } returns Success(mockSignInResult())
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.signUp("username", "password", emptyList())
+        advanceUntilIdle()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
     }
 
 //endregion

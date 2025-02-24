@@ -25,8 +25,11 @@ import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.TOTPSetupDetails
 import com.amplifyframework.auth.result.AuthSignInResult
+import com.amplifyframework.auth.result.AuthSignUpResult
 import com.amplifyframework.auth.result.step.AuthNextSignInStep
+import com.amplifyframework.auth.result.step.AuthNextSignUpStep
 import com.amplifyframework.auth.result.step.AuthSignInStep
+import com.amplifyframework.auth.result.step.AuthSignUpStep
 import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
@@ -110,6 +113,25 @@ internal fun mockNextSignInStep(
     totpSetupDetails,
     allowedMFATypes,
     availableFactors
+)
+
+internal fun mockSignUpResult(
+    nextStep: AuthNextSignUpStep,
+    userId: String = "userId"
+) = AuthSignUpResult(
+    nextStep.signUpStep != AuthSignUpStep.CONFIRM_SIGN_UP_STEP,
+    nextStep,
+    userId
+)
+
+internal fun mockNextSignUpStep(
+    signUpStep: AuthSignUpStep = AuthSignUpStep.DONE,
+    additionalInfo: Map<String, String> = emptyMap(),
+    codeDeliveryDetails: AuthCodeDeliveryDetails? = null
+) = AuthNextSignUpStep(
+    signUpStep,
+    additionalInfo,
+    codeDeliveryDetails
 )
 
 internal fun mockUserAttributes(vararg attribute: Pair<AuthUserAttributeKey, String>) =

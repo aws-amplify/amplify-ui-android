@@ -53,8 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.LifecycleEventObserver
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
@@ -192,6 +191,22 @@ internal fun ChallengeView(
             )
         }
 
+        val observer = LifecycleEventObserver { _, event ->
+            // If the app ever gets paused or disposed while the liveness check is in progress,
+            // send a cancelled event to the backend and stop the session.
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                val isActionable = coordinator?.livenessState?.livenessCheckState?.isActionable
+                if (isActionable != null && isActionable) {
+                    coordinator?.processSessionError(
+                        FaceLivenessDetectionException.UserCancelledException(),
+                        true
+                    )
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
         onDispose {
             coordinator?.destroy(context)
         }
@@ -209,15 +224,18 @@ internal fun ChallengeView(
         Color.Black
     }
 
-    LifecycleResumeEffect(key) {
-
-        onPauseOrDispose {
-            livenessCoordinator.processSessionError(
-                FaceLivenessDetectionException.UserCancelledException(),
-                true
-            )
-        }
-    }
+//    LifecycleResumeEffect(key) {
+//        onPauseOrDispose {
+//            // If the app ever gets paused or disposed while the liveness check is in progress,
+//            // send a cancelled event to the backend and stop the session.
+//            if (livenessState.livenessCheckState.isActionable) {
+//                livenessCoordinator.processSessionError(
+//                    FaceLivenessDetectionException.UserCancelledException(),
+//                    true
+//                )
+//            }
+//        }
+//    }
 
     Box(
         modifier = Modifier

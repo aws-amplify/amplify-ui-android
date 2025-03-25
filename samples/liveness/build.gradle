@@ -1,8 +1,8 @@
 buildscript {
     ext {
         compose_version = '1.5.4'
-        amplifyVersion = '2.15.1'
-        LivenessVersion = '1.3.0'
+        amplifyVersion = '2.27.999'
+        LivenessVersion = '1.4.0'
     }
     repositories {
         google()
@@ -11,6 +11,6 @@ buildscript {
 plugins {
     id 'com.android.application' version '8.1.4' apply false
     id 'com.android.library' version '8.1.4' apply false
-    id 'org.jetbrains.kotlin.android' version '1.9.10' apply false
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.10' apply false
+    id 'org.jetbrains.kotlin.android' version '1.8.10' apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.10' apply false
 }

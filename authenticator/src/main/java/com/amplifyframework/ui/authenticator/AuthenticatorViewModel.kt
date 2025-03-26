@@ -90,10 +90,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
 
-internal class AuthenticatorViewModel(
-    application: Application,
-    private val authProvider: AuthProvider
-) : AndroidViewModel(application) {
+internal class AuthenticatorViewModel(application: Application, private val authProvider: AuthProvider) :
+    AndroidViewModel(application) {
 
     // Constructor for compose viewModels provider
     constructor(application: Application) : this(application, RealAuthProvider())
@@ -185,7 +183,8 @@ internal class AuthenticatorViewModel(
 
     //region SignUp
 
-    private suspend fun signUp(username: String, password: String, attributes: List<AuthUserAttribute>) {
+    @VisibleForTesting
+    suspend fun signUp(username: String, password: String, attributes: List<AuthUserAttribute>) {
         viewModelScope.launch {
             val options = AuthSignUpOptions.builder().userAttributes(attributes).build()
 
@@ -229,6 +228,28 @@ internal class AuthenticatorViewModel(
                 moveTo(newState)
             }
             AuthSignUpStep.DONE -> handleSignedUp(username, password)
+            AuthSignUpStep.COMPLETE_AUTO_SIGN_IN -> handleAutoSignIn(username, password)
+            else -> {
+                // Generic error for any other next steps that may be added in the future
+                val exception = AuthException(
+                    "Unsupported next step ${result.nextStep.signUpStep}.",
+                    "Authenticator does not support this Authentication flow, disable it to use Authenticator."
+                )
+                logger.error("Unsupported next step ${result.nextStep.signUpStep}", exception)
+                sendMessage(UnknownErrorMessage(exception))
+            }
+        }
+    }
+
+    private suspend fun handleAutoSignIn(username: String, password: String) {
+        when (val result = authProvider.autoSignIn()) {
+            is AmplifyResult.Error -> {
+                // If auto sign in fails then proceed with manually trying to sign in the user. If this also fails the
+                // user will end up back on the sign in screen.
+                logger.warn("Unable to complete auto-signIn")
+                handleSignedUp(username, password)
+            }
+            is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
         }
     }
 
@@ -346,10 +367,7 @@ internal class AuthenticatorViewModel(
         )
     }
 
-    private suspend fun handleEmailMfaSetupRequired(
-        username: String,
-        password: String
-    ) {
+    private suspend fun handleEmailMfaSetupRequired(username: String, password: String) {
         moveTo(
             stateFactory.newSignInContinueWithEmailSetupState(
                 onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
@@ -357,11 +375,7 @@ internal class AuthenticatorViewModel(
         )
     }
 
-    private suspend fun handleMfaSelectionRequired(
-        username: String,
-        password: String,
-        allowedMfaTypes: Set<MFAType>?
-    ) {
+    private suspend fun handleMfaSelectionRequired(username: String, password: String, allowedMfaTypes: Set<MFAType>?) {
         if (allowedMfaTypes.isNullOrEmpty()) {
             handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
             return
@@ -483,10 +497,7 @@ internal class AuthenticatorViewModel(
         }.join()
     }
 
-    private suspend fun handleResetPasswordSuccess(
-        username: String,
-        result: AuthResetPasswordResult
-    ) {
+    private suspend fun handleResetPasswordSuccess(username: String, result: AuthResetPasswordResult) {
         when (result.nextStep.resetPasswordStep) {
             AuthResetPasswordStep.DONE -> handlePasswordResetComplete()
             AuthResetPasswordStep.CONFIRM_RESET_PASSWORD_WITH_CODE -> {

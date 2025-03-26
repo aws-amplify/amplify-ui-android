@@ -1,3 +1,17 @@
+## [Release 1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.2)
+
+### Bug Fixes
+- **authenticator:** Add support for auto-sign-in ([#216](https://github.com/aws-amplify/amplify-ui-android/issues/216))
+
+[See all changes between 1.4.1 and 1.4.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.1...release_authenticator_v1.4.2)
+
+## [Release 1.4.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.1)
+
+### Bug Fixes
+- **authenticator:** Upgrade Amplify dependency to 2.27.0 ([#213](https://github.com/aws-amplify/amplify-ui-android/issues/213))
+
+[See all changes between 1.4.0 and 1.4.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.0...release_authenticator_v1.4.1)
+
 ## [Release 1.4.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.0)
 
 ### Features

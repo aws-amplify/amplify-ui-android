@@ -34,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -192,13 +191,13 @@ internal fun ChallengeView(
         }
 
         val observer = LifecycleEventObserver { _, event ->
-            // If the app ever gets paused or disposed while the liveness check is in progress,
+            // If the app ever gets paused while the liveness check is in progress,
             // send a cancelled event to the backend and stop the session.
             if (event == Lifecycle.Event.ON_PAUSE) {
                 val isActionable = coordinator?.livenessState?.livenessCheckState?.isActionable
                 if (isActionable != null && isActionable) {
                     coordinator?.processSessionError(
-                        FaceLivenessDetectionException.UserCancelledException(),
+                        FaceLivenessDetectionException.LostFocusException(),
                         true
                     )
                 }
@@ -223,19 +222,6 @@ internal fun ChallengeView(
     } else {
         Color.Black
     }
-
-//    LifecycleResumeEffect(key) {
-//        onPauseOrDispose {
-//            // If the app ever gets paused or disposed while the liveness check is in progress,
-//            // send a cancelled event to the backend and stop the session.
-//            if (livenessState.livenessCheckState.isActionable) {
-//                livenessCoordinator.processSessionError(
-//                    FaceLivenessDetectionException.UserCancelledException(),
-//                    true
-//                )
-//            }
-//        }
-//    }
 
     Box(
         modifier = Modifier

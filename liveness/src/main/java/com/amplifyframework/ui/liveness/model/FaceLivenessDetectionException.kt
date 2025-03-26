@@ -58,6 +58,12 @@ open class FaceLivenessDetectionException(
         throwable: Throwable? = null
     ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 
+    class LostFocusException(
+        message: String = "Face liveness check was cancelled because the app lost focus.",
+        recoverySuggestion: String = "Retry the face liveness check.",
+        throwable: Throwable? = null
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+
     /**
      * This is not an error we have determined to publicly expose.
      * The error will come to the customer in onError, but only instance checked as FaceLivenessDetectionException.

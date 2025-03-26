@@ -29,7 +29,10 @@ fun LivenessScreen(
                 onChallengeComplete()
             },
             onError = {
-                if (it is FaceLivenessDetectionException.UserCancelledException) {
+                if (
+                    it is FaceLivenessDetectionException.UserCancelledException ||
+                    it is FaceLivenessDetectionException.LostFocusException
+                ) {
                     onBack()
                 } else {
                     viewModel.reportErrorResult(it)

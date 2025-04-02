@@ -33,9 +33,6 @@ class LicensesConventionPlugin : Plugin<Project> {
                 allowUrl("http://aws.amazon.com/apache2.0")
                 allowUrl("https://developer.android.com/studio/terms.html")
 
-                ignoreDependencies("javax.annotation", "javax.annotation-api") {
-                    because("Transitive dependency for androidx.test.espresso:espresso-core")
-                }
                 ignoreDependencies("org.junit", "junit-bom") {
                     because("Unit Testing Dependency")
                 }

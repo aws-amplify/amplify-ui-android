@@ -49,7 +49,7 @@ fun PasswordResetConfirm(
             .padding(horizontal = 16.dp)
     ) {
         headerContent(state)
-        deliveryNoticeContent(details = state.deliveryDetails)
+        deliveryNoticeContent(state.deliveryDetails)
         AuthenticatorForm(
             state = state.form
         )

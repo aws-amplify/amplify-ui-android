@@ -4,7 +4,7 @@ amplify = "2.27.0"
 androidx-junit = "1.1.4"
 binary-compatibility = "0.14.0"
 cameraX = "1.2.0"
-compose = "1.5.4"
+compose-bom = "2025.03.01"
 coroutines = "1.7.3"
 desugar = "1.1.8"
 futures = "1.1.0"
@@ -40,11 +40,12 @@ androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.r
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraX" }
 androidx-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "futures" }
 androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
 # Compose
-androidx-compose-material = { module = "androidx.compose.material3:material3", version.ref = "material3" }
-androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
-androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+androidx-compose-material = { module = "androidx.compose.material3:material3" }
+androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling" }
 
 # Kotlin
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
@@ -58,8 +59,8 @@ zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 # Testing libraries
 test-androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
-test-compose-junit = {  module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
-test-compose-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
+test-compose-junit = {  module = "androidx.compose.ui:ui-test-junit4" }
+test-compose-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 test-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 test-junit = { module = "junit:junit", version.ref = "junit" }
 test-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }

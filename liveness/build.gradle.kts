@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
 
     api(libs.amplify.api)
     api(libs.amplify.predictions)

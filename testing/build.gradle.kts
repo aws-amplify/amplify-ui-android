@@ -23,7 +23,7 @@ android {
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
-    
+
     api(libs.bundles.test)
     implementation(libs.bundles.compose)
 }

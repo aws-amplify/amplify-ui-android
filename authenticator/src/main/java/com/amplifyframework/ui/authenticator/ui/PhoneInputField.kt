@@ -28,8 +28,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -70,10 +70,7 @@ import java.util.Locale
 import kotlinx.coroutines.launch
 
 @Stable
-private class PhoneNumberFieldState(
-    initialRegionCode: String,
-    initialNumber: String = ""
-) {
+private class PhoneNumberFieldState(initialRegionCode: String, initialNumber: String = "") {
     var region by mutableStateOf(regionMap[initialRegionCode] ?: regionMap["US"]!!)
     var number by mutableStateOf(initialNumber)
     var expanded by mutableStateOf(false)
@@ -137,9 +134,7 @@ internal fun PhoneInputField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DialCodeSelector(
-    state: PhoneNumberFieldState
-) {
+private fun DialCodeSelector(state: PhoneNumberFieldState) {
     Text(
         modifier = Modifier
             .clickable { state.expanded = true }
@@ -195,11 +190,7 @@ private fun DialCodeSelector(
 }
 
 @Composable
-private fun RegionSearchBox(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun RegionSearchBox(value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
     OutlinedTextField(
         modifier = modifier,
         value = value,
@@ -227,11 +218,7 @@ private fun RegionSearchBox(
 }
 
 @Composable
-private fun LazyItemScope.RegionItem(
-    showDivider: Boolean,
-    region: Region,
-    onClick: (Region) -> Unit
-) {
+private fun LazyItemScope.RegionItem(showDivider: Boolean, region: Region, onClick: (Region) -> Unit) {
     Row(
         modifier = Modifier
             .fillParentMaxWidth()
@@ -249,6 +236,6 @@ private fun LazyItemScope.RegionItem(
     }
 
     if (showDivider) {
-        Divider(modifier = Modifier.padding(horizontal = 16.dp))
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
     }
 }

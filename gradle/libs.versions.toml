@@ -1,7 +1,12 @@
 [versions]
+accompanist = "0.28.0"
 agp = "8.7.2"
 amplify = "2.27.0"
+appcompat = "1.6.1"
+androidx-core = "1.9.0"
 androidx-junit = "1.1.4"
+androidx-activity = "1.6.1"
+androidx-navigation = "2.5.3"
 binary-compatibility = "0.14.0"
 cameraX = "1.2.0"
 compose-bom = "2025.03.01"
@@ -26,6 +31,7 @@ zxing = "3.5.2"
 
 [libraries]
 # Amplify Dependencies
+amplify-core-kotlin = { module = "com.amplifyframework:core-kotlin", version.ref = "amplify" }
 amplify-api = { module = "com.amplifyframework:aws-api", version.ref = "amplify" }
 amplify-auth = { module = "com.amplifyframework:aws-auth-cognito", version.ref = "amplify" }
 amplify-predictions = { module = "com.amplifyframework:aws-predictions", version.ref = "amplify" }
@@ -34,20 +40,28 @@ amplify-predictions = { module = "com.amplifyframework:aws-predictions", version
 android-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 
 # AndroidX
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraX" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraX" }
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraX" }
 androidx-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "futures" }
 androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 
 # Compose
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 androidx-compose-material = { module = "androidx.compose.material3:material3" }
 androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 
 # Kotlin
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
 # TensorFlow
 tensorflow = { module = "org.tensorflow:tensorflow-lite", version.ref = "tensorflow" }
@@ -55,6 +69,7 @@ tensorflow-support = {module = "org.tensorflow:tensorflow-lite-support", version
 
 # Other
 zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
+accompanist = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 # Testing libraries
 test-androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }

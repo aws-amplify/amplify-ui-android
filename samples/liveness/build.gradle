@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        LivenessVersion = '1.4.0'
+        LivenessVersion = '1.4.1'
     }
     repositories {
         google()

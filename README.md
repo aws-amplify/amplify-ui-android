@@ -16,14 +16,14 @@ Amplify UI for Android is an open-source UI library with cloud-connected compone
 | Component | Summary | Latest Version                                                                                       | Docs | Sample |
 | --- | --- |------------------------------------------------------------------------------------------------------| --- | --- |
 | [Authenticator](authenticator) | Amplify Authenticator provides a complete drop-in implementation of an authentication flow for your application using [Amplify Authentication](https://docs.amplify.aws/lib/auth/getting-started/q/platform/android/). | [1.4.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.3) | [Docs](https://ui.docs.amplify.aws/android/connected-components/authenticator) | [Sample](samples/authenticator/) |
-| [Face Liveness](liveness) | Amplify FaceLivenessDetector provides a UI component for [Amazon Rekognition Face Liveness](https://aws.amazon.com/rekognition/face-liveness/) feature that helps developers verify that only real users, not bad actors using spoofs, can access your services. | [1.4.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.1)      | [Docs](https://ui.docs.amplify.aws/android/connected-components/liveness) | [Sample](samples/liveness/) |
+| [Face Liveness](liveness) | Amplify FaceLivenessDetector provides a UI component for [Amazon Rekognition Face Liveness](https://aws.amazon.com/rekognition/face-liveness/) feature that helps developers verify that only real users, not bad actors using spoofs, can access your services. | [1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.2)      | [Docs](https://ui.docs.amplify.aws/android/connected-components/liveness) | [Sample](samples/liveness/) |
 
 ## Supported Versions
 
 | Component | Version | Amplify  | Material3 |
 | --- |---------|----------|-----------|
 | Authenticator | 1.4.3   | 2.24.0+ | 1.1.2     |
-| Liveness | 1.4.1   | 2.15.1+  | 1.1.2     |
+| Liveness | 1.4.2   | 2.15.1+  | 1.1.2     |
 
 ## Getting Started
 

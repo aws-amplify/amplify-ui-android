@@ -30,7 +30,6 @@ import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.auth.result.step.AuthSignUpStep
 import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.util.AmplifyResult
 import com.amplifyframework.ui.authenticator.util.AmplifyResult.Error
 import com.amplifyframework.ui.authenticator.util.AmplifyResult.Success
 import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
@@ -39,6 +38,7 @@ import com.amplifyframework.ui.authenticator.util.LimitExceededMessage
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
 import com.amplifyframework.ui.testing.CoroutineTestRule
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -109,7 +109,7 @@ class AuthenticatorViewModelTest {
 
     @Test
     fun `fetchAuthSession error during start results in an error`() = runTest {
-        coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Error(mockAuthException())
+        coEvery { authProvider.fetchAuthSession() } returns Error(mockAuthException())
 
         viewModel.start(mockAuthenticatorConfiguration())
         advanceUntilIdle()
@@ -119,9 +119,27 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
+    fun `fetchAuthSession error can be retried`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns
+            Error(mockAuthException()) andThen Success(mockAuthSession())
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        advanceUntilIdle()
+
+        val state = viewModel.stepState.value.shouldBeInstanceOf<ErrorState>()
+        state.retry()
+        advanceUntilIdle()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+        coVerify(exactly = 2) {
+            authProvider.fetchAuthSession()
+        }
+    }
+
+    @Test
     fun `getCurrentUser error during start results in an error`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
-        coEvery { authProvider.getCurrentUser() } returns AmplifyResult.Error(mockAuthException())
+        coEvery { authProvider.getCurrentUser() } returns Error(mockAuthException())
 
         viewModel.start(mockAuthenticatorConfiguration())
         advanceUntilIdle()
@@ -136,7 +154,7 @@ class AuthenticatorViewModelTest {
     @Test
     fun `getCurrentUser error with session expired exception during start results in being signed out`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
-        coEvery { authProvider.getCurrentUser() } returns AmplifyResult.Error(SessionExpiredException())
+        coEvery { authProvider.getCurrentUser() } returns Error(SessionExpiredException())
 
         viewModel.start(mockAuthenticatorConfiguration())
         advanceUntilIdle()
@@ -145,6 +163,27 @@ class AuthenticatorViewModelTest {
             authProvider.fetchAuthSession()
             authProvider.getCurrentUser()
             authProvider.signOut()
+        }
+    }
+
+    @Test
+    fun `getCurrentUser error can be retried`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
+        coEvery { authProvider.getCurrentUser() } returns Error(mockAuthException()) andThen Success(mockAuthUser())
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        advanceUntilIdle()
+
+        val state = viewModel.stepState.value.shouldBeInstanceOf<ErrorState>()
+        state.retry()
+        advanceUntilIdle()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+        coVerify(exactly = 1) {
+            authProvider.fetchAuthSession()
+        }
+        coVerify(exactly = 2) {
+            authProvider.getCurrentUser()
         }
     }
 
@@ -266,7 +305,7 @@ class AuthenticatorViewModelTest {
         coEvery { authProvider.signIn(any(), any()) } returns Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_UP)
         )
-        coEvery { authProvider.resendSignUpCode(any()) } returns AmplifyResult.Error(mockAuthException())
+        coEvery { authProvider.resendSignUpCode(any()) } returns Error(mockAuthException())
 
         viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
 
@@ -395,7 +434,7 @@ class AuthenticatorViewModelTest {
             verificationMechanisms = setOf(VerificationMechanism.Email)
         )
         // cannot fetch user attributes
-        coEvery { authProvider.fetchUserAttributes() } returns AmplifyResult.Error(mockk(relaxed = true))
+        coEvery { authProvider.fetchUserAttributes() } returns Error(mockk(relaxed = true))
 
         viewModel.start(mockAuthenticatorConfiguration())
         viewModel.signIn("username", "password")
@@ -588,6 +627,7 @@ class AuthenticatorViewModelTest {
             viewModel.resetPassword("username")
         }
     }
+
 //endregion
 //region helpers
     private val AuthenticatorViewModel.currentStep: AuthenticatorStep

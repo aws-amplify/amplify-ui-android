@@ -7,6 +7,21 @@ body:
       value: |
         Thank you for taking the time to fill out this bug report! Try to include as much information as you can.
 
+  - type: markdown
+    attributes:
+      value: |
+        For reference, the current versions of the Amplify UI Android packages are listed below. Please verify your issue against the latest version(s) of the relevant package(s).
+
+        <details>
+          <summary>Click to expand package version list</summary>
+
+          | Package                                                | Version                                                                                                          |
+          | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+          | `com.amplifyframework.ui:authenticator`                | ![Maven Central](https://img.shields.io/maven-central/v/com.amplifyframework.ui/authenticator)                   |
+          | `com.amplifyframework.ui:liveness`                     | ![Maven Central](https://img.shields.io/maven-central/v/com.amplifyframework.ui/liveness)                        |
+
+        </details>
+
   - type: checkboxes
     attributes:
       label: |
@@ -38,7 +53,7 @@ body:
       description: |
         Please provide the version of Amplify UI Android being used from your `build.gradle (Module: app)` file.
       value: |
-        ```groovy
+        ```kotlin
         // Put output below this line
 
         ```
@@ -91,7 +106,7 @@ body:
 
         **Be sure to remove any sensitive data.**
       value: |
-        ```java
+        ```kotlin
         // Put your code below this line.
 
         ```
@@ -114,8 +129,8 @@ body:
         ## Configuration
   - type: textarea
     attributes:
-      label: amplifyconfiguration.json
-      description: If applicable, please provide your `amplifyconfiguration.json` file with sensitive information removed.
+      label: Configuration File
+      description: If applicable, please provide your `amplifyconfiguration.json` (Gen1) or `amplify_outputs.json` (Gen2) file with sensitive information removed.
       placeholder: |
         ```json
           {

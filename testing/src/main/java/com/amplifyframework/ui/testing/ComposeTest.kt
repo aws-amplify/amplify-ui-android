@@ -22,16 +22,25 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.takahirom.roborazzi.RobolectricDeviceQualifiers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
 import org.robolectric.shadows.ShadowLog
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+@Config(sdk = [33], qualifiers = RobolectricDeviceQualifiers.Pixel6)
 abstract class ComposeTest {
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    @get:Rule
+    val screenshotRule = ScreenshotRule(composeTestRule)
 
     @Before
     @Throws(Exception::class)
@@ -39,7 +48,7 @@ abstract class ComposeTest {
         ShadowLog.stream = System.out // Redirect Logcat to console
     }
 
-    protected fun setContent(content: @Composable () -> Unit) = composeTestRule.setContent {
+    protected open fun setContent(content: @Composable () -> Unit) = composeTestRule.setContent {
         Box(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             content()
         }

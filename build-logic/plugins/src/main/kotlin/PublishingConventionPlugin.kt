@@ -148,7 +148,7 @@ class PublishingConventionPlugin : Plugin<Project> {
         get() = URI.create(
             getPropertyOrDefault(
                 "RELEASE_REPOSITORY_URL",
-                "https://aws.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
             )
         )
 
@@ -156,7 +156,7 @@ class PublishingConventionPlugin : Plugin<Project> {
         get() = URI.create(
             getPropertyOrDefault(
                 "SNAPSHOT_REPOSITORY_URL",
-                "https://aws.oss.sonatype.org/content/repositories/snapshots/"
+                "https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/"
             )
         )
 

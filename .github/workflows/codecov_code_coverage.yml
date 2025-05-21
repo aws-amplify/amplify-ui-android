@@ -22,11 +22,11 @@ jobs:
           distribution: 'corretto'
 
       - name: Run test and generate kover report
-        run: ./gradlew koverXmlReport
+        run: ./gradlew koverXmlReportCoverage
 
       - name: Upload Test Report
         uses: codecov/codecov-action@v5
         with:
           name: report
-          files: build/reports/kover/report.xml
+          files: build/reports/kover/reportCoverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}

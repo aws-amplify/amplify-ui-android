@@ -15,13 +15,17 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.auth.SignInMethod
-import com.amplifyframework.ui.authenticator.states.SignInStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldError
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.forms.setFieldError
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInState
 import com.amplifyframework.ui.authenticator.ui.robots.signIn
 import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import org.junit.Test
 
-class SignInTest : ComposeTest() {
+class SignInTest : AuthenticatorUiTest() {
 
     @Test
     fun `title is Sign In`() {
@@ -43,9 +47,49 @@ class SignInTest : ComposeTest() {
         }
     }
 
-    private fun mockSignInState() = SignInStateImpl(
-        signInMethod = SignInMethod.Username,
-        onSubmit = { _, _ -> },
-        onMoveTo = { }
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            SignIn(state = mockSignInState())
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `ready to submit`() {
+        setContent {
+            SignIn(state = mockSignInState())
+        }
+        signIn {
+            setUsername("username")
+            setPassword("password")
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `password visible`() {
+        setContent {
+            SignIn(state = mockSignInState())
+        }
+        signIn {
+            setUsername("username")
+            setPassword("password")
+            clickShowPassword()
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `username not found`() {
+        val state = mockSignInState()
+        setContent {
+            SignIn(state = state)
+        }
+        signIn {
+            setUsername("username")
+        }
+        state.form.setFieldError(FieldKey.Username, FieldError.NotFound)
+    }
 }

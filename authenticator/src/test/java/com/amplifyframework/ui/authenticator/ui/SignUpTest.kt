@@ -15,15 +15,18 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
-import com.amplifyframework.ui.authenticator.auth.SignInMethod
-import com.amplifyframework.ui.authenticator.forms.FormData
-import com.amplifyframework.ui.authenticator.states.SignUpStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldError
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.forms.PasswordError
+import com.amplifyframework.ui.authenticator.forms.setFieldError
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignUpState
 import com.amplifyframework.ui.authenticator.ui.robots.signUp
 import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import org.junit.Test
 
-class SignUpTest : ComposeTest() {
+class SignUpTest : AuthenticatorUiTest() {
 
     @Test
     fun `title is Create Account`() {
@@ -45,12 +48,117 @@ class SignUpTest : ComposeTest() {
         }
     }
 
-    private fun mockSignUpState() = SignUpStateImpl(
-        signInMethod = SignInMethod.Username,
-        signUpAttributes = emptyList(),
-        passwordCriteria = PasswordCriteria(8, false, false, false, false),
-        signUpForm = FormData(emptyList()),
-        onSubmit = { _, _, _ -> },
-        onMoveTo = { }
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            SignUp(state = mockSignUpState())
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `ready to submit`() {
+        setContent {
+            SignUp(state = mockSignUpState())
+        }
+        signUp {
+            setUsername("username")
+            setPassword("password")
+            setConfirmPassword("password")
+            setEmail("email@email.com")
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `password visible`() {
+        setContent {
+            SignUp(state = mockSignUpState())
+        }
+        signUp {
+            setUsername("username")
+            setPassword("password")
+            setConfirmPassword("password")
+            setEmail("email@email.com")
+
+            clickShowPassword(FieldKey.Password)
+            clickShowPassword(FieldKey.ConfirmPassword)
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `username exists`() {
+        val state = mockSignUpState()
+        setContent {
+            SignUp(state = state)
+        }
+        signUp {
+            setUsername("username")
+            setPassword("password")
+            setConfirmPassword("password")
+            setEmail("email@email.com")
+        }
+
+        state.form.setFieldError(FieldKey.Username, FieldError.FieldValueExists)
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `invalid password`() {
+        val state = mockSignUpState()
+        setContent {
+            SignUp(state = state)
+        }
+        signUp {
+            setUsername("username")
+            setPassword("password")
+            setConfirmPassword("password")
+            setEmail("email@email.com")
+        }
+
+        val error = FieldError.InvalidPassword(
+            listOf(
+                PasswordError.InvalidPasswordLength(10),
+                PasswordError.InvalidPasswordMissingUpper,
+                PasswordError.InvalidPasswordMissingSpecial,
+                PasswordError.InvalidPasswordMissingNumber
+            )
+        )
+
+        state.form.setFieldError(FieldKey.Password, error)
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `passwords do not match`() {
+        val state = mockSignUpState()
+        setContent {
+            SignUp(state = state)
+        }
+        signUp {
+            setUsername("username")
+            setPassword("password")
+            setConfirmPassword("password")
+            setEmail("email@email.com")
+        }
+        state.form.setFieldError(FieldKey.ConfirmPassword, FieldError.PasswordsDoNotMatch)
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `invalid email`() {
+        val state = mockSignUpState()
+        setContent {
+            SignUp(state = state)
+        }
+        signUp {
+            setUsername("username")
+            setPassword("password")
+            setConfirmPassword("password")
+            setEmail("email@email.com")
+        }
+        state.form.setFieldError(FieldKey.Email, FieldError.InvalidFormat)
+    }
 }

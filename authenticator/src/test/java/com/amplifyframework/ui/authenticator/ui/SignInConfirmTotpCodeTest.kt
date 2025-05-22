@@ -17,14 +17,19 @@ package com.amplifyframework.ui.authenticator.ui
 
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.states.SignInConfirmTotpCodeStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldError
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.forms.setFieldError
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInConfirmTotpCodeState
 import com.amplifyframework.ui.authenticator.ui.robots.signInConfirmTotpCode
 import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
 
-class SignInConfirmTotpCodeTest : ComposeTest() {
+class SignInConfirmTotpCodeTest : AuthenticatorUiTest() {
     @Test
     fun `title is Enter your one-time passcode`() {
         setContent {
@@ -76,11 +81,24 @@ class SignInConfirmTotpCodeTest : ComposeTest() {
         }
     }
 
-    private fun mockSignInConfirmTotpCodeState(
-        onSubmit: (String) -> Unit = { },
-        onMoveTo: (AuthenticatorInitialStep) -> Unit = { }
-    ) = SignInConfirmTotpCodeStateImpl(
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            SignInConfirmTotpCode(state = mockSignInConfirmTotpCodeState())
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `invalid code`() {
+        val state = mockSignInConfirmTotpCodeState()
+        setContent {
+            SignInConfirmTotpCode(state = state)
+        }
+        signInConfirmTotpCode {
+            setConfirmationCode("123456")
+        }
+        state.form.setFieldError(FieldKey.ConfirmationCode, FieldError.ConfirmationCodeIncorrect)
+    }
 }

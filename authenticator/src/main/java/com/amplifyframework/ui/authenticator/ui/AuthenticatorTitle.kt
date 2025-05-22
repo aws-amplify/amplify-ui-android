@@ -34,6 +34,6 @@ internal fun AuthenticatorTitle(
     Text(
         style = MaterialTheme.typography.titleLarge,
         text = text,
-        modifier = modifier.padding(bottom = 16.dp).testTag("AuthenticatorTitle")
+        modifier = modifier.padding(bottom = 16.dp).testTag(TestTags.AuthenticatorTitle)
     )
 }

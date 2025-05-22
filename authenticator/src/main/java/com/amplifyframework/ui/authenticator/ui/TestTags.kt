@@ -19,4 +19,10 @@ internal object TestTags {
     const val SignInConfirmButton = "SignInConfirmButton"
     const val BackToSignInButton = "BackToSignInButton"
     const val CopyKeyButton = "CopyKeyButton"
+    const val SignInButton = "SignInButton"
+    const val SignUpButton = "SignUpButton"
+    const val PasswordResetButton = "PasswordResetButton"
+    const val AuthenticatorTitle = "AuthenticatorTitle"
+
+    const val ShowPasswordIcon = "ShowPasswordIcon"
 }

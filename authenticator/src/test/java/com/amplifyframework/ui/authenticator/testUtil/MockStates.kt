@@ -18,15 +18,9 @@ package com.amplifyframework.ui.authenticator.testUtil
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
-import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
-import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSetupSelectionState
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
-import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FieldConfig
-import com.amplifyframework.ui.authenticator.forms.FieldError
-import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.FormData
 import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmMfaStateImpl
@@ -74,7 +68,6 @@ internal fun mockSignInContinueWithEmailSetupState(
     onSubmit = onSubmit,
     onMoveTo = onMoveTo
 )
-
 
 internal fun mockSignInContinueWithMfaSelectionState(
     allowedMfaTypes: Set<MFAType> = MFAType.entries.toSet(),

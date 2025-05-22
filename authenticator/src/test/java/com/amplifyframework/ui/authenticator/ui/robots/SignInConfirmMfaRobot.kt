@@ -23,7 +23,7 @@ fun ComposeTest.signInConfirmMfa(func: SignInConfirmMfaRobot.() -> Unit) = SignI
     composeTestRule
 ).func()
 
-class SignInConfirmMfaRobot(composeTestRule: ComposeTestRule): ScreenLevelRobot(composeTestRule) {
+class SignInConfirmMfaRobot(composeTestRule: ComposeTestRule) : ScreenLevelRobot(composeTestRule) {
 
     fun setConfirmationCode(value: String) = setFieldContent(FieldKey.ConfirmationCode, value)
 }

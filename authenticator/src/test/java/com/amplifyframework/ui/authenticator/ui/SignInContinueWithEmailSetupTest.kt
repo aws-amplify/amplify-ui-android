@@ -17,11 +17,9 @@ package com.amplifyframework.ui.authenticator.ui
 
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.states.SignInContinueWithEmailSetupStateImpl
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithEmailSetupState
 import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithEmailSetup
-import com.amplifyframework.ui.testing.ComposeTest
 import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify

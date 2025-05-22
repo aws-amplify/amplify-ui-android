@@ -23,7 +23,6 @@ import com.amplifyframework.ui.authenticator.forms.setFieldError
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockSignInConfirmTotpCodeState
 import com.amplifyframework.ui.authenticator.ui.robots.signInConfirmTotpCode
-import com.amplifyframework.ui.testing.ComposeTest
 import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify

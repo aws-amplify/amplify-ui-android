@@ -21,7 +21,6 @@ import com.amplifyframework.ui.authenticator.forms.setFieldError
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockSignInState
 import com.amplifyframework.ui.authenticator.ui.robots.signIn
-import com.amplifyframework.ui.testing.ComposeTest
 import com.amplifyframework.ui.testing.ScreenshotTest
 import org.junit.Test
 

@@ -15,7 +15,6 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.ui.authenticator.forms.FieldError
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.setFieldError

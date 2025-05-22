@@ -19,7 +19,6 @@ import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import com.github.takahirom.roborazzi.captureRoboImage
 import java.io.File
-import org.junit.Rule
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
@@ -37,16 +36,14 @@ annotation class ScreenshotTest
  *
  * Screenshot will be named "ClassName_function-name.png"
  */
-class ScreenshotRule(val composeTestRule: ComposeTestRule): TestRule {
-    override fun apply(base: Statement, description: Description): Statement {
-        return object : Statement() {
-            override fun evaluate() {
-                base.evaluate()
-                if (description.getAnnotation(ScreenshotTest::class.java) != null) {
-                    composeTestRule.onNode(isRoot()).captureRoboImage(
-                       file = File("src/test/screenshots", generateScreenshotName(description))
-                    )
-                }
+class ScreenshotRule(val composeTestRule: ComposeTestRule) : TestRule {
+    override fun apply(base: Statement, description: Description): Statement = object : Statement() {
+        override fun evaluate() {
+            base.evaluate()
+            if (description.getAnnotation(ScreenshotTest::class.java) != null) {
+                composeTestRule.onNode(isRoot()).captureRoboImage(
+                    file = File("src/test/screenshots", generateScreenshotName(description))
+                )
             }
         }
     }
@@ -54,6 +51,6 @@ class ScreenshotRule(val composeTestRule: ComposeTestRule): TestRule {
     private fun generateScreenshotName(description: Description): String {
         val className = description.className.takeLastWhile { it != '.' }
         val methodName = description.methodName.replace("\\s+".toRegex(), "-")
-        return "${className}_${methodName}.png"
+        return "${className}_$methodName.png"
     }
 }

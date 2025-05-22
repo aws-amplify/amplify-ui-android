@@ -19,16 +19,17 @@ import android.content.ClipboardManager
 import android.content.Context
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.states.SignInContinueWithTotpSetupStateImpl
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithTotpSetupState
 import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithTotpSetup
-import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
 import org.robolectric.RuntimeEnvironment
 
-class SignInContinueWithTotpCodeTest : ComposeTest() {
+class SignInContinueWithTotpSetupTest : AuthenticatorUiTest() {
     @Test
     fun `title is Enable Two-Factor Auth`() {
         setContent {
@@ -92,17 +93,13 @@ class SignInContinueWithTotpCodeTest : ComposeTest() {
         getClipboardContent() shouldBe "secret!"
     }
 
-    private fun mockSignInContinueWithTotpSetupState(
-        sharedSecret: String = "",
-        setupUri: String = "",
-        onSubmit: (String) -> Unit = { },
-        onMoveTo: (AuthenticatorInitialStep) -> Unit = { }
-    ) = SignInContinueWithTotpSetupStateImpl(
-        sharedSecret = sharedSecret,
-        setupUri = setupUri,
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            SignInContinueWithTotpSetup(state = mockSignInContinueWithTotpSetupState())
+        }
+    }
 
     private fun getClipboardContent(): String? {
         val clipboardManager =

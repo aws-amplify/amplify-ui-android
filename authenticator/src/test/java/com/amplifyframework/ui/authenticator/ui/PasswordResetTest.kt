@@ -15,13 +15,17 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.auth.SignInMethod
-import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
+import com.amplifyframework.ui.authenticator.forms.FieldError
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.forms.setFieldError
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockPasswordResetState
 import com.amplifyframework.ui.authenticator.ui.robots.passwordReset
 import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import org.junit.Test
 
-class PasswordResetTest : ComposeTest() {
+class PasswordResetTest : AuthenticatorUiTest() {
 
     @Test
     fun `title is reset password`() {
@@ -53,9 +57,24 @@ class PasswordResetTest : ComposeTest() {
         }
     }
 
-    private fun mockPasswordResetState() = PasswordResetStateImpl(
-        signInMethod = SignInMethod.Username,
-        onSubmit = {},
-        onMoveTo = {}
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            PasswordReset(state = mockPasswordResetState())
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `username not found`() {
+        val state = mockPasswordResetState()
+        setContent {
+            PasswordReset(state = state)
+        }
+        passwordReset {
+            setUsername("username")
+        }
+        state.form.setFieldError(FieldKey.Username, FieldError.NotFound)
+    }
 }

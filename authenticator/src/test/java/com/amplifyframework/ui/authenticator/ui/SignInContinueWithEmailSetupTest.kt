@@ -18,13 +18,16 @@ package com.amplifyframework.ui.authenticator.ui
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithEmailSetupStateImpl
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithEmailSetupState
 import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithEmailSetup
 import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
 
-class SignInContinueWithEmailSetupTest : ComposeTest() {
+class SignInContinueWithEmailSetupTest : AuthenticatorUiTest() {
 
     @Test
     fun `title is Setup Two-Factor Auth Method`() {
@@ -81,11 +84,11 @@ class SignInContinueWithEmailSetupTest : ComposeTest() {
         }
     }
 
-    private fun mockSignInContinueWithEmailSetupState(
-        onSubmit: suspend (email: String) -> Unit = {},
-        onMoveTo: (step: AuthenticatorInitialStep) -> Unit = {}
-    ) = SignInContinueWithEmailSetupStateImpl(
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            SignInContinueWithEmailSetup(mockSignInContinueWithEmailSetupState())
+        }
+    }
 }

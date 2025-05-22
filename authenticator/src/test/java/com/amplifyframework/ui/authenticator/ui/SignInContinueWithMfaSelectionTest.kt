@@ -4,14 +4,16 @@ import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.cognito.challengeResponse
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSelectionStateImpl
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithMfaSelectionState
 import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithMfaSelection
 import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
 
-class SignInContinueWithMfaSelectionTest : ComposeTest() {
+class SignInContinueWithMfaSelectionTest : AuthenticatorUiTest() {
 
     @Test
     fun `title is Choose your two-factor authentication method`() {
@@ -106,13 +108,11 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
         }
     }
 
-    private fun mockSignInContinueWithMfaSelectionState(
-        allowedMfaTypes: Set<MFAType> = MFAType.values().toSet(),
-        onSubmit: (String) -> Unit = {},
-        onMoveTo: (AuthenticatorInitialStep) -> Unit = {}
-    ) = SignInContinueWithMfaSelectionStateImpl(
-        allowedMfaTypes = allowedMfaTypes,
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
+        }
+    }
 }

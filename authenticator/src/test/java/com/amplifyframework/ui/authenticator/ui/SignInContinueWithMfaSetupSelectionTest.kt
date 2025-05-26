@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-internal object TestTags {
-    const val SignInConfirmButton = "SignInConfirmButton"
-    const val BackToSignInButton = "BackToSignInButton"
-    const val CopyKeyButton = "CopyKeyButton"
-    const val SignInButton = "SignInButton"
-    const val SignUpButton = "SignUpButton"
-    const val PasswordResetButton = "PasswordResetButton"
-    const val AuthenticatorTitle = "AuthenticatorTitle"
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithMfaSetupSelectionState
+import org.junit.Test
 
-    const val ShowPasswordIcon = "ShowPasswordIcon"
+class SignInContinueWithMfaSetupSelectionTest : AuthenticatorUiTest() {
+    @Test
+    fun `default state`() {
+        setContent {
+            SignInContinueWithMfaSetupSelection(mockSignInContinueWithMfaSetupSelectionState())
+        }
+    }
 }

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.ir.backend.js.compile
+
 /*
  * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -38,6 +40,7 @@ dependencies {
     compileOnly(libs.plugin.kover)
     compileOnly(libs.plugin.ktlint)
     compileOnly(libs.plugin.licensee)
+    compileOnly(libs.plugin.roborazzi)
 }
 
 gradlePlugin {
@@ -69,6 +72,10 @@ gradlePlugin {
         register("publishing") {
             id = "amplify.android.publishing"
             implementationClass = "PublishingConventionPlugin"
+        }
+        register("screenshots") {
+            id = "amplify.android.screenshots"
+            implementationClass = "ScreenshotConventionPlugin"
         }
     }
 }

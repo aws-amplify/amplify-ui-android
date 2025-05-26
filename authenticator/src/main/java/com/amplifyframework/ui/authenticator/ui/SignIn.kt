@@ -54,7 +54,7 @@ fun SignIn(
             onClick = { scope.launch { state.signIn() } },
             loading = !state.form.enabled,
             label = stringResource(R.string.amplify_ui_authenticator_button_signin),
-            modifier = Modifier.testTag("SignInButton")
+            modifier = Modifier.testTag(TestTags.SignInButton)
         )
         footerContent(state)
     }

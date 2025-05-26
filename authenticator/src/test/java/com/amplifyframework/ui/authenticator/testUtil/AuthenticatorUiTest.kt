@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,27 +13,24 @@
  * permissions and limitations under the License.
  */
 
-package com.amplifyframework.ui.authenticator.ui
+package com.amplifyframework.ui.authenticator.testUtil
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.amplifyframework.ui.authenticator.theme.AmplifyTheme
+import com.amplifyframework.ui.testing.ComposeTest
 
-/**
- * Composable for the title shown at the top of each state's content in Authenticator.
- */
-@Composable
-internal fun AuthenticatorTitle(
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        style = MaterialTheme.typography.titleLarge,
-        text = text,
-        modifier = modifier.padding(bottom = 16.dp).testTag(TestTags.AuthenticatorTitle)
-    )
+abstract class AuthenticatorUiTest : ComposeTest() {
+    override fun setContent(content: @Composable () -> Unit) {
+        super.setContent {
+            AmplifyTheme {
+                Box(modifier = Modifier.padding(top = 16.dp)) {
+                    content()
+                }
+            }
+        }
+    }
 }

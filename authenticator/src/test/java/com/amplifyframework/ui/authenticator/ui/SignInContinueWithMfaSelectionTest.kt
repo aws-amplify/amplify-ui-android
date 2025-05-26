@@ -7,7 +7,6 @@ import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithMfaSelectionState
 import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithMfaSelection
-import com.amplifyframework.ui.testing.ComposeTest
 import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify

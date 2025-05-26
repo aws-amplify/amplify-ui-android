@@ -17,6 +17,7 @@ package com.amplifyframework.ui.testing
 
 import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.ComposeTestRule
+import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
 import java.io.File
 import org.junit.rules.TestRule
@@ -37,12 +38,21 @@ annotation class ScreenshotTest
  * Screenshot will be named "ClassName_function-name.png"
  */
 class ScreenshotRule(val composeTestRule: ComposeTestRule) : TestRule {
+
+    private val options = RoborazziOptions(
+        compareOptions = RoborazziOptions.CompareOptions(
+            // Allow a 0.5% difference when comparing to allow for platform rendering differences
+            changeThreshold = 0.005f
+        )
+    )
+
     override fun apply(base: Statement, description: Description): Statement = object : Statement() {
         override fun evaluate() {
             base.evaluate()
             if (description.getAnnotation(ScreenshotTest::class.java) != null) {
                 composeTestRule.onNode(isRoot()).captureRoboImage(
-                    file = File("src/test/screenshots", generateScreenshotName(description))
+                    file = File("src/test/screenshots", generateScreenshotName(description)),
+                    roborazziOptions = options
                 )
             }
         }

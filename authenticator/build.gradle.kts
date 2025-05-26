@@ -1,6 +1,5 @@
 plugins {
     id("amplify.android.ui.component")
-    alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -26,8 +25,4 @@ dependencies {
     coreLibraryDesugaring(libs.android.desugar)
 
     testImplementation(projects.testing)
-}
-
-roborazzi {
-    outputDir.set(file("src/test/screenshots"))
 }

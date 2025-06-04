@@ -18,7 +18,6 @@ package com.amplifyframework.ui.liveness.ml
 import android.content.Context
 import android.graphics.RectF
 import androidx.annotation.VisibleForTesting
-import com.amplifyframework.predictions.aws.models.FaceTargetChallenge
 import com.amplifyframework.predictions.aws.models.FaceTargetMatchingParameters
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator.Companion.TARGET_HEIGHT

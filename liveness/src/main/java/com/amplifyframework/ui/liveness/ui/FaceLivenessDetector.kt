@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -51,6 +52,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Action
@@ -72,6 +75,7 @@ import kotlinx.coroutines.launch
  * @param region AWS region to stream the video to. Current supported regions are listed in [add link here]
  * @param credentialsProvider to provide custom CredentialsProvider for authentication. Default uses initialized Amplify.Auth CredentialsProvider
  * @param disableStartView to bypass warmup screen.
+ * @param challengeOptions is the list of ChallengeOptions that are to be overridden from the default configuration
  * @param onComplete callback notifying a completed challenge
  * @param onError callback containing exception for cause
  */
@@ -81,6 +85,7 @@ fun FaceLivenessDetector(
     region: String,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>? = null,
     disableStartView: Boolean = false,
+    challengeOptions: ChallengeOptions = ChallengeOptions(),
     onComplete: Action,
     onError: Consumer<FaceLivenessDetectionException>
 ) {
@@ -124,6 +129,7 @@ fun FaceLivenessDetector(
                 region,
                 credentialsProvider = credentialsProvider,
                 disableStartView,
+                challengeOptions = challengeOptions,
                 onChallengeComplete = {
                     scope.launch {
                         // if we are already finished, we already provided a result in complete or failed
@@ -156,6 +162,7 @@ internal fun ChallengeView(
     region: String,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     disableStartView: Boolean,
+    challengeOptions: ChallengeOptions,
     onChallengeComplete: OnChallengeComplete,
     onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -176,6 +183,7 @@ internal fun ChallengeView(
                 region,
                 credentialsProvider,
                 disableStartView,
+                challengeOptions,
                 onChallengeComplete = { currentOnChallengeComplete() },
                 onChallengeFailed = { currentOnChallengeFailed.accept(it) }
             )
@@ -187,6 +195,23 @@ internal fun ChallengeView(
                 )
             )
         }
+
+
+        val observer = LifecycleEventObserver { _, event ->
+            // If the app ever gets paused while the liveness check is in progress,
+            // send a cancelled event to the backend and stop the session.
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                val isActionable = coordinator?.livenessState?.livenessCheckState?.isActionable
+                if (isActionable != null && isActionable) {
+                    coordinator?.processSessionError(
+                        FaceLivenessDetectionException.LostFocusException(),
+                        true
+                    )
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
 
         onDispose {
             coordinator?.destroy(context)
@@ -231,6 +256,15 @@ internal fun ChallengeView(
             }
 
             if (livenessState.showingStartView) {
+
+                if (livenessState.loadingCameraPreview) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .align(Alignment.Center),
+                        strokeWidth = 2.dp,
+                    )
+                }
 
                 FaceGuide(
                     modifier = Modifier
@@ -400,6 +434,40 @@ internal fun ChallengeView(
             }
         }
     }
+}
+
+data class ChallengeOptions(
+    val faceMovementAndLight: LivenessChallenge.FaceMovementAndLight = LivenessChallenge.FaceMovementAndLight,
+    val faceMovement: LivenessChallenge.FaceMovement = LivenessChallenge.FaceMovement()
+) {
+    fun getOptions(challengeType: FaceLivenessChallengeType): LivenessChallenge =
+        when (challengeType) {
+            FaceLivenessChallengeType.FaceMovementAndLightChallenge -> faceMovementAndLight
+            FaceLivenessChallengeType.FaceMovementChallenge -> faceMovement
+        }
+
+    /**
+     * @return true if all of the challenge options are configured to use the same camera configuration
+     */
+    fun hasOneCameraConfigured(): Boolean =
+        listOf(
+            faceMovementAndLight,
+            faceMovement
+        ).all { it.camera == faceMovementAndLight.camera }
+}
+
+sealed class LivenessChallenge(
+    val camera: Camera = Camera.Front
+) {
+    class FaceMovement(camera: Camera = Camera.Front) : LivenessChallenge(
+        camera = camera
+    )
+    object FaceMovementAndLight : LivenessChallenge()
+}
+
+sealed class Camera {
+    object Front : Camera()
+    object Back : Camera()
 }
 
 private fun FaceLivenessSession?.isFaceMovementAndLightChallenge(): Boolean =

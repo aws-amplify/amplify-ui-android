@@ -1,3 +1,17 @@
+## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.5.0)
+
+### Features
+- **authenticator:** Handle SignedIn events from outside of Authenticator ([#236](https://github.com/aws-amplify/amplify-ui-android/issues/236))
+
+[See all changes between 1.4.3 and 1.5.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.3...release_authenticator_v1.5.0)
+
+## [Release 1.4.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.3)
+
+### Bug Fixes
+- **all:** Upgrade Compose to latest BOM ([#222](https://github.com/aws-amplify/amplify-ui-android/issues/222))
+
+[See all changes between 1.4.2 and 1.4.3](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.2...release_authenticator_v1.4.3)
+
 ## [Release 1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.2)
 
 ### Bug Fixes

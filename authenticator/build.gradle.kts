@@ -14,6 +14,8 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+
     api(libs.amplify.auth)
 
     implementation(libs.bundles.compose)

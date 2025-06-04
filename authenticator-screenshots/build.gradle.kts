@@ -27,6 +27,8 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+
     implementation(libs.bundles.compose)
     implementation(libs.test.mockk)
     implementation(projects.authenticator)

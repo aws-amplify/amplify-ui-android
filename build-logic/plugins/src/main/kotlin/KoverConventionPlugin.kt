@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-import kotlinx.kover.gradle.plugin.dsl.KoverReportExtension
+import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -25,11 +25,14 @@ class KoverConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply("org.jetbrains.kotlinx.kover")
-
-            extensions.configure<KoverReportExtension> {
-                defaults {
-                    // Use the release variant for the default coverage report
-                    mergeWith("release")
+            extensions.configure<KoverProjectExtension> {
+                currentProject {
+                    createVariant("coverage") {
+                        add("release") // Use release variant for generating coverage reports
+                    }
+                }
+                reports {
+                    filters.excludes.androidGeneratedClasses()
                 }
             }
         }

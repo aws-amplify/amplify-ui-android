@@ -22,6 +22,15 @@ tasks.register<Delete>("clean").configure {
     delete(rootProject.buildDir)
 }
 
+kover {
+    currentProject {
+        createVariant("coverage") {
+            // Use a custom variant called "coverage" to generate the merged report. This variant only runs the tests
+            // for the release variant.
+        }
+    }
+}
+
 dependencies {
     // Generate combined coverage report
     kover(project(":authenticator"))

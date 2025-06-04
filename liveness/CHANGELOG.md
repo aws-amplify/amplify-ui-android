@@ -1,3 +1,17 @@
+## [Release 1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.2)
+
+### Miscellaneous
+- **all:** Update Amplify dependency to 2.27.2 ([#226](https://github.com/aws-amplify/amplify-ui-android/issues/226))
+
+[See all changes between 1.4.1 and 1.4.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.1...release_liveness_v1.4.2)
+
+## [Release 1.4.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.1)
+
+### Bug Fixes
+- **all:** Upgrade Compose to latest BOM ([#222](https://github.com/aws-amplify/amplify-ui-android/issues/222))
+
+[See all changes between 1.4.0 and 1.4.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.0...release_liveness_v1.4.1)
+
 ## [Release 1.4.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.0)
 
 ### Bug Fixes

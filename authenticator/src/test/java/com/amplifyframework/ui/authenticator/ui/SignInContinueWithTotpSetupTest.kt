@@ -15,36 +15,37 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
+import android.content.ClipboardManager
+import android.content.Context
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.forms.FieldError
-import com.amplifyframework.ui.authenticator.forms.FieldKey
-import com.amplifyframework.ui.authenticator.forms.setFieldError
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
-import com.amplifyframework.ui.authenticator.testUtil.mockSignInConfirmTotpCodeState
-import com.amplifyframework.ui.authenticator.ui.robots.signInConfirmTotpCode
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithTotpSetupState
+import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithTotpSetup
 import com.amplifyframework.ui.testing.ScreenshotTest
+import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
+import org.robolectric.RuntimeEnvironment
 
-class SignInConfirmTotpCodeTest : AuthenticatorUiTest() {
+class SignInContinueWithTotpSetupTest : AuthenticatorUiTest() {
     @Test
-    fun `title is Enter your one-time passcode`() {
+    fun `title is Enable Two-Factor Auth`() {
         setContent {
-            SignInConfirmTotpCode(state = mockSignInConfirmTotpCodeState())
+            SignInContinueWithTotpSetup(state = mockSignInContinueWithTotpSetupState())
         }
-        signInConfirmTotpCode {
-            hasTitle("Enter your one-time passcode")
+        signInContinueWithTotpSetup {
+            hasTitle("Enable Two-Factor Auth")
         }
     }
 
     @Test
     fun `Submit button label is Submit`() {
         setContent {
-            SignInConfirmTotpCode(state = mockSignInConfirmTotpCodeState())
+            SignInContinueWithTotpSetup(state = mockSignInContinueWithTotpSetupState())
         }
-        signInConfirmTotpCode {
+        signInContinueWithTotpSetup {
             hasSubmitButton("Submit")
         }
     }
@@ -54,9 +55,9 @@ class SignInConfirmTotpCodeTest : AuthenticatorUiTest() {
         val onSubmit = mockk<(String) -> Unit>(relaxed = true)
 
         setContent {
-            SignInConfirmTotpCode(state = mockSignInConfirmTotpCodeState(onSubmit = onSubmit))
+            SignInContinueWithTotpSetup(state = mockSignInContinueWithTotpSetupState(onSubmit = onSubmit))
         }
-        signInConfirmTotpCode {
+        signInContinueWithTotpSetup {
             setConfirmationCode("123123")
             clickSubmitButton()
         }
@@ -70,9 +71,9 @@ class SignInConfirmTotpCodeTest : AuthenticatorUiTest() {
     fun `moves back to sign in`() {
         val onMoveTo = mockk<(AuthenticatorInitialStep) -> Unit>(relaxed = true)
         setContent {
-            SignInConfirmTotpCode(state = mockSignInConfirmTotpCodeState(onMoveTo = onMoveTo))
+            SignInContinueWithTotpSetup(state = mockSignInContinueWithTotpSetupState(onMoveTo = onMoveTo))
         }
-        signInConfirmTotpCode {
+        signInContinueWithTotpSetup {
             clickBackToSignInButton()
         }
         verify {
@@ -81,23 +82,28 @@ class SignInConfirmTotpCodeTest : AuthenticatorUiTest() {
     }
 
     @Test
-    @ScreenshotTest
-    fun `default state`() {
+    fun `copies shared secret to clipboard`() {
         setContent {
-            SignInConfirmTotpCode(state = mockSignInConfirmTotpCodeState())
+            SignInContinueWithTotpSetup(state = mockSignInContinueWithTotpSetupState(sharedSecret = "secret!"))
         }
+        signInContinueWithTotpSetup {
+            clickCopyKeyButton()
+        }
+
+        getClipboardContent() shouldBe "secret!"
     }
 
     @Test
     @ScreenshotTest
-    fun `invalid code`() {
-        val state = mockSignInConfirmTotpCodeState()
+    fun `default state`() {
         setContent {
-            SignInConfirmTotpCode(state = state)
+            SignInContinueWithTotpSetup(state = mockSignInContinueWithTotpSetupState())
         }
-        signInConfirmTotpCode {
-            setConfirmationCode("123456")
-        }
-        state.form.setFieldError(FieldKey.ConfirmationCode, FieldError.ConfirmationCodeIncorrect)
+    }
+
+    private fun getClipboardContent(): String? {
+        val clipboardManager =
+            RuntimeEnvironment.getApplication().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
     }
 }

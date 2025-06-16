@@ -26,4 +26,6 @@ dependencies {
 
     api(libs.bundles.test)
     implementation(libs.bundles.compose)
+
+    implementation(libs.test.roborazzi)
 }

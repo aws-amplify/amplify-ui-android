@@ -16,11 +16,14 @@
 package com.amplifyframework.ui.authenticator.ui.robots
 
 import androidx.compose.ui.test.junit4.ComposeTestRule
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.testing.ComposeTest
 
 fun ComposeTest.passwordReset(func: PasswordResetRobot.() -> Unit) = PasswordResetRobot(composeTestRule).func()
 
 class PasswordResetRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule) {
+    fun hasSubmitButton(expected: String) = assertExists(TestTags.PasswordResetButton, expected)
 
-    fun hasSubmitButton(expected: String) = assertExists("PasswordResetButton", expected)
+    fun setUsername(value: String) = setFieldContent(FieldKey.Username, value)
 }

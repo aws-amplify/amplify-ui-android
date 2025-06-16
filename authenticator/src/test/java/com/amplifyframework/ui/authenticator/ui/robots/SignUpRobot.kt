@@ -16,10 +16,18 @@
 package com.amplifyframework.ui.authenticator.ui.robots
 
 import androidx.compose.ui.test.junit4.ComposeTestRule
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.testing.ComposeTest
 
 fun ComposeTest.signUp(func: SignUpRobot.() -> Unit) = SignUpRobot(composeTestRule).func()
 
 class SignUpRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule) {
-    fun hasSubmitButton(expected: String) = assertExists("SignUpButton", expected)
+    fun hasSubmitButton(expected: String) = assertExists(TestTags.SignUpButton, expected)
+
+    fun setUsername(value: String) = setFieldContent(FieldKey.Username, value)
+    fun setPassword(value: String) = setFieldContent(FieldKey.Password, value)
+    fun setConfirmPassword(value: String) = setFieldContent(FieldKey.ConfirmPassword, value)
+    fun setEmail(value: String) = setFieldContent(FieldKey.Email, value)
+    fun clickShowPassword(fieldKey: FieldKey) = clickOnShowIcon(fieldKey)
 }

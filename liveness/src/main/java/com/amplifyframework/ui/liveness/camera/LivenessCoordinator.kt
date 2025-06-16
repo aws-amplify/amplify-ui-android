@@ -269,7 +269,6 @@ internal class LivenessCoordinator(
         val webSocketCloseCode = when (faceLivenessException) {
             is FaceLivenessDetectionException.UserCancelledException -> WebSocketCloseCode.CANCELED
             is FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException -> WebSocketCloseCode.TIMEOUT
-            is FaceLivenessDetectionException.LostFocusException -> WebSocketCloseCode.LOST_FOCUS
             else -> WebSocketCloseCode.RUNTIME_ERROR
         }
         livenessState.onError(stopLivenessSession, webSocketCloseCode)

@@ -60,7 +60,7 @@ internal data class LivenessState(
     var initialLocalFaceFound by mutableStateOf(false)
 
     var showingStartView by mutableStateOf(!disableStartView)
-    var loadingCameraPreview by  mutableStateOf(false)
+    var loadingCameraPreview by mutableStateOf(false)
 
     private var initialStreamFace: InitialStreamFace? = null
     @VisibleForTesting

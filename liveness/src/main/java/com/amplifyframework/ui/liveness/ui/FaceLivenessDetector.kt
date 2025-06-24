@@ -73,6 +73,32 @@ import kotlinx.coroutines.launch
  * @param region AWS region to stream the video to. Current supported regions are listed in [add link here]
  * @param credentialsProvider to provide custom CredentialsProvider for authentication. Default uses initialized Amplify.Auth CredentialsProvider
  * @param disableStartView to bypass warmup screen.
+ * @param onComplete callback notifying a completed challenge
+ * @param onError callback containing exception for cause
+ */
+@Composable
+fun FaceLivenessDetector(
+    sessionId: String,
+    region: String,
+    credentialsProvider: AWSCredentialsProvider<AWSCredentials>? = null,
+    disableStartView: Boolean = false,
+    onComplete: Action,
+    onError: Consumer<FaceLivenessDetectionException>
+) = FaceLivenessDetector(
+    sessionId,
+    region,
+    credentialsProvider,
+    disableStartView,
+    onComplete,
+    onError,
+    ChallengeOptions()
+)
+
+/**
+ * @param sessionId of challenge
+ * @param region AWS region to stream the video to. Current supported regions are listed in [add link here]
+ * @param credentialsProvider to provide custom CredentialsProvider for authentication. Default uses initialized Amplify.Auth CredentialsProvider
+ * @param disableStartView to bypass warmup screen.
  * @param challengeOptions is the list of ChallengeOptions that are to be overridden from the default configuration
  * @param onComplete callback notifying a completed challenge
  * @param onError callback containing exception for cause
@@ -83,9 +109,9 @@ fun FaceLivenessDetector(
     region: String,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>? = null,
     disableStartView: Boolean = false,
-    challengeOptions: ChallengeOptions = ChallengeOptions(),
     onComplete: Action,
-    onError: Consumer<FaceLivenessDetectionException>
+    onError: Consumer<FaceLivenessDetectionException>,
+    challengeOptions: ChallengeOptions = ChallengeOptions(),
 ) {
     val scope = rememberCoroutineScope()
     val key = Triple(sessionId, region, credentialsProvider)
@@ -421,7 +447,7 @@ data class ChallengeOptions(
     val faceMovementAndLight: LivenessChallenge.FaceMovementAndLight = LivenessChallenge.FaceMovementAndLight,
     val faceMovement: LivenessChallenge.FaceMovement = LivenessChallenge.FaceMovement()
 ) {
-    fun getOptions(challengeType: FaceLivenessChallengeType): LivenessChallenge =
+    internal fun getLivenessChallenge(challengeType: FaceLivenessChallengeType): LivenessChallenge =
         when (challengeType) {
             FaceLivenessChallengeType.FaceMovementAndLightChallenge -> faceMovementAndLight
             FaceLivenessChallengeType.FaceMovementChallenge -> faceMovement
@@ -430,7 +456,7 @@ data class ChallengeOptions(
     /**
      * @return true if all of the challenge options are configured to use the same camera configuration
      */
-    fun hasOneCameraConfigured(): Boolean =
+    internal fun hasOneCameraConfigured(): Boolean =
         listOf(
             faceMovementAndLight,
             faceMovement
@@ -438,17 +464,17 @@ data class ChallengeOptions(
 }
 
 sealed class LivenessChallenge(
-    val camera: Camera = Camera.Front
+    open val camera: Camera = Camera.Front
 ) {
-    class FaceMovement(camera: Camera = Camera.Front) : LivenessChallenge(
+    data class FaceMovement(override val camera: Camera = Camera.Front) : LivenessChallenge(
         camera = camera
     )
-    object FaceMovementAndLight : LivenessChallenge()
+    data object FaceMovementAndLight : LivenessChallenge()
 }
 
 sealed class Camera {
-    object Front : Camera()
-    object Back : Camera()
+    data object Front : Camera()
+    data object Back : Camera()
 }
 
 private fun FaceLivenessSession?.isFaceMovementAndLightChallenge(): Boolean =

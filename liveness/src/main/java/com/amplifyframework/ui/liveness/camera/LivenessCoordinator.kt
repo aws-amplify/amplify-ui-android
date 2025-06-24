@@ -188,7 +188,6 @@ internal class LivenessCoordinator(
                         )
                         processSessionError(faceLivenessException, true)
                     }
-                    livenessState.loadingCameraPreview = false
                 }
             }
         }
@@ -222,7 +221,7 @@ internal class LivenessCoordinator(
             {
                 livenessState.onLivenessSessionReady(it)
                 if (!challengeOptions.hasOneCameraConfigured()) {
-                    val foundChallenge = challengeOptions.getOptions(it.challengeType)
+                    val foundChallenge = challengeOptions.getLivenessChallenge(it.challengeType)
                     launchCamera(foundChallenge.camera)
                 }
             },

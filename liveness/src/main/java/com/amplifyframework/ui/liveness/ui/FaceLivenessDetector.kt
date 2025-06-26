@@ -114,7 +114,7 @@ fun FaceLivenessDetector(
     challengeOptions: ChallengeOptions = ChallengeOptions(),
 ) {
     val scope = rememberCoroutineScope()
-    val key = DetectorStateKey(sessionId, region, credentialsProvider, challengeOptions)
+    val key = DetectorStateKey(sessionId, region, credentialsProvider)
     var isFinished by remember(key) { mutableStateOf(false) }
     val currentOnComplete by rememberUpdatedState(onComplete)
     val currentOnError by rememberUpdatedState(onError)
@@ -446,8 +446,7 @@ internal fun ChallengeView(
 internal data class DetectorStateKey(
     val sessionId: String,
     val region: String,
-    val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
-    val challengeOptions: ChallengeOptions
+    val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?
 )
 
 data class ChallengeOptions(

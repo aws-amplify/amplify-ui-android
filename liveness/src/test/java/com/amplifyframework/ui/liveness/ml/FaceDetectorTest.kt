@@ -37,8 +37,7 @@ internal class FaceDetectorTest {
     private val mouth = Landmark(0.5062596f, 0.68926525f)
     private val leftEar = Landmark(0.78989476f, 0.5973732f)
     private val rightEar = Landmark(0.16585289f, 0.5668279f)
-    private val width = 0.65490234f
-    private val height = 0.49117205f
+    private val heightWidthRatio = 1.618f
 
     @Before
     fun setup() {
@@ -68,7 +67,8 @@ internal class FaceDetectorTest {
             nose,
             mouth,
             leftEar,
-            rightEar
+            rightEar,
+            heightWidthRatio
         )
 
         // then

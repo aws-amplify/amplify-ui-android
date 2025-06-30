@@ -30,6 +30,7 @@ import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Assert.assertEquals
@@ -74,6 +75,20 @@ internal class LivenessStateTest {
             onFinalEventsSent
         )
 
+        val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
+        val challenges = listOf<FaceLivenessSessionChallenge>(
+            faceTargetChallenge
+        )
+        val faceLivenessSession = FaceLivenessSession(
+            challengeId = "12345",
+            challengeType = FaceLivenessChallengeType.FaceMovementAndLightChallenge,
+            challenges = challenges,
+            onVideoEvent = { },
+            onChallengeResponseEvent = { },
+            stopLivenessSession = { }
+        )
+        stateWithStartView.onLivenessSessionReady(faceLivenessSession)
+
         // then
         assertFalse(stateWithStartView.onFrameAvailable())
         stateWithStartView.onFrameFaceUpdate(
@@ -109,6 +124,20 @@ internal class LivenessStateTest {
             onSessionError,
             onFinalEventsSent
         )
+
+        val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
+        val challenges = listOf<FaceLivenessSessionChallenge>(
+            faceTargetChallenge
+        )
+        val faceLivenessSession = FaceLivenessSession(
+            challengeId = "12345",
+            challengeType = FaceLivenessChallengeType.FaceMovementAndLightChallenge,
+            challenges = challenges,
+            onVideoEvent = { },
+            onChallengeResponseEvent = { },
+            stopLivenessSession = { }
+        )
+        stateWithoutStartView.onLivenessSessionReady(faceLivenessSession)
 
         // then
         assertTrue(stateWithoutStartView.onFrameAvailable())
@@ -344,6 +373,20 @@ internal class LivenessStateTest {
 
     @Test
     fun `state is initial if face distance check fails before running`() {
+        val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
+        val challenges = listOf<FaceLivenessSessionChallenge>(
+            faceTargetChallenge
+        )
+        val faceLivenessSession = FaceLivenessSession(
+            challengeId = "12345",
+            challengeType = FaceLivenessChallengeType.FaceMovementAndLightChallenge,
+            challenges = challenges,
+            onVideoEvent = { },
+            onChallengeResponseEvent = { },
+            stopLivenessSession = { }
+        )
+        livenessState.onLivenessSessionReady(faceLivenessSession)
+
         val faceRect = RectF(20f, 20f, 100f, 100f)
         val leftEye = FaceDetector.Landmark(25f, 40f)
         val rightEye = FaceDetector.Landmark(75f, 40f)
@@ -354,6 +397,23 @@ internal class LivenessStateTest {
 
     @Test
     fun `face distance check passes when face is far enough away before running`() {
+        val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
+        val challenges = listOf<FaceLivenessSessionChallenge>(
+            faceTargetChallenge
+        )
+        
+        every { faceTargetChallenge.faceTargetMatching.faceDistanceThresholdMin } returns 1f
+
+        val faceLivenessSession = FaceLivenessSession(
+            challengeId = "12345",
+            challengeType = FaceLivenessChallengeType.FaceMovementAndLightChallenge,
+            challenges = challenges,
+            onVideoEvent = { },
+            onChallengeResponseEvent = { },
+            stopLivenessSession = { }
+        )
+        livenessState.onLivenessSessionReady(faceLivenessSession)
+
         val faceRect = RectF(20f, 20f, 100f, 100f)
         val leftEye = FaceDetector.Landmark(25f, 40f)
         val rightEye = FaceDetector.Landmark(75f, 40f)

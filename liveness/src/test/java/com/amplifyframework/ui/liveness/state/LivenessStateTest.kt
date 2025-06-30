@@ -401,7 +401,7 @@ internal class LivenessStateTest {
         val challenges = listOf<FaceLivenessSessionChallenge>(
             faceTargetChallenge
         )
-        
+
         every { faceTargetChallenge.faceTargetMatching.faceDistanceThresholdMin } returns 1f
 
         val faceLivenessSession = FaceLivenessSession(

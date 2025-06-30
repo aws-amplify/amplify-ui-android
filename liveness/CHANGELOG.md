@@ -1,30 +1,9 @@
 ## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.5.0)
 
 ### Features
-- **liveness:** Liveness connected component
-- **liveness:** Remove countdown ([#56](https://github.com/aws-amplify/amplify-ui-android/issues/56))
-- **liveness:** Update Liveness UI ([#100](https://github.com/aws-amplify/amplify-ui-android/issues/100))
 - **liveness:** Add support for a no light liveness challenge ([#248](https://github.com/aws-amplify/amplify-ui-android/issues/248))
 
 ### Bug Fixes
-- **liveness:** update liveness dependency in sample app ([#15](https://github.com/aws-amplify/amplify-ui-android/issues/15))
-- **liveness:** center camera preview ([#50](https://github.com/aws-amplify/amplify-ui-android/issues/50))
-- **liveness:** check for empty session ID ([#53](https://github.com/aws-amplify/amplify-ui-android/issues/53))
-- **liveness:** Added Rekognition backend for Android app and updated README ([#59](https://github.com/aws-amplify/amplify-ui-android/issues/59))
-- **liveness:** Screen rotation saves/loads correctly; lifecycle not destroyed at time of use ([#65](https://github.com/aws-amplify/amplify-ui-android/issues/65))
-- **liveness:** Use server facematch timeout ([#74](https://github.com/aws-amplify/amplify-ui-android/issues/74))
-- **liveness:** Add version to liveness websocket user agent ([#73](https://github.com/aws-amplify/amplify-ui-android/issues/73))
-- **liveness:** use updated Liveness oval algorithm ([#95](https://github.com/aws-amplify/amplify-ui-android/issues/95))
-- **liveness:** Minor UI Fixes ([#103](https://github.com/aws-amplify/amplify-ui-android/issues/103))
-- **liveness:** ui updates ([#104](https://github.com/aws-amplify/amplify-ui-android/issues/104))
-- **liveness:** fix typo in state messages ([#123](https://github.com/aws-amplify/amplify-ui-android/issues/123))
-- **liveness:** Multiple Liveness Bug Fixes ([#124](https://github.com/aws-amplify/amplify-ui-android/issues/124))
-- **liveness:** Update Amplify to 2.14.12 to fix InvalidSignatureException ([#126](https://github.com/aws-amplify/amplify-ui-android/issues/126))
-- **liveness:** Remove End Timeout ([#129](https://github.com/aws-amplify/amplify-ui-android/issues/129))
-- **liveness:** Catch unhandled exceptions in coordinator ([#141](https://github.com/aws-amplify/amplify-ui-android/issues/141))
-- **liveness:** Detect failed camera opening ([#205](https://github.com/aws-amplify/amplify-ui-android/issues/205))
-- **liveness:** Prevent the "Create Liveness Session" button from flashing on screen transition ([#193](https://github.com/aws-amplify/amplify-ui-android/issues/193))
-- **all:** Upgrade Compose to latest BOM ([#222](https://github.com/aws-amplify/amplify-ui-android/issues/222))
 - **liveness:** Update CameraX library to latest ([#230](https://github.com/aws-amplify/amplify-ui-android/issues/230))
 - **liveness:** Prevent crashing if there's an exception thrown by the SurfaceTexture ([#231](https://github.com/aws-amplify/amplify-ui-android/issues/231))
 

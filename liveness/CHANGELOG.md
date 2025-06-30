@@ -1,3 +1,14 @@
+## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.5.0)
+
+### Features
+- **liveness:** Add support for a no light liveness challenge ([#248](https://github.com/aws-amplify/amplify-ui-android/issues/248))
+
+### Bug Fixes
+- **liveness:** Update CameraX library to latest ([#230](https://github.com/aws-amplify/amplify-ui-android/issues/230))
+- **liveness:** Prevent crashing if there's an exception thrown by the SurfaceTexture ([#231](https://github.com/aws-amplify/amplify-ui-android/issues/231))
+
+[See all changes between 1.4.2 and 1.5.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.2...release_liveness_v1.5.0)
+
 ## [Release 1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.2)
 
 ### Miscellaneous

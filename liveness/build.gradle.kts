@@ -38,9 +38,14 @@ android {
     androidResources {
         noCompress += "tflite"
     }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
+    implementation(platform(libs.androidx.compose.bom))
 
     api(libs.amplify.api)
     api(libs.amplify.predictions)
@@ -55,6 +60,8 @@ dependencies {
 
     implementation(libs.tensorflow)
     implementation(libs.tensorflow.support)
+
+    coreLibraryDesugaring(libs.android.desugar)
 
     testImplementation(projects.testing)
 }

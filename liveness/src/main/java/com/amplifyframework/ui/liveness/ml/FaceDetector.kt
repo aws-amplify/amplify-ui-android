@@ -42,10 +42,12 @@ class FaceDetector(private val livenessState: LivenessState) {
         outputScores: Array<Array<FloatArray>>
     ): List<Detection> {
         val detections = mutableListOf<Detection>()
+        val faceTargetChallenge = livenessState.faceTargetChallenge ?: return emptyList()
         for (i in 0 until NUM_BOXES) {
             var score = outputScores[0][i][0]
             score = computeSigmoid(score)
-            if (score < MIN_SCORE_THRESHOLD) {
+
+            if (score < faceTargetChallenge.faceTargetMatching.faceDetectionThreshold) {
                 continue
             }
 
@@ -159,6 +161,7 @@ class FaceDetector(private val livenessState: LivenessState) {
                     scaledMouth,
                     scaledLeftEar,
                     scaledRightEar,
+                    faceTargetChallenge.faceTargetMatching.targetHeightWidthRatio
                 )
             renormalizedDetections.add(
                 Detection(
@@ -183,13 +186,14 @@ class FaceDetector(private val livenessState: LivenessState) {
         nose: Landmark,
         mouth: Landmark,
         leftEar: Landmark,
-        rightEar: Landmark
+        rightEar: Landmark,
+        heightWidthRatio: Float
     ): RectF {
         val pupilDistance = calculatePupilDistance(leftEye, rightEye)
         val faceHeight = calculateFaceHeight(leftEye, rightEye, mouth)
 
         val ow = (ALPHA * pupilDistance + GAMMA * faceHeight) / 2
-        val oh = GOLDEN_RATIO * ow
+        val oh = heightWidthRatio * ow
 
         val eyeCenterX = (leftEye.x + rightEye.x) / 2
         val eyeCenterY = (leftEye.y + rightEye.y) / 2
@@ -450,7 +454,6 @@ class FaceDetector(private val livenessState: LivenessState) {
 
     companion object {
         private const val MIN_SUPPRESSION_THRESHOLD = 0.3f
-        private const val MIN_SCORE_THRESHOLD = 0.7f
         private val strides = listOf(8, 16, 16, 16)
         private const val ASPECT_RATIOS_SIZE = 1
         private const val MIN_SCALE = 0.1484375f
@@ -459,7 +462,6 @@ class FaceDetector(private val livenessState: LivenessState) {
         private const val ANCHOR_OFFSET_Y = 0.5f
         private const val INPUT_SIZE_HEIGHT = 128
         private const val INPUT_SIZE_WIDTH = 128
-        private const val GOLDEN_RATIO = 1.618f
         private const val ALPHA = 2.0f
         private const val GAMMA = 1.8f
         const val X_SCALE = 128f
@@ -479,7 +481,6 @@ class FaceDetector(private val livenessState: LivenessState) {
          * 14, 15 - right eye tragion
          */
         const val NUM_COORDS = 16
-        const val INITIAL_FACE_DISTANCE_THRESHOLD = 0.32f
 
         fun loadModel(context: Context): Interpreter {
             val modelFileDescriptor =

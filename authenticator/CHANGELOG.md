@@ -1,3 +1,45 @@
+## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.5.0)
+
+### Features
+- **authenticator:** Handle SignedIn events from outside of Authenticator ([#236](https://github.com/aws-amplify/amplify-ui-android/issues/236))
+
+[See all changes between 1.4.3 and 1.5.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.3...release_authenticator_v1.5.0)
+
+## [Release 1.4.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.3)
+
+### Bug Fixes
+- **all:** Upgrade Compose to latest BOM ([#222](https://github.com/aws-amplify/amplify-ui-android/issues/222))
+
+[See all changes between 1.4.2 and 1.4.3](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.2...release_authenticator_v1.4.3)
+
+## [Release 1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.2)
+
+### Bug Fixes
+- **authenticator:** Add support for auto-sign-in ([#216](https://github.com/aws-amplify/amplify-ui-android/issues/216))
+
+[See all changes between 1.4.1 and 1.4.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.1...release_authenticator_v1.4.2)
+
+## [Release 1.4.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.1)
+
+### Bug Fixes
+- **authenticator:** Upgrade Amplify dependency to 2.27.0 ([#213](https://github.com/aws-amplify/amplify-ui-android/issues/213))
+
+[See all changes between 1.4.0 and 1.4.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.4.0...release_authenticator_v1.4.1)
+
+## [Release 1.4.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.4.0)
+
+### Features
+- **authenticator:** Add support for Email MFA ([#199](https://github.com/aws-amplify/amplify-ui-android/issues/199))
+
+[See all changes between 1.3.0 and 1.4.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.3.0...release_authenticator_v1.4.0)
+
+## [Release 1.3.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.3.0)
+
+### Features
+- **authenticator:** Add default error string for LimitExceededException ([#182](https://github.com/aws-amplify/amplify-ui-android/issues/182))
+
+[See all changes between 1.2.3 and 1.3.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.2.3...release_authenticator_v1.3.0)
+
 ## [Release 1.2.3](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.2.3)
 
 ### Bug Fixes

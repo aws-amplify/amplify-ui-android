@@ -117,6 +117,7 @@ class PublishingConventionPlugin : Plugin<Project> {
 
             repositories {
                 maven {
+                    name = "ossrh-staging-api"
                     url = if (isReleaseBuild) releaseRepositoryUrl else snapshotRepositoryUrl
                     credentials {
                         username = System.getenv("GITHUB_ACTOR")

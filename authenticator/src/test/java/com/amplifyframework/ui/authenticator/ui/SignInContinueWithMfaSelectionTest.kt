@@ -4,32 +4,33 @@ import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.cognito.challengeResponse
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSelectionStateImpl
+import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
+import com.amplifyframework.ui.authenticator.testUtil.mockSignInContinueWithMfaSelectionState
 import com.amplifyframework.ui.authenticator.ui.robots.signInContinueWithMfaSelection
-import com.amplifyframework.ui.testing.ComposeTest
+import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
 
-class SignInContinueWithMfaSelectionTest : ComposeTest() {
+class SignInContinueWithMfaSelectionTest : AuthenticatorUiTest() {
 
     @Test
-    fun `title is Select your preferred Two-Factor Auth method`() {
+    fun `title is Choose your two-factor authentication method`() {
         setContent {
             SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
         }
         signInContinueWithMfaSelection {
-            hasTitle("Select your preferred Two-Factor Auth method")
+            hasTitle("Choose your two-factor authentication method")
         }
     }
 
     @Test
-    fun `Submit button label is Submit`() {
+    fun `Continue button label is Continue`() {
         setContent {
             SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
         }
         signInContinueWithMfaSelection {
-            hasSubmitButton("Submit")
+            hasSubmitButton("Continue")
         }
     }
 
@@ -77,6 +78,22 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
     }
 
     @Test
+    fun `Submits Email MFA type`() {
+        val onSubmit = mockk<(String) -> Unit>(relaxed = true)
+        setContent {
+            SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState(onSubmit = onSubmit))
+        }
+        signInContinueWithMfaSelection {
+            selectMfaType(MFAType.EMAIL)
+            hasMfaTypeSelected(MFAType.EMAIL)
+            clickSubmitButton()
+        }
+        verify {
+            onSubmit(MFAType.EMAIL.challengeResponse)
+        }
+    }
+
+    @Test
     fun `moves back to sign in`() {
         val onMoveTo = mockk<(AuthenticatorInitialStep) -> Unit>(relaxed = true)
         setContent {
@@ -90,13 +107,11 @@ class SignInContinueWithMfaSelectionTest : ComposeTest() {
         }
     }
 
-    private fun mockSignInContinueWithMfaSelectionState(
-        allowedMfaTypes: Set<MFAType> = MFAType.values().toSet(),
-        onSubmit: (String) -> Unit = {},
-        onMoveTo: (AuthenticatorInitialStep) -> Unit = {}
-    ) = SignInContinueWithMfaSelectionStateImpl(
-        allowedMfaTypes = allowedMfaTypes,
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    @Test
+    @ScreenshotTest
+    fun `default state`() {
+        setContent {
+            SignInContinueWithMfaSelection(mockSignInContinueWithMfaSelectionState())
+        }
+    }
 }

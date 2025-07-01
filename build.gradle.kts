@@ -16,10 +16,20 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.licensee) apply false
+    alias(libs.plugins.roborazzi) apply false
 }
 
 tasks.register<Delete>("clean").configure {
     delete(rootProject.buildDir)
+}
+
+kover {
+    currentProject {
+        createVariant("coverage") {
+            // Use a custom variant called "coverage" to generate the merged report. This variant only runs the tests
+            // for the release variant.
+        }
+    }
 }
 
 dependencies {

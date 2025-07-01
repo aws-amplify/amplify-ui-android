@@ -16,16 +16,21 @@
 package com.amplifyframework.ui.authenticator
 
 import android.app.Application
+import androidx.lifecycle.viewmodel.compose.viewModel
 import aws.smithy.kotlin.runtime.http.HttpException
+import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthUserAttributeKey.email
 import com.amplifyframework.auth.AuthUserAttributeKey.emailVerified
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.cognito.exceptions.service.LimitExceededException
 import com.amplifyframework.auth.exceptions.SessionExpiredException
 import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.step.AuthNextResetPasswordStep
 import com.amplifyframework.auth.result.step.AuthResetPasswordStep
 import com.amplifyframework.auth.result.step.AuthSignInStep
+import com.amplifyframework.auth.result.step.AuthSignUpStep
+import com.amplifyframework.hub.HubEvent
 import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
@@ -33,6 +38,7 @@ import com.amplifyframework.ui.authenticator.util.AmplifyResult.Error
 import com.amplifyframework.ui.authenticator.util.AmplifyResult.Success
 import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
 import com.amplifyframework.ui.authenticator.util.AuthProvider
+import com.amplifyframework.ui.authenticator.util.LimitExceededMessage
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
 import com.amplifyframework.ui.testing.CoroutineTestRule
 import io.kotest.matchers.shouldBe
@@ -42,7 +48,11 @@ import io.mockk.every
 import io.mockk.mockk
 import java.net.UnknownHostException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -62,10 +72,13 @@ class AuthenticatorViewModelTest {
 
     private val viewModel = AuthenticatorViewModel(application, authProvider)
 
+    private val hubFlow = MutableSharedFlow<HubEvent<*>>(replay = 0)
+
     @Before
     fun setup() {
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration()
         coEvery { authProvider.getCurrentUser() } returns Success(mockUser())
+        coEvery { authProvider.authStatusEvents() } returns hubFlow
     }
 
 //region start tests
@@ -131,7 +144,7 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
-    fun `getCurrentUser error with session expired exception during start results in SignIn state`() = runTest {
+    fun `getCurrentUser error with session expired exception during start results in being signed out`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
         coEvery { authProvider.getCurrentUser() } returns AmplifyResult.Error(SessionExpiredException())
 
@@ -141,8 +154,8 @@ class AuthenticatorViewModelTest {
         coVerify(exactly = 1) {
             authProvider.fetchAuthSession()
             authProvider.getCurrentUser()
+            authProvider.signOut()
         }
-        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
     @Test
@@ -216,6 +229,73 @@ class AuthenticatorViewModelTest {
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmTotpCode
+    }
+
+    @Test
+    fun `SMS MFA Code next step shows the SignInConfirmMfa screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE)
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmMfa
+    }
+
+    @Test
+    fun `Custom Challenge next step shows the SignInConfirmCustomAuth screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_CUSTOM_CHALLENGE)
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmCustomAuth
+    }
+
+    @Test
+    fun `New Password next step shows the SignInConfirmNewPassword screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_NEW_PASSWORD)
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmNewPassword
+    }
+
+    @Test
+    fun `Confirm SignUp next step, get error from resendSignUpCode, stays in SignIn screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_UP)
+        )
+        coEvery { authProvider.resendSignUpCode(any()) } returns AmplifyResult.Error(mockAuthException())
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+    }
+
+    @Test
+    fun `Confirm SignUp next step shows the SignUpConfirm screen`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(
+            mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_UP)
+        )
+        coEvery { authProvider.resendSignUpCode(any()) } returns Success(mockk())
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+
+        viewModel.signIn("username", "password")
+        viewModel.currentStep shouldBe AuthenticatorStep.SignUpConfirm
     }
 
     @Test
@@ -371,6 +451,76 @@ class AuthenticatorViewModelTest {
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
+    @Test
+    fun `moves to SignedInState when receiving SignedIn event`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        runCurrent()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+        hubFlow.emit(HubEvent.create(AuthChannelEventName.SIGNED_IN.name))
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+    }
+
+    @Test
+    fun `does not advance to signed in if sign in is in progress when SignedIn event is received`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } coAnswers {
+            delay(1000) // delay so that the sign in does not complete until the clock is advanced
+            Success(mockSignInResult())
+        }
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        runCurrent()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+
+        backgroundScope.launch { viewModel.signIn("username", "password") }
+
+        hubFlow.emit(HubEvent.create(AuthChannelEventName.SIGNED_IN.name))
+
+        // Since sign in is in progress we should not move to SignedIn until after it completes
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+        advanceUntilIdle() // advance the clock to complete sign in
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+    }
+
+    @Test
+    fun `does not advance to SignedIn when SignedIn event is received in a post-sign-in state`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
+            verificationMechanisms = setOf(VerificationMechanism.Email)
+        )
+        coEvery { authProvider.fetchUserAttributes() } returns Success(
+            mockUserAttributes(email() to "email", emailVerified() to "false")
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.signIn("username", "password")
+
+        viewModel.currentStep shouldBe AuthenticatorStep.VerifyUser
+        hubFlow.emit(HubEvent.create(AuthChannelEventName.SIGNED_IN.name))
+        viewModel.currentStep shouldBe AuthenticatorStep.VerifyUser // stay in current state
+    }
+
+//endregion
+//region sign up tests
+
+    @Test
+    fun `user can autoSignIn after sign up`() = runTest {
+        val result = mockSignUpResult(nextStep = mockNextSignUpStep(signUpStep = AuthSignUpStep.COMPLETE_AUTO_SIGN_IN))
+        coEvery { authProvider.signUp("username", "password", any()) } returns Success(result)
+        coEvery { authProvider.autoSignIn() } returns Success(mockSignInResult())
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.signUp("username", "password", emptyList())
+        advanceUntilIdle()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+    }
+
 //endregion
 //region password reset tests
 
@@ -489,6 +639,18 @@ class AuthenticatorViewModelTest {
         viewModel.resetPassword("username")
         viewModel.confirmResetPassword("username", "password", "code")
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+    }
+
+    @Test
+    fun `Password reset results in limit exceeded message`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.resetPassword(any()) } returns Error(LimitExceededException(null))
+
+        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+
+        viewModel.shouldEmitMessage<LimitExceededMessage> {
+            viewModel.resetPassword("username")
+        }
     }
 //endregion
 //region helpers

@@ -30,6 +30,7 @@ import com.amplifyframework.auth.cognito.exceptions.service.CodeMismatchExceptio
 import com.amplifyframework.auth.cognito.exceptions.service.CodeValidationException
 import com.amplifyframework.auth.cognito.exceptions.service.InvalidParameterException
 import com.amplifyframework.auth.cognito.exceptions.service.InvalidPasswordException
+import com.amplifyframework.auth.cognito.exceptions.service.LimitExceededException
 import com.amplifyframework.auth.cognito.exceptions.service.PasswordResetRequiredException
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotConfirmedException
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotFoundException
@@ -71,6 +72,7 @@ import com.amplifyframework.ui.authenticator.util.CodeSentMessage
 import com.amplifyframework.ui.authenticator.util.ExpiredCodeMessage
 import com.amplifyframework.ui.authenticator.util.InvalidConfigurationException
 import com.amplifyframework.ui.authenticator.util.InvalidLoginMessage
+import com.amplifyframework.ui.authenticator.util.LimitExceededMessage
 import com.amplifyframework.ui.authenticator.util.MissingConfigurationException
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
 import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
@@ -88,10 +90,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
 
-internal class AuthenticatorViewModel(
-    application: Application,
-    private val authProvider: AuthProvider
-) : AndroidViewModel(application) {
+internal class AuthenticatorViewModel(application: Application, private val authProvider: AuthProvider) :
+    AndroidViewModel(application) {
 
     // Constructor for compose viewModels provider
     constructor(application: Application) : this(application, RealAuthProvider())
@@ -117,6 +117,9 @@ internal class AuthenticatorViewModel(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val events = _events.asSharedFlow()
+
+    // Is there a current Amplify call in progress that could result in a signed in event?
+    private var expectingSignInEvent: Boolean = false
 
     fun start(configuration: AuthenticatorConfiguration) {
         if (::configuration.isInitialized) {
@@ -183,7 +186,8 @@ internal class AuthenticatorViewModel(
 
     //region SignUp
 
-    private suspend fun signUp(username: String, password: String, attributes: List<AuthUserAttribute>) {
+    @VisibleForTesting
+    suspend fun signUp(username: String, password: String, attributes: List<AuthUserAttribute>) {
         viewModelScope.launch {
             val options = AuthSignUpOptions.builder().userAttributes(attributes).build()
 
@@ -227,16 +231,44 @@ internal class AuthenticatorViewModel(
                 moveTo(newState)
             }
             AuthSignUpStep.DONE -> handleSignedUp(username, password)
+            AuthSignUpStep.COMPLETE_AUTO_SIGN_IN -> handleAutoSignIn(username, password)
+            else -> {
+                // Generic error for any other next steps that may be added in the future
+                val exception = AuthException(
+                    "Unsupported next step ${result.nextStep.signUpStep}.",
+                    "Authenticator does not support this Authentication flow, disable it to use Authenticator."
+                )
+                logger.error("Unsupported next step ${result.nextStep.signUpStep}", exception)
+                sendMessage(UnknownErrorMessage(exception))
+            }
+        }
+    }
+
+    private suspend fun handleAutoSignIn(username: String, password: String) {
+        startSignInJob {
+            when (val result = authProvider.autoSignIn()) {
+                is AmplifyResult.Error -> {
+                    // If auto sign in fails then proceed with manually trying to sign in the user. If this also fails the
+                    // user will end up back on the sign in screen.
+                    logger.warn("Unable to complete auto-signIn")
+                    handleSignedUp(username, password)
+                }
+
+                is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
+            }
         }
     }
 
     private suspend fun handleSignedUp(username: String, password: String) {
-        when (val result = authProvider.signIn(username, password)) {
-            is AmplifyResult.Error -> {
-                moveTo(AuthenticatorStep.SignIn)
-                handleSignInFailure(username, password, result.error)
+        startSignInJob {
+            when (val result = authProvider.signIn(username, password)) {
+                is AmplifyResult.Error -> {
+                    moveTo(AuthenticatorStep.SignIn)
+                    handleSignInFailure(username, password, result.error)
+                }
+
+                is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
             }
-            is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
         }
     }
 
@@ -245,31 +277,31 @@ internal class AuthenticatorViewModel(
 
     @VisibleForTesting
     suspend fun signIn(username: String, password: String) {
-        viewModelScope.launch {
+        startSignInJob {
             when (val result = authProvider.signIn(username, password)) {
                 is AmplifyResult.Error -> handleSignInFailure(username, password, result.error)
                 is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
             }
-        }.join()
+        }
     }
 
     private suspend fun confirmSignIn(username: String, password: String, challengeResponse: String) {
-        viewModelScope.launch {
+        startSignInJob {
             when (val result = authProvider.confirmSignIn(challengeResponse)) {
                 is AmplifyResult.Error -> handleSignInFailure(username, password, result.error)
                 is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
             }
-        }.join()
+        }
     }
 
     private suspend fun setNewSignInPassword(username: String, password: String) {
-        viewModelScope.launch {
+        startSignInJob {
             when (val result = authProvider.confirmSignIn(password)) {
                 // an error here is more similar to a sign up error
                 is AmplifyResult.Error -> handleSignUpFailure(result.error)
                 is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
             }
-        }.join()
+        }
     }
 
     private suspend fun handleSignInFailure(username: String, password: String, error: AuthException) {
@@ -326,11 +358,33 @@ internal class AuthenticatorViewModel(
         moveTo(newState)
     }
 
-    private suspend fun handleMfaSelectionRequired(
+    private suspend fun handleMfaSetupSelectionRequired(
         username: String,
         password: String,
         allowedMfaTypes: Set<MFAType>?
     ) {
+        if (allowedMfaTypes.isNullOrEmpty()) {
+            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
+            return
+        }
+
+        moveTo(
+            stateFactory.newSignInContinueWithMfaSetupSelectionState(
+                allowedMfaTypes = allowedMfaTypes,
+                onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
+            )
+        )
+    }
+
+    private suspend fun handleEmailMfaSetupRequired(username: String, password: String) {
+        moveTo(
+            stateFactory.newSignInContinueWithEmailSetupState(
+                onSubmit = { mfaType -> confirmSignIn(username, password, mfaType) }
+            )
+        )
+    }
+
+    private suspend fun handleMfaSelectionRequired(username: String, password: String, allowedMfaTypes: Set<MFAType>?) {
         if (allowedMfaTypes.isNullOrEmpty()) {
             handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
             return
@@ -347,7 +401,8 @@ internal class AuthenticatorViewModel(
     private suspend fun handleSignInSuccess(username: String, password: String, result: AuthSignInResult) {
         when (val nextStep = result.nextStep.signInStep) {
             AuthSignInStep.DONE -> checkVerificationMechanisms()
-            AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE -> moveTo(
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE,
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_OTP -> moveTo(
                 stateFactory.newSignInMfaState(
                     result.nextStep.codeDeliveryDetails
                 ) { confirmationCode -> confirmSignIn(username, password, confirmationCode) }
@@ -371,6 +426,10 @@ internal class AuthenticatorViewModel(
             AuthSignInStep.CONFIRM_SIGN_UP -> handleUnconfirmedSignIn(username, password)
             AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION ->
                 handleMfaSelectionRequired(username, password, result.nextStep.allowedMFATypes)
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SETUP_SELECTION ->
+                handleMfaSetupSelectionRequired(username, password, result.nextStep.allowedMFATypes)
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_EMAIL_MFA_SETUP ->
+                handleEmailMfaSetupRequired(username, password)
             AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP ->
                 handleTotpSetupRequired(username, password, result.nextStep.totpSetupDetails)
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE -> moveTo(
@@ -447,10 +506,7 @@ internal class AuthenticatorViewModel(
         }.join()
     }
 
-    private suspend fun handleResetPasswordSuccess(
-        username: String,
-        result: AuthResetPasswordResult
-    ) {
+    private suspend fun handleResetPasswordSuccess(username: String, result: AuthResetPasswordResult) {
         when (result.nextStep.resetPasswordStep) {
             AuthResetPasswordStep.DONE -> handlePasswordResetComplete()
             AuthResetPasswordStep.CONFIRM_RESET_PASSWORD_WITH_CODE -> {
@@ -473,9 +529,11 @@ internal class AuthenticatorViewModel(
         logger.debug("Password reset complete")
         sendMessage(PasswordResetMessage)
         if (username != null && password != null) {
-            when (val result = authProvider.signIn(username, password)) {
-                is AmplifyResult.Error -> moveTo(stateFactory.newSignInState(this::signIn))
-                is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
+            startSignInJob {
+                when (val result = authProvider.signIn(username, password)) {
+                    is AmplifyResult.Error -> moveTo(stateFactory.newSignInState(this::signIn))
+                    is AmplifyResult.Success -> handleSignInSuccess(username, password, result.data)
+                }
             }
         } else {
             moveTo(stateFactory.newSignInState(this::signIn))
@@ -560,6 +618,7 @@ internal class AuthenticatorViewModel(
             is CodeDeliveryFailureException -> sendMessage(CannotSendCodeMessage(error))
             is CodeExpiredException -> sendMessage(ExpiredCodeMessage(error))
             is CodeValidationException -> sendMessage(UnknownErrorMessage(error))
+            is LimitExceededException -> sendMessage(LimitExceededMessage(error))
             is UnknownException -> {
                 if (error.isConnectivityIssue()) {
                     sendMessage(NetworkErrorMessage(error))
@@ -579,7 +638,6 @@ internal class AuthenticatorViewModel(
                     logger.error(result.error.toString())
                     logger.error("Current signed in user session has expired, signing out.")
                     signOut()
-                    moveTo(AuthenticatorStep.SignIn)
                 } else {
                     handleGeneralFailure(result.error)
                 }
@@ -589,9 +647,27 @@ internal class AuthenticatorViewModel(
         }
     }
 
+    private suspend fun startSignInJob(body: suspend () -> Unit) {
+        expectingSignInEvent = true
+        viewModelScope.launch { body() }.join()
+        expectingSignInEvent = false
+    }
+
     // Amplify has told us the user signed in.
     private suspend fun handleSignedInEvent() {
-        // TODO : move the user to signedInState *if* we are not in the process of signing in or verifying the user
+        if (!expectingSignInEvent && !inPostSignInState()) {
+            handleSignedIn()
+        }
+    }
+
+    private fun inPostSignInState(): Boolean {
+        val step = currentState.step
+        return when (step) {
+            is AuthenticatorStep.VerifyUser,
+            is AuthenticatorStep.VerifyUserConfirm,
+            is AuthenticatorStep.SignedIn -> true
+            else -> false
+        }
     }
 
     private fun handleSignedOut() {

@@ -23,6 +23,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
@@ -57,10 +58,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 maxHeapSize = "4g"
             }
 
-            tasks.withType<KotlinCompile>().configureEach {
-                kotlinOptions {
-                    jvmTarget = JavaVersion.VERSION_11.toString()
-                }
+            configure<KotlinProjectExtension> {
+                jvmToolchain(17)
             }
         }
     }
@@ -105,11 +104,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 disable += listOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
             }
 
-            compileOptions {
-                sourceCompatibility = JavaVersion.VERSION_11
-                targetCompatibility = JavaVersion.VERSION_11
-            }
-
             // Needed when running integration tests. The oauth2 library uses relies on two
             // dependencies (Apache's httpcore and httpclient), both of which include
             // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
@@ -123,7 +117,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
 
             composeOptions {
-                kotlinCompilerExtensionVersion = "1.4.3"
+                kotlinCompilerExtensionVersion = "1.5.3"
             }
         }
     }

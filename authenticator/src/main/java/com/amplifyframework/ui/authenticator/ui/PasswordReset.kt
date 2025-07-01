@@ -53,7 +53,7 @@ fun PasswordReset(
             state = state.form
         )
         AuthenticatorButton(
-            modifier = Modifier.testTag("PasswordResetButton"),
+            modifier = Modifier.testTag(TestTags.PasswordResetButton),
             onClick = { scope.launch { state.submitPasswordReset() } },
             loading = !state.form.enabled
         )

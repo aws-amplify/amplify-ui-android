@@ -3,6 +3,7 @@ package com.amplifyframework.ui.authenticator.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,6 +19,8 @@ import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSelectionState
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import kotlinx.coroutines.launch
+
+private val MFA_SELECTION_ORDER = setOf(MFAType.TOTP, MFAType.SMS, MFAType.EMAIL)
 
 @Composable
 fun SignInContinueWithMfaSelection(
@@ -40,7 +43,11 @@ fun SignInContinueWithMfaSelection(
             .padding(horizontal = 16.dp)
     ) {
         headerContent(state)
-        val items = remember { state.allowedMfaTypes.map { it.challengeResponse } }
+        Text(
+            modifier = Modifier.padding(bottom = 16.dp),
+            text = stringResource(R.string.amplify_ui_authenticator_mfa_selection_description)
+        )
+        val items = remember { MFA_SELECTION_ORDER.intersect(state.allowedMfaTypes).map { it.challengeResponse } }
         RadioGroup(
             items = items,
             selected = fieldState.content,
@@ -48,6 +55,7 @@ fun SignInContinueWithMfaSelection(
             label = {
                 when (it) {
                     MFAType.SMS.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_sms)
+                    MFAType.EMAIL.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_email)
                     else -> context.getString(R.string.amplify_ui_authenticator_mfa_totp)
                 }
             },
@@ -56,7 +64,8 @@ fun SignInContinueWithMfaSelection(
         AuthenticatorButton(
             modifier = modifier.testTag(TestTags.SignInConfirmButton),
             onClick = { scope.launch { state.continueSignIn() } },
-            loading = !state.form.enabled
+            loading = !state.form.enabled,
+            label = stringResource(R.string.amplify_ui_authenticator_button_continue)
         )
         footerContent(state)
     }

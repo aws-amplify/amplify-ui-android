@@ -35,21 +35,27 @@ import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
 import com.amplifyframework.predictions.aws.exceptions.AccessDeniedException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionNotFoundException
 import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionTimeoutException
+import com.amplifyframework.predictions.aws.exceptions.FaceLivenessUnsupportedChallengeTypeException
 import com.amplifyframework.predictions.aws.models.ColorChallengeResponse
 import com.amplifyframework.predictions.aws.models.RgbColor
 import com.amplifyframework.predictions.aws.options.AWSFaceLivenessSessionOptions
+import com.amplifyframework.predictions.models.Challenge
 import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
+import com.amplifyframework.ui.liveness.state.AttemptCounter
 import com.amplifyframework.ui.liveness.state.LivenessState
+import com.amplifyframework.ui.liveness.ui.Camera
+import com.amplifyframework.ui.liveness.ui.ChallengeOptions
 import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 typealias OnMuxedSegment = (bytes: ByteArray, timestamp: Long) -> Unit
@@ -64,25 +70,26 @@ typealias OnFreshnessColorDisplayed = (
 @SuppressLint("UnsafeOptInUsageError")
 class LivenessCoordinator(
     val context: Context,
-    lifecycleOwner: LifecycleOwner,
+    private val lifecycleOwner: LifecycleOwner,
     private val sessionId: String,
     private val region: String,
     private val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
-    disableStartView: Boolean,
+    private val disableStartView: Boolean,
+    private val challengeOptions: ChallengeOptions,
     private val onChallengeComplete: OnChallengeComplete,
     val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
 
+    private val attemptCounter = AttemptCounter()
     private val analysisExecutor = Executors.newSingleThreadExecutor()
 
     val livenessState = LivenessState(
-        sessionId,
-        context,
-        disableStartView,
-        this::processCaptureReady,
-        this::startLivenessSession,
-        this::processSessionError,
-        this::processFinalEventsSent
+        sessionId = sessionId,
+        context = context,
+        disableStartView = disableStartView,
+        onCaptureReady = this::processCaptureReady,
+        onSessionError = this::processSessionError,
+        onFinalEventsSent = this::processFinalEventsSent
     )
 
     private val preview = Preview.Builder().apply {
@@ -137,21 +144,47 @@ class LivenessCoordinator(
     private var disconnectEventReceived = false
 
     init {
+        startLivenessSession()
+        if (challengeOptions.hasOneCameraConfigured()) {
+            launchCamera(challengeOptions.faceMovementAndLight.camera)
+        } else {
+            livenessState.loadingCameraPreview = true
+        }
+    }
+
+    private fun launchCamera(camera: Camera) {
+        MainScope().launch {
+            delay(5_000)
+            if (!previewTextureView.hasReceivedUpdate) {
+                val faceLivenessException = FaceLivenessDetectionException(
+                    "The camera failed to open within the allowed time limit.",
+                    "Ensure the camera is available to use and that no other apps are using it."
+                )
+                processSessionError(faceLivenessException, true)
+            }
+        }
         MainScope().launch {
             getCameraProvider(context).apply {
                 if (lifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
                     unbindAll()
-                    if (this.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA)) {
+
+                    val (chosenCamera, orientation) = when (camera) {
+                        Camera.Front -> Pair(CameraSelector.DEFAULT_FRONT_CAMERA, "front")
+                        Camera.Back -> Pair(CameraSelector.DEFAULT_BACK_CAMERA, "back")
+                    }
+
+                    if (this.hasCamera(chosenCamera)) {
                         bindToLifecycle(
                             lifecycleOwner,
-                            CameraSelector.DEFAULT_FRONT_CAMERA,
+                            chosenCamera,
                             preview,
                             analysis
                         )
                     } else {
+                        livenessState.loadingCameraPreview = false
                         val faceLivenessException = FaceLivenessDetectionException(
-                            "A front facing camera is required but no front facing camera detected.",
-                            "Enable a front facing camera."
+                            "A $orientation facing camera is required but no $orientation facing camera detected.",
+                            "Enable a $orientation facing camera."
                         )
                         processSessionError(faceLivenessException, true)
                     }
@@ -161,13 +194,19 @@ class LivenessCoordinator(
     }
 
     private fun startLivenessSession() {
-        livenessState.livenessCheckState.value = LivenessCheckState.Initial.withConnectingMessage()
+        livenessState.livenessCheckState = LivenessCheckState.Initial.withConnectingMessage()
+        attemptCounter.countAttempt()
 
         val faceLivenessSessionInformation = FaceLivenessSessionInformation(
-            TARGET_WIDTH.toFloat(),
-            TARGET_HEIGHT.toFloat(),
-            "FaceMovementAndLightChallenge_1.0.0",
-            region
+            videoWidth = TARGET_WIDTH.toFloat(),
+            videoHeight = TARGET_HEIGHT.toFloat(),
+            challengeVersions = listOf(
+                Challenge.FaceMovementAndLightChallenge("2.0.0"),
+                Challenge.FaceMovementChallenge("1.0.0")
+            ),
+            region = region,
+            preCheckViewEnabled = !disableStartView,
+            attemptCount = attemptCounter.getCount()
         )
 
         val faceLivenessSessionOptions = AWSFaceLivenessSessionOptions.builder().apply {
@@ -179,28 +218,33 @@ class LivenessCoordinator(
             faceLivenessSessionInformation,
             faceLivenessSessionOptions,
             BuildConfig.LIVENESS_VERSION_NAME,
-            { livenessState.onLivenessSessionReady(it) },
+            {
+                livenessState.onLivenessSessionReady(it)
+                if (!challengeOptions.hasOneCameraConfigured()) {
+                    val foundChallenge = challengeOptions.getLivenessChallenge(it.challengeType)
+                    launchCamera(foundChallenge.camera)
+                }
+            },
             {
                 disconnectEventReceived = true
                 onChallengeComplete()
             },
             { error ->
-                val faceLivenessException = when (error) {
+                val (faceLivenessException, shouldStopLivenessSession) = when (error) {
                     is AccessDeniedException ->
-                        FaceLivenessDetectionException.AccessDeniedException(throwable = error)
-
+                        FaceLivenessDetectionException.AccessDeniedException(throwable = error) to false
                     is FaceLivenessSessionNotFoundException ->
-                        FaceLivenessDetectionException.SessionNotFoundException(throwable = error)
-
+                        FaceLivenessDetectionException.SessionNotFoundException(throwable = error) to false
                     is FaceLivenessSessionTimeoutException ->
-                        FaceLivenessDetectionException.SessionTimedOutException(throwable = error)
-
+                        FaceLivenessDetectionException.SessionTimedOutException(throwable = error) to false
+                    is FaceLivenessUnsupportedChallengeTypeException ->
+                        FaceLivenessDetectionException.UnsupportedChallengeTypeException(throwable = error) to true
                     else -> FaceLivenessDetectionException(
                         error.message ?: "Unknown error.",
                         error.recoverySuggestion, error
-                    )
+                    ) to false
                 }
-                processSessionError(faceLivenessException, false)
+                processSessionError(faceLivenessException, shouldStopLivenessSession)
             }
         )
     }
@@ -248,8 +292,8 @@ class LivenessCoordinator(
         )
     }
 
-    fun processFreshnessChallengeComplete() {
-        livenessState.onFreshnessComplete()
+    fun processLivenessCheckComplete() {
+        livenessState.onLivenessChallengeComplete()
         stopEncoder { livenessState.onFullChallengeComplete() }
     }
 

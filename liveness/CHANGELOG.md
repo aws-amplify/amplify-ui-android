@@ -1,41 +1,51 @@
-## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.5.0)
-
-### Features
-- **liveness:** Add support for a no light liveness challenge ([#248](https://github.com/aws-amplify/amplify-ui-android/issues/248))
+## [Release 1.3.7](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.7)
 
 ### Bug Fixes
-- **liveness:** Update CameraX library to latest ([#230](https://github.com/aws-amplify/amplify-ui-android/issues/230))
-- **liveness:** Prevent crashing if there's an exception thrown by the SurfaceTexture ([#231](https://github.com/aws-amplify/amplify-ui-android/issues/231))
+- **liveness:** Make more classes public
 
-[See all changes between 1.4.2 and 1.5.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.2...release_liveness_v1.5.0)
+[See all changes between 1.3.6 and 1.3.7](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.6...release_liveness_v1.3.7)
 
-## [Release 1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.2)
-
-### Miscellaneous
-- **all:** Update Amplify dependency to 2.27.2 ([#226](https://github.com/aws-amplify/amplify-ui-android/issues/226))
-
-[See all changes between 1.4.1 and 1.4.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.1...release_liveness_v1.4.2)
-
-## [Release 1.4.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.1)
+## [Release 1.3.6](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.6)
 
 ### Bug Fixes
-- **all:** Upgrade Compose to latest BOM ([#222](https://github.com/aws-amplify/amplify-ui-android/issues/222))
+- **liveness:** Make more classes public
 
-[See all changes between 1.4.0 and 1.4.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.0...release_liveness_v1.4.1)
+[See all changes between 1.3.5 and 1.3.6](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.5...release_liveness_v1.3.6)
 
-## [Release 1.4.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.0)
+## [Release 1.3.5](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.5)
 
 ### Bug Fixes
-- **liveness:** Detect failed camera opening ([#205](https://github.com/aws-amplify/amplify-ui-android/issues/205))
-- **liveness:** Prevent the "Create Liveness Session" button from flashing on screen transition ([#193](https://github.com/aws-amplify/amplify-ui-android/issues/193))
+- **liveness:** Update packaging resources
 
-[See all changes between 1.3.0 and 1.4.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.3.0...release_liveness_v1.4.0)
+[See all changes between 1.3.4 and 1.3.5](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.4...release_liveness_v1.3.5)
 
-## [Release 1.3.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.3.0)
+## [Release 1.3.4](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.4)
 
+### Bug Fixes
+- **liveness:** Fix packaging resources
 
+[See all changes between 1.3.3 and 1.3.4](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.3...release_liveness_v1.3.4)
 
-[See all changes between 1.2.6 and 1.3.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.2.6...release_liveness_v1.3.0)
+## [Release 1.3.3](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.3)
+
+### Bug Fixes
+- **liveness:** Only publish liveness lib
+
+[See all changes between 1.3.2 and 1.3.3](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.2...release_liveness_v1.3.3)
+
+## [Release 1.3.2](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.2)
+
+### Bug Fixes
+- **liveness:** Fix public api declarations
+
+[See all changes between 1.3.1 and 1.3.2](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.1...release_liveness_v1.3.2)
+
+## [Release 1.3.1](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.3.1)
+
+### Bug Fixes
+- **liveness:** Make liveness classes public
+
+[See all changes between 1.3.0 and 1.3.1](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.0...release_liveness_v1.3.1)
 
 ## [Release 1.2.6](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.2.6)
 

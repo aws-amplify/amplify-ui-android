@@ -1,3 +1,24 @@
+## [Release 1.4.0](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.4.0)
+
+### Features
+- **liveness:** Add support for a no light liveness challenge ([#248](https://github.com/traderepublic/amplify-ui-android/issues/248))
+
+### Bug Fixes
+- **liveness:** Detect failed camera opening ([#205](https://github.com/traderepublic/amplify-ui-android/issues/205))
+- **liveness:** Prevent the "Create Liveness Session" button from flashing on screen transition ([#193](https://github.com/traderepublic/amplify-ui-android/issues/193))
+- **all:** Upgrade Compose to latest BOM ([#222](https://github.com/traderepublic/amplify-ui-android/issues/222))
+- **liveness:** Update CameraX library to latest ([#230](https://github.com/traderepublic/amplify-ui-android/issues/230))
+- **liveness:** Prevent crashing if there's an exception thrown by the SurfaceTexture ([#231](https://github.com/traderepublic/amplify-ui-android/issues/231))
+- **liveness:** Make liveness classes public
+- **liveness:** Fix public api declarations
+- **liveness:** Only publish liveness lib
+- **liveness:** Fix packaging resources
+- **liveness:** Update packaging resources
+- **liveness:** Make more classes public
+- **liveness:** Make more classes public
+
+[See all changes between 1.3.7 and 1.4.0](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.3.7...release_liveness_v1.4.0)
+
 ## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.5.0)
 
 ### Features

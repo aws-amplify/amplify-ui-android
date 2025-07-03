@@ -1,3 +1,10 @@
+## [Release 1.4.1](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.4.1)
+
+### Bug Fixes
+- **liveness:** Update lib
+
+[See all changes between 1.4.0 and 1.4.1](https://github.com/traderepublic/amplify-ui-android/compare/release_liveness_v1.4.0...release_liveness_v1.4.1)
+
 ## [Release 1.4.0](https://github.com/traderepublic/amplify-ui-android/releases/tag/release_liveness_v1.4.0)
 
 ### Features

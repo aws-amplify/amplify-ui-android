@@ -27,9 +27,9 @@ abstract class ScreenLevelRobot(rule: ComposeTestRule) : ComposeRobot(rule) {
     // Check that the composable has the expected title
     fun hasTitle(expected: String) = assertExists(TestTags.AuthenticatorTitle, expected)
 
-    fun setFieldContent(key: FieldKey, content: String) = writeTo(key.toString(), content)
+    fun setFieldContent(key: FieldKey, content: String) = writeTo(key.testTag, content)
 
     fun clickOnShowIcon(key: FieldKey) = composeTestRule.onNode(
-        hasTestTag(TestTags.ShowPasswordIcon) and hasAnyAncestor(hasTestTag(key.toString()))
+        hasTestTag(TestTags.ShowPasswordIcon) and hasAnyAncestor(hasTestTag(key.testTag))
     ).performClick()
 }

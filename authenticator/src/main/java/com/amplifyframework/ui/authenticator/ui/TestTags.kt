@@ -15,6 +15,8 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+
 internal object TestTags {
     const val SignInConfirmButton = "SignInConfirmButton"
     const val BackToSignInButton = "BackToSignInButton"
@@ -26,3 +28,6 @@ internal object TestTags {
 
     const val ShowPasswordIcon = "ShowPasswordIcon"
 }
+
+internal val FieldKey.testTag: String
+    get() = this.toString()

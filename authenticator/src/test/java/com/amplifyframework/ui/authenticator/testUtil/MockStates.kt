@@ -22,6 +22,8 @@ import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
+import com.amplifyframework.ui.authenticator.mockAuthCodeDeliveryDetails
+import com.amplifyframework.ui.authenticator.states.PasswordResetConfirmStateImpl
 import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmMfaStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmTotpCodeStateImpl
@@ -52,6 +54,19 @@ internal fun mockPasswordResetState() = PasswordResetStateImpl(
     onSubmit = {},
     onMoveTo = {}
 )
+
+internal fun mockPasswordResetConfirmState(
+    passwordCriteria: PasswordCriteria = PasswordCriteria(8, false, false, false, false),
+    deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails(),
+    onSubmit: (String, String) -> Unit = {_, _ -> },
+    onMoveTo: (AuthenticatorInitialStep) -> Unit = {}
+) = PasswordResetConfirmStateImpl(
+    passwordCriteria = passwordCriteria,
+    deliveryDetails = deliveryDetails,
+    onSubmit = onSubmit,
+    onMoveTo = onMoveTo
+)
+
 
 internal fun mockSignInConfirmTotpCodeState(
     onSubmit: (String) -> Unit = { },

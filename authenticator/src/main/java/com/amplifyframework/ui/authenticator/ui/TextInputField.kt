@@ -24,10 +24,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.MutableFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
+import com.amplifyframework.ui.authenticator.util.contentTypeForKey
+import com.amplifyframework.ui.authenticator.util.deriveContentType
 
 @Composable
 internal fun TextInputField(
@@ -40,8 +44,9 @@ internal fun TextInputField(
 
     val label = StringResolver.label(fieldConfig)
     val hint = StringResolver.hint(fieldConfig)
+
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.contentTypeForKey(fieldConfig.key),
         enabled = enabled,
         value = fieldState.content,
         onValueChange = { fieldState.content = it.take(fieldConfig.maxLength) },

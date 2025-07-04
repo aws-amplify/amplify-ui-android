@@ -17,12 +17,15 @@ package com.amplifyframework.ui.authenticator.ui
 
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 
+@Suppress("ConstPropertyName")
 internal object TestTags {
     const val SignInConfirmButton = "SignInConfirmButton"
     const val BackToSignInButton = "BackToSignInButton"
     const val CopyKeyButton = "CopyKeyButton"
     const val SignInButton = "SignInButton"
     const val SignUpButton = "SignUpButton"
+    const val ForgotPasswordButton = "ForgotPasswordButton"
+    const val CreateAccountButton = "CreateAccountButton"
     const val PasswordResetButton = "PasswordResetButton"
     const val AuthenticatorTitle = "AuthenticatorTitle"
 

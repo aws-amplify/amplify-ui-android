@@ -15,6 +15,9 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
+import androidx.compose.ui.autofill.AutofillManager
+import androidx.compose.ui.autofill.ContentType
+import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldError
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.setFieldError
@@ -22,6 +25,8 @@ import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockSignInState
 import com.amplifyframework.ui.authenticator.ui.robots.signIn
 import com.amplifyframework.ui.testing.ScreenshotTest
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Test
 
 class SignInTest : AuthenticatorUiTest() {
@@ -43,6 +48,49 @@ class SignInTest : AuthenticatorUiTest() {
         }
         signIn {
             hasSubmitButton("Sign In")
+        }
+    }
+
+    @Test
+    fun `has expected content types set`() {
+        setContent(providedStep = AuthenticatorStep.SignIn) {
+            SignIn(state = mockSignInState())
+        }
+        signIn {
+            hasUsernameContentType(ContentType.Username)
+            hasPasswordContentType(ContentType.Password)
+        }
+    }
+
+    @Test
+    fun `cancels autofill values on create account`() {
+        val autofillManager = mockk<AutofillManager>(relaxed = true)
+        setContent(autofillManager = autofillManager) {
+            SignIn(state = mockSignInState())
+        }
+        signIn {
+            setUsername("foo")
+            setPassword("bar")
+            clickCreateAccount()
+        }
+        verify {
+            autofillManager.cancel()
+        }
+    }
+
+    @Test
+    fun `cancels autofill values on forgot password`() {
+        val autofillManager = mockk<AutofillManager>(relaxed = true)
+        setContent(autofillManager = autofillManager) {
+            SignIn(state = mockSignInState())
+        }
+        signIn {
+            setUsername("foo")
+            setPassword("bar")
+            clickForgotPassword()
+        }
+        verify {
+            autofillManager.cancel()
         }
     }
 

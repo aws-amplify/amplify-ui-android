@@ -15,6 +15,9 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
+import androidx.compose.ui.autofill.AutofillManager
+import androidx.compose.ui.autofill.ContentType
+import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldError
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.PasswordError
@@ -23,6 +26,8 @@ import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockSignUpState
 import com.amplifyframework.ui.authenticator.ui.robots.signUp
 import com.amplifyframework.ui.testing.ScreenshotTest
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Test
 
 class SignUpTest : AuthenticatorUiTest() {
@@ -44,6 +49,34 @@ class SignUpTest : AuthenticatorUiTest() {
         }
         signUp {
             hasSubmitButton("Create Account")
+        }
+    }
+
+    @Test
+    fun `expected content types are set`() {
+        setContent(providedStep = AuthenticatorStep.SignUp) {
+            SignUp(state = mockSignUpState())
+        }
+        signUp {
+            hasUsernameContentType(ContentType.NewUsername)
+            hasPasswordContentType(ContentType.NewPassword)
+            hasConfirmPasswordContentType(ContentType.NewPassword)
+        }
+    }
+
+    @Test
+    fun `cancels autofill values on back to sign in`() {
+        val autofillManager = mockk<AutofillManager>(relaxed = true)
+        setContent(autofillManager = autofillManager) {
+            SignUp(state = mockSignUpState())
+        }
+        signUp {
+            setUsername("foo")
+            setPassword("bar")
+            clickBackToSignIn()
+        }
+        verify {
+            autofillManager.cancel()
         }
     }
 

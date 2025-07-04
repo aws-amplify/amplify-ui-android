@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.authenticator
 
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
+import com.amplifyframework.auth.AuthCodeDeliveryDetails.DeliveryMedium
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthFactorType
 import com.amplifyframework.auth.AuthSession
@@ -138,3 +139,13 @@ internal fun mockUserAttributes(vararg attribute: Pair<AuthUserAttributeKey, Str
     attribute.map { AuthUserAttribute(it.first, it.second) }
 
 internal fun mockUser(userId: String = "userId", username: String = "username") = AuthUser(userId, username)
+
+internal fun mockAuthCodeDeliveryDetails(
+    destination: String = "123-123-1234",
+    deliveryMedium: DeliveryMedium = DeliveryMedium.SMS,
+    attributeName: String? = AuthUserAttributeKey.phoneNumber().keyString
+) = AuthCodeDeliveryDetails(
+    destination,
+    deliveryMedium,
+    attributeName
+)

@@ -9,7 +9,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags += "-std=c++17"
-                arguments += "-DCMAKE_VERBOSE_MAKEFILE=ON"
+                arguments += listOf("-DCMAKE_VERBOSE_MAKEFILE=ON", "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
             }
         }
         buildConfigField(
@@ -58,8 +58,8 @@ dependencies {
 
     implementation(libs.kotlin.serialization.json)
 
-    implementation(libs.tensorflow)
-    implementation(libs.tensorflow.support)
+    implementation(libs.litert)
+    implementation(libs.litert.support)
 
     coreLibraryDesugaring(libs.android.desugar)
 

@@ -21,7 +21,6 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.ui.TestTags
@@ -42,17 +41,4 @@ abstract class ScreenLevelRobot(rule: ComposeTestRule) : ComposeRobot(rule) {
     fun clickOnShowIcon(key: FieldKey) = composeTestRule.onNode(
         hasTestTag(TestTags.ShowPasswordIcon) and hasAnyAncestor(hasTestTag(key.testTag))
     ).performClick()
-
-    fun field(key: FieldKey) = FieldLevelRobot(key, composeTestRule)
-}
-
-class FieldLevelRobot(private val fieldKey: FieldKey, private val composeTestRule: ComposeTestRule) {
-    private val composeRobot = ComposeRobot(composeTestRule)
-
-    // Check that the given field has the specified content type set
-    fun hasContentType(contentType: ContentType) = composeTestRule.onNode(
-        hasTestTag(fieldKey.testTag) and SemanticsMatcher.expectValue(SemanticsProperties.ContentType, contentType)
-    ).assertExists()
-
-    fun setContent(content: String) = composeRobot.writeTo(fieldKey.testTag, content)
 }

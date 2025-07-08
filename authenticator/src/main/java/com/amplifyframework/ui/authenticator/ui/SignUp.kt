@@ -50,11 +50,7 @@ fun SignUp(
             state = state.form
         )
         AuthenticatorButton(
-            onClick = {
-                scope.launch {
-                    state.signUp()
-                }
-            },
+            onClick = { scope.launch { state.signUp() } },
             loading = !state.form.enabled,
             label = stringResource(R.string.amplify_ui_authenticator_button_signup),
             modifier = Modifier.testTag(TestTags.SignUpButton)

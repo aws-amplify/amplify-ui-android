@@ -106,10 +106,7 @@ internal fun mockSignInContinueWithTotpSetupState(
 )
 
 internal fun mockSignInConfirmMfaState(
-    deliveryDetails: AuthCodeDeliveryDetails = AuthCodeDeliveryDetails(
-        "123-123-1234",
-        AuthCodeDeliveryDetails.DeliveryMedium.SMS
-    )
+    deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()
 ) = SignInConfirmMfaStateImpl(
     deliveryDetails = deliveryDetails,
     onSubmit = { },

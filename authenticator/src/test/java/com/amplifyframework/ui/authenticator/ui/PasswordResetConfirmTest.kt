@@ -9,11 +9,7 @@ import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.forms.setFieldError
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockPasswordResetConfirmState
-import com.amplifyframework.ui.authenticator.testUtil.mockSignInState
-import com.amplifyframework.ui.authenticator.testUtil.mockSignUpState
 import com.amplifyframework.ui.authenticator.ui.robots.passwordResetConfirm
-import com.amplifyframework.ui.authenticator.ui.robots.signIn
-import com.amplifyframework.ui.authenticator.ui.robots.signUp
 import com.amplifyframework.ui.testing.ScreenshotTest
 import io.mockk.mockk
 import io.mockk.verify
@@ -57,6 +53,7 @@ class PasswordResetConfirmTest : AuthenticatorUiTest() {
             autofillManager.cancel()
         }
     }
+
     @Test
     fun `moves back to sign in`() {
         val onMoveTo = mockk<(AuthenticatorInitialStep) -> Unit>(relaxed = true)
@@ -94,7 +91,7 @@ class PasswordResetConfirmTest : AuthenticatorUiTest() {
     fun `passwords do not match`() {
         val state = mockPasswordResetConfirmState()
         setContent {
-            PasswordResetConfirm(state =state)
+            PasswordResetConfirm(state = state)
         }
         state.form.setFieldError(FieldKey.ConfirmPassword, FieldError.PasswordsDoNotMatch)
     }

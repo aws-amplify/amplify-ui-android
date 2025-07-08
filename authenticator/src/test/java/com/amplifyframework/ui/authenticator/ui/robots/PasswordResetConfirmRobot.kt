@@ -6,7 +6,8 @@ import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.testing.ComposeTest
 
-fun ComposeTest.passwordResetConfirm(func: PasswordResetConfirmRobot.() -> Unit) = PasswordResetConfirmRobot(composeTestRule).func()
+fun ComposeTest.passwordResetConfirm(func: PasswordResetConfirmRobot.() -> Unit) =
+    PasswordResetConfirmRobot(composeTestRule).func()
 
 class PasswordResetConfirmRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule) {
     fun hasSubmitButton(expected: String) = assertExists(TestTags.PasswordResetButton, expected)

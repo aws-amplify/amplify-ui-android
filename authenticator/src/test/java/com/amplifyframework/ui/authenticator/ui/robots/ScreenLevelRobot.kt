@@ -31,7 +31,7 @@ abstract class ScreenLevelRobot(rule: ComposeTestRule) : ComposeRobot(rule) {
     // Check that the composable has the expected title
     fun hasTitle(expected: String) = assertExists(TestTags.AuthenticatorTitle, expected)
 
-
+    // Check that the expected content type is set
     fun hasContentType(key: FieldKey, contentType: ContentType) = composeTestRule.onNode(
         hasTestTag(key.testTag) and SemanticsMatcher.expectValue(SemanticsProperties.ContentType, contentType)
     ).assertExists()

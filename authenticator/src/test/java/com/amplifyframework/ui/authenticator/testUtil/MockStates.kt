@@ -58,7 +58,7 @@ internal fun mockPasswordResetState() = PasswordResetStateImpl(
 internal fun mockPasswordResetConfirmState(
     passwordCriteria: PasswordCriteria = PasswordCriteria(8, false, false, false, false),
     deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails(),
-    onSubmit: (String, String) -> Unit = {_, _ -> },
+    onSubmit: (String, String) -> Unit = { _, _ -> },
     onMoveTo: (AuthenticatorInitialStep) -> Unit = {}
 ) = PasswordResetConfirmStateImpl(
     passwordCriteria = passwordCriteria,
@@ -66,7 +66,6 @@ internal fun mockPasswordResetConfirmState(
     onSubmit = onSubmit,
     onMoveTo = onMoveTo
 )
-
 
 internal fun mockSignInConfirmTotpCodeState(
     onSubmit: (String) -> Unit = { },

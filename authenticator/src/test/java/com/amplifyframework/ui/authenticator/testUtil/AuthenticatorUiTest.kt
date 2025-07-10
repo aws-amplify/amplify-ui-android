@@ -18,12 +18,31 @@ package com.amplifyframework.ui.authenticator.testUtil
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillManager
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.unit.dp
+import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
+import com.amplifyframework.ui.authenticator.locals.LocalAuthenticatorStep
 import com.amplifyframework.ui.authenticator.theme.AmplifyTheme
 import com.amplifyframework.ui.testing.ComposeTest
 
 abstract class AuthenticatorUiTest : ComposeTest() {
+    fun setContent(
+        providedStep: AuthenticatorStep? = null,
+        autofillManager: AutofillManager? = null,
+        content: @Composable () -> Unit
+    ) = setContent {
+        val step = providedStep ?: AuthenticatorStep.Loading
+        CompositionLocalProvider(
+            LocalAutofillManager provides autofillManager,
+            LocalAuthenticatorStep provides step
+        ) {
+            content()
+        }
+    }
+
     override fun setContent(content: @Composable () -> Unit) {
         super.setContent {
             AmplifyTheme {

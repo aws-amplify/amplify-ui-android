@@ -15,21 +15,30 @@
 
 package com.amplifyframework.ui.authenticator.ui.robots
 
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.performClick
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.ui.TestTags
+import com.amplifyframework.ui.authenticator.ui.testTag
 import com.amplifyframework.ui.testing.ComposeRobot
 
 abstract class ScreenLevelRobot(rule: ComposeTestRule) : ComposeRobot(rule) {
     // Check that the composable has the expected title
     fun hasTitle(expected: String) = assertExists(TestTags.AuthenticatorTitle, expected)
 
-    fun setFieldContent(key: FieldKey, content: String) = writeTo(key.toString(), content)
+    // Check that the expected content type is set
+    fun hasContentType(key: FieldKey, contentType: ContentType) = composeTestRule.onNode(
+        hasTestTag(key.testTag) and SemanticsMatcher.expectValue(SemanticsProperties.ContentType, contentType)
+    ).assertExists()
+
+    fun setFieldContent(key: FieldKey, content: String) = writeTo(key.testTag, content)
 
     fun clickOnShowIcon(key: FieldKey) = composeTestRule.onNode(
-        hasTestTag(TestTags.ShowPasswordIcon) and hasAnyAncestor(hasTestTag(key.toString()))
+        hasTestTag(TestTags.ShowPasswordIcon) and hasAnyAncestor(hasTestTag(key.testTag))
     ).performClick()
 }

@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 
 /**
@@ -58,10 +59,7 @@ fun AuthenticatorLoading(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun LoadingDot(
-    modifier: Modifier = Modifier,
-    color: Color
-) {
+private fun LoadingDot(modifier: Modifier = Modifier, color: Color) {
     Box(
         modifier = modifier
             .clip(shape = CircleShape)
@@ -101,7 +99,7 @@ internal fun LoadingIndicator(
                 modifier = Modifier
                     .size(dotSize)
                     .aspectRatio(1f)
-                    .offset(y = offset.dp)
+                    .offset { IntOffset(x = 0, y = offset.dp.roundToPx()) }
             )
         }
     }

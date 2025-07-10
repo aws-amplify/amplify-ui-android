@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.amplifyframework.ui.sample.authenticator'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.amplifyframework.ui.sample.authenticator"

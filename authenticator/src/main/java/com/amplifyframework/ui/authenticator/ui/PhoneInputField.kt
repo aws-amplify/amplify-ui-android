@@ -64,6 +64,7 @@ import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.MutableFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
 import com.amplifyframework.ui.authenticator.util.Region
+import com.amplifyframework.ui.authenticator.util.contentTypeForKey
 import com.amplifyframework.ui.authenticator.util.regionList
 import com.amplifyframework.ui.authenticator.util.regionMap
 import java.util.Locale
@@ -102,7 +103,7 @@ internal fun PhoneInputField(
     }
 
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.contentTypeForKey(fieldConfig.key),
         enabled = enabled,
         value = state.number,
         onValueChange = { state.number = it },

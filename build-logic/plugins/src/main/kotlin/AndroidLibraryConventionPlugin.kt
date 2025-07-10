@@ -75,7 +75,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         }
 
         extension.apply {
-            compileSdk = 34
+            compileSdk = 35
 
             buildFeatures {
                 buildConfig = true

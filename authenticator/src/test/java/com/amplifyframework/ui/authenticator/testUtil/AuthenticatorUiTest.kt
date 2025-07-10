@@ -35,10 +35,11 @@ abstract class AuthenticatorUiTest : ComposeTest() {
         content: @Composable () -> Unit
     ) = setContent {
         val step = providedStep ?: AuthenticatorStep.Loading
-        CompositionLocalProvider(LocalAutofillManager provides autofillManager) {
-            CompositionLocalProvider(LocalAuthenticatorStep provides step) {
-                content()
-            }
+        CompositionLocalProvider(
+            LocalAutofillManager provides autofillManager,
+            LocalAuthenticatorStep provides step
+        ) {
+            content()
         }
     }
 

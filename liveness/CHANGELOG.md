@@ -1,3 +1,10 @@
+## [Release 1.6.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.6.0)
+
+### Bug Fixes
+- **liveness:** 16kb Page Support for Liveness ([#251](https://github.com/aws-amplify/amplify-ui-android/issues/251))
+
+[See all changes between 1.5.0 and 1.6.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.5.0...release_liveness_v1.6.0)
+
 ## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.5.0)
 
 ### Features

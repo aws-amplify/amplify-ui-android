@@ -325,7 +325,11 @@ final class OpenGLRenderer {
                 mExecutor.execute(
                         () -> {
                             if (!mIsShutdown) {
-                                setWindowSurface(mAdditionalContext, null);
+                                if (mAdditionalContext != 0) {
+                                    setWindowSurface(mAdditionalContext, null);
+                                } else if (DEBUG) {
+                                    Log.d(TAG, "!!! mAdditionalContext null during detachPreviewSurface");
+                                }
                                 mAdditionalTransformation.mSurfaceSize = null;
                             }
                             completer.set(null);

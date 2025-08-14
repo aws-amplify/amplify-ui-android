@@ -40,6 +40,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 target.configureAndroid(this)
                 defaultConfig {
                     targetSdk = 34
+                    versionCode = 1
+                    versionName = "1"
                 }
                 compileOptions {
                     isCoreLibraryDesugaringEnabled = true

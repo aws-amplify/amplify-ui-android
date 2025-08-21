@@ -45,6 +45,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
+        register("androidApplication") {
+            id = "amplify.android.application"
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
         register("androidLibrary") {
             id = "amplify.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"

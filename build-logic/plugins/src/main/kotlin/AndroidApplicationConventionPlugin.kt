@@ -14,7 +14,7 @@
  */
 
 import com.amplify.ui.configureAndroid
-import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
@@ -27,24 +27,24 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 /**
  * This convention plugin configures an Android library module
  */
-@Suppress("LocalVariableName")
-class AndroidLibraryConventionPlugin : Plugin<Project> {
+class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target.pluginManager) {
-            apply("com.android.library")
+            apply("com.android.application")
             apply("org.jetbrains.kotlin.plugin.compose")
             apply("org.jetbrains.kotlin.android")
-            apply("amplify.android.ktlint")
         }
 
-        val POM_GROUP: String by target
-
         with(target) {
-            group = POM_GROUP
-            extensions.configure<LibraryExtension> {
+            extensions.configure<ApplicationExtension> {
                 target.configureAndroid(this)
                 defaultConfig {
-                    consumerProguardFiles += rootProject.file("configuration/consumer-rules.pro")
+                    targetSdk = 34
+                    versionCode = 1
+                    versionName = "1"
+                }
+                compileOptions {
+                    isCoreLibraryDesugaringEnabled = true
                 }
             }
 

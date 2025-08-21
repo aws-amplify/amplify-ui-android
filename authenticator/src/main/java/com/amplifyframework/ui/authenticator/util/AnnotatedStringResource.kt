@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
+import androidx.core.text.toHtml
 
 /**
  * Reads an HTML string from resources and turns it into an [AnnotatedString]
@@ -63,7 +64,7 @@ private fun Context.getText(
     vararg formatArgs: Any
 ): CharSequence {
     val resource = SpannedString(getText(id))
-    val html = HtmlCompat.toHtml(resource, HtmlCompat.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE)
+    val html = resource.toHtml()
     val string = String.format(html, *formatArgs)
     return HtmlCompat.fromHtml(string, FROM_HTML_MODE_COMPACT)
 }

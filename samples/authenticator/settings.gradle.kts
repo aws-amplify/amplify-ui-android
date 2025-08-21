@@ -1,21 +1,27 @@
 pluginManagement {
-    includeBuild('../../build-logic')
+    includeBuild("../../build-logic")
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") {
+            from(files("../../gradle/libs.versions.toml"))
+        }
+    }
 }
+
 rootProject.name = "Authenticator-Sample"
-include ':app'
+include(":app")
 
 // Uncomment this to use local authenticator module from Amplify UI Repo
-// Must also change samples/authenticator/app/build.gradle implementation
-includeBuild('../../') {}
+includeBuild("../../") {}

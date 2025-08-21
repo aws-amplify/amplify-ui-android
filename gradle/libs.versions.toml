@@ -1,21 +1,21 @@
 [versions]
 accompanist = "0.28.0"
-agp = "8.7.2"
-amplify = "2.29.0"
+agp = "8.11.1"
+amplify = "2.29.2"
 appcompat = "1.6.1"
 androidx-core = "1.9.0"
 androidx-junit = "1.1.4"
 androidx-activity = "1.6.1"
 androidx-navigation = "2.5.3"
-binary-compatibility = "0.14.0"
+binary-compatibility = "0.18.1"
 cameraX = "1.4.2"
 compose-bom = "2025.06.01"
 coroutines = "1.7.3"
-desugar = "1.2.0"
+desugar = "2.1.5"
 futures = "1.1.0"
 junit = "4.13.2"
 kotest = "5.7.1"
-kotlin = "1.9.10"
+kotlin = "2.2.0"
 kover = "0.9.1"
 ktlint = "11.0.0"
 licensee = "1.7.0"
@@ -113,6 +113,7 @@ test = [
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 binary-compatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }

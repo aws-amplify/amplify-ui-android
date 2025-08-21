@@ -1,5 +1,5 @@
 pluginManagement {
-    includeBuild('../../build-logic')
+    includeBuild("../../build-logic")
     repositories {
         google()
         mavenCentral()
@@ -13,16 +13,15 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
-
     versionCatalogs {
         create("libs") {
             from(files("../../gradle/libs.versions.toml"))
         }
     }
 }
+
 rootProject.name = "Liveness-Sample"
-include ':app'
+include(":app")
 
 // Uncomment this to use local liveness module from Amplify UI Repo
-// Must also change samples/liveness/app/build.gradle implementation
-//includeBuild('../../') {}
+//includeBuild("../../") {}

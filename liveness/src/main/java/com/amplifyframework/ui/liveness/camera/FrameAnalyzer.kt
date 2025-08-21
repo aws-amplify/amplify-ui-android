@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.util.Size
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.core.graphics.createBitmap
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.ml.FaceOval
@@ -31,10 +32,7 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.image.ops.Rot90Op
 
-internal class FrameAnalyzer(
-    context: Context,
-    private val livenessState: LivenessState
-) : ImageAnalysis.Analyzer {
+internal class FrameAnalyzer(context: Context, private val livenessState: LivenessState) : ImageAnalysis.Analyzer {
 
     private val tfLite = FaceDetector.loadModel(context)
     private val tfImageBuffer = TensorImage(DataType.UINT8)
@@ -58,11 +56,7 @@ internal class FrameAnalyzer(
 
     private fun attemptAnalyze(image: ImageProxy) {
         if (cachedBitmap == null) {
-            cachedBitmap = Bitmap.createBitmap(
-                image.width,
-                image.height,
-                Bitmap.Config.ARGB_8888
-            )
+            cachedBitmap = createBitmap(image.width, image.height)
         }
 
         image.use {

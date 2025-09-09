@@ -27,4 +27,6 @@
     <string name="amplify_ui_authenticator_title_signin_continue_setup_mfa_select">Choose your preferred two-factor authentication method to set up</string>
     <string name="amplify_ui_authenticator_title_signin_continue_mfa_select">Choose your two-factor authentication method</string>
     <string name="amplify_ui_authenticator_title_signin_continue_email_setup">Add Email for Two-Factor Authentication</string>
+    <string name="amplify_ui_authenticator_title_prompt_for_passkey">Sign in faster with Passkey</string>
+    <string name="amplify_ui_authenticator_title_passkey_created">Passkey created successfully!</string>
 </resources>

@@ -18,11 +18,14 @@ package com.amplifyframework.ui.authenticator.testUtil
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
 import com.amplifyframework.ui.authenticator.mockAuthCodeDeliveryDetails
+import com.amplifyframework.ui.authenticator.states.PasskeyCreatedStateImpl
+import com.amplifyframework.ui.authenticator.states.PasskeyCreationPromptStateImpl
 import com.amplifyframework.ui.authenticator.states.PasswordResetConfirmStateImpl
 import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmMfaStateImpl
@@ -105,13 +108,12 @@ internal fun mockSignInContinueWithTotpSetupState(
     onMoveTo = onMoveTo
 )
 
-internal fun mockSignInConfirmMfaState(
-    deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()
-) = SignInConfirmMfaStateImpl(
-    deliveryDetails = deliveryDetails,
-    onSubmit = { },
-    onMoveTo = { }
-)
+internal fun mockSignInConfirmMfaState(deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()) =
+    SignInConfirmMfaStateImpl(
+        deliveryDetails = deliveryDetails,
+        onSubmit = { },
+        onMoveTo = { }
+    )
 
 internal fun mockSignInContinueWithMfaSetupSelectionState(
     allowedMfaTypes: Set<MFAType> = setOf(MFAType.TOTP, MFAType.SMS, MFAType.EMAIL)
@@ -120,3 +122,17 @@ internal fun mockSignInContinueWithMfaSetupSelectionState(
     onSubmit = { },
     onMoveTo = { }
 )
+
+internal fun mockPasskeyCreatedState(
+    passkeys: List<AuthWebAuthnCredential> = emptyList(),
+    onDone: suspend () -> Unit = {}
+) = PasskeyCreatedStateImpl(
+    passkeys = passkeys,
+    onDone = onDone
+)
+
+internal fun mockPasskeyCreationPromptState(onSubmit: suspend () -> Unit = {}, onSkip: suspend () -> Unit = {}) =
+    PasskeyCreationPromptStateImpl(
+        onSubmit = onSubmit,
+        onSkip = onSkip
+    )

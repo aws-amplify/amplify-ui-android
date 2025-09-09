@@ -120,4 +120,15 @@ abstract class AuthenticatorStep internal constructor() {
      * The user has initiated verification of an account recovery mechanism (email, phone) and needs to provide a confirmation code.
      */
     object VerifyUserConfirm : AuthenticatorStep()
+
+    /**
+     * The user is being shown a prompt to create a passkey, encouraging them to use this as a way to sign in quickly
+     * via biometrics
+     */
+    object PasskeyCreationPrompt : AuthenticatorStep()
+
+    /**
+     * The user is being shown a confirmation screen after creating a passkey
+     */
+    object PasskeyCreated : AuthenticatorStep()
 }

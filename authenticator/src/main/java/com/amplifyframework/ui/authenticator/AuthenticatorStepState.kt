@@ -23,6 +23,7 @@ import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.MutableFormState
@@ -459,4 +460,37 @@ interface VerifyUserConfirmState : AuthenticatorStepState {
      * Skip verification and move to the Signed In state.
      */
     fun skip()
+}
+
+/**
+ * The user is being shown a prompt to create a passkey, encouraging them to use this as a way to sign in quickly
+ * via biometrics
+ */
+@Stable
+interface PasskeyCreationPromptState : AuthenticatorStepState {
+    /**
+     * Create a passkey
+     */
+    suspend fun createPasskey()
+
+    /**
+     * Skip passkey creation and continue to the next step
+     */
+    suspend fun skip()
+}
+
+/**
+ * The user is being shown a confirmation screen after creating a passkey
+ */
+@Stable
+interface PasskeyCreatedState : AuthenticatorStepState {
+    /**
+     * A list of existing passkeys for this user, including the one they've just created
+     */
+    val passkeys: List<AuthWebAuthnCredential>
+
+    /**
+     * Continue to the next step
+     */
+    suspend fun done()
 }

@@ -27,6 +27,9 @@ internal object TestTags {
     const val ForgotPasswordButton = "ForgotPasswordButton"
     const val CreateAccountButton = "CreateAccountButton"
     const val PasswordResetButton = "PasswordResetButton"
+    const val ContinueButton = "ContinueButton"
+    const val CreatePasskeyButton = "CreatePasskeyButton"
+    const val SkipPasskeyButton = "SkipPasskeyButton"
     const val AuthenticatorTitle = "AuthenticatorTitle"
 
     const val ShowPasswordIcon = "ShowPasswordIcon"

@@ -26,6 +26,7 @@ import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
+import com.amplifyframework.ui.authenticator.enums.AuthFactor
 import com.amplifyframework.ui.authenticator.forms.MutableFormState
 
 /**
@@ -82,6 +83,68 @@ interface SignInState : AuthenticatorStepState {
      * The input form state holder for this step.
      */
     val form: MutableFormState
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Initiate a sign in with the information entered into the [form].
+     */
+    suspend fun signIn()
+}
+
+/**
+ * The user has entered their username and must select the authentication factor they'd like to use to sign in
+ */
+@Stable
+interface SignInSelectFactorState: AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * The username entered in the SignIn step
+     */
+    val username: String
+
+    /**
+     * The available types to select how to sign in.
+     */
+    val availableAuthFactors: Set<AuthFactor>
+
+    /**
+     * The factor the user selected and is currently being processed
+     */
+    val selectedFactor: AuthFactor?
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Initiate a sign in with one of the available sign in types
+     */
+    suspend fun select(authFactor: AuthFactor)
+}
+
+/**
+ * A user has entered their username and must enter their password to continue signing in
+ */
+@Stable
+interface SignInConfirmPasswordState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * The username entered in the SignIn step
+     */
+    val username: String
 
     /**
      * Move the user to a different [AuthenticatorInitialStep].

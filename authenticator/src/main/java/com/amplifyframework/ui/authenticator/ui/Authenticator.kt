@@ -41,16 +41,20 @@ import com.amplifyframework.ui.authenticator.AuthenticatorState
 import com.amplifyframework.ui.authenticator.AuthenticatorStepState
 import com.amplifyframework.ui.authenticator.ErrorState
 import com.amplifyframework.ui.authenticator.LoadingState
+import com.amplifyframework.ui.authenticator.PasskeyCreatedState
 import com.amplifyframework.ui.authenticator.PasswordResetConfirmState
 import com.amplifyframework.ui.authenticator.PasswordResetState
+import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState
 import com.amplifyframework.ui.authenticator.SignInConfirmCustomState
 import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
 import com.amplifyframework.ui.authenticator.SignInConfirmNewPasswordState
+import com.amplifyframework.ui.authenticator.SignInConfirmPasswordState
 import com.amplifyframework.ui.authenticator.SignInConfirmTotpCodeState
 import com.amplifyframework.ui.authenticator.SignInContinueWithEmailSetupState
 import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSelectionState
 import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSetupSelectionState
 import com.amplifyframework.ui.authenticator.SignInContinueWithTotpSetupState
+import com.amplifyframework.ui.authenticator.SignInSelectFactorState
 import com.amplifyframework.ui.authenticator.SignInState
 import com.amplifyframework.ui.authenticator.SignUpConfirmState
 import com.amplifyframework.ui.authenticator.SignUpState
@@ -147,6 +151,7 @@ fun Authenticator(
                         when (targetState) {
                             is LoadingState -> loadingContent()
                             is SignInState -> signInContent(targetState)
+                            is SignInSelectFactorState -> SignInSelectFactor(targetState)
                             is SignInConfirmMfaState -> signInConfirmMfaContent(targetState)
                             is SignInConfirmCustomState -> signInConfirmCustomContent(targetState)
                             is SignInConfirmNewPasswordState -> signInConfirmNewPasswordContent(
@@ -167,7 +172,10 @@ fun Authenticator(
                             is SignUpConfirmState -> signUpConfirmContent(targetState)
                             is VerifyUserState -> verifyUserContent(targetState)
                             is VerifyUserConfirmState -> verifyUserConfirmContent(targetState)
-                            else -> Unit
+                            is PasskeyCreationPromptState -> PasskeyPrompt(targetState)
+                            is PasskeyCreatedState -> PasskeyCreated(targetState)
+                            is SignInConfirmPasswordState -> SignInConfirmPassword(targetState)
+                            else -> error("Unimplemented state")
                         }
                         footerContent()
                     }

@@ -11,5 +11,4 @@ class PasskeyCreatedRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule) {
     fun hasPasskeyText(text: String) = assertExists(text)
 
     fun clickContinueButton() = clickOnTag(TestTags.ContinueButton)
-
 }

@@ -130,5 +130,5 @@ abstract class AuthenticatorStep internal constructor() {
     /**
      * The user is being shown a confirmation screen after creating a passkey
      */
-    object PasskeyCreated: AuthenticatorStep()
+    object PasskeyCreated : AuthenticatorStep()
 }

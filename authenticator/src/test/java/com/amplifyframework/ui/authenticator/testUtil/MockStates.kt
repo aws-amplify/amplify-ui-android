@@ -36,7 +36,6 @@ import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSetupSe
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithTotpSetupStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInStateImpl
 import com.amplifyframework.ui.authenticator.states.SignUpStateImpl
-import io.mockk.mockk
 
 internal fun mockSignInState() = SignInStateImpl(
     signInMethod = SignInMethod.Username,
@@ -109,13 +108,12 @@ internal fun mockSignInContinueWithTotpSetupState(
     onMoveTo = onMoveTo
 )
 
-internal fun mockSignInConfirmMfaState(
-    deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()
-) = SignInConfirmMfaStateImpl(
-    deliveryDetails = deliveryDetails,
-    onSubmit = { },
-    onMoveTo = { }
-)
+internal fun mockSignInConfirmMfaState(deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()) =
+    SignInConfirmMfaStateImpl(
+        deliveryDetails = deliveryDetails,
+        onSubmit = { },
+        onMoveTo = { }
+    )
 
 internal fun mockSignInContinueWithMfaSetupSelectionState(
     allowedMfaTypes: Set<MFAType> = setOf(MFAType.TOTP, MFAType.SMS, MFAType.EMAIL)
@@ -133,10 +131,8 @@ internal fun mockPasskeyCreatedState(
     onDone = onDone
 )
 
-internal fun mockPasskeyCreationPromptState(
-    onSubmit: suspend () -> Unit = {},
-    onSkip: suspend () -> Unit = {}
-) = PasskeyCreationPromptStateImpl(
-    onSubmit = onSubmit,
-    onSkip = onSkip
-)
+internal fun mockPasskeyCreationPromptState(onSubmit: suspend () -> Unit = {}, onSkip: suspend () -> Unit = {}) =
+    PasskeyCreationPromptStateImpl(
+        onSubmit = onSubmit,
+        onSkip = onSkip
+    )

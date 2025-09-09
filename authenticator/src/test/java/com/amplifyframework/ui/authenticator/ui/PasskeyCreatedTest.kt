@@ -73,8 +73,8 @@ class PasskeyCreatedTest : AuthenticatorUiTest() {
     @ScreenshotTest
     fun `with multiple passkeys`() {
         val passkeys = listOf(
-            mockk<AuthWebAuthnCredential> { every { friendlyName} returns "Test Passkey 1" },
-            mockk<AuthWebAuthnCredential> { every { friendlyName} returns "Test Passkey 2" }
+            mockk<AuthWebAuthnCredential> { every { friendlyName } returns "Test Passkey 1" },
+            mockk<AuthWebAuthnCredential> { every { friendlyName } returns "Test Passkey 2" }
         )
         setContent {
             PasskeyCreated(state = mockPasskeyCreatedState(passkeys = passkeys))

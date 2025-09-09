@@ -56,33 +56,5 @@ internal fun AuthenticatorForm(
         }
         Spacer(modifier = Modifier.size(16.dp))
     }
-}
-
-/**
- * The button displayed in Authenticator.
- * @param onClick The click handler for the button
- * @param loading True to show the [loadingIndicator] content, false to show the button label.
- * @param modifier The [Modifier] for the composable.
- * @param label The label for the button
- * @param loadingIndicator The content to show when loading.
- */
-@Composable
-internal fun AuthenticatorButton(
-    onClick: () -> Unit,
-    loading: Boolean,
-    modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.amplify_ui_authenticator_button_submit),
-    loadingIndicator: @Composable () -> Unit = { LoadingIndicator() }
-) {
-    Button(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
-        enabled = !loading
-    ) {
-        if (loading) {
-            loadingIndicator()
-        } else {
-            Text(label)
-        }
     }
 }

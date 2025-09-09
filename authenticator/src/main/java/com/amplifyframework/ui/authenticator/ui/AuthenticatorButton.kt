@@ -2,13 +2,17 @@ package com.amplifyframework.ui.authenticator.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.amplifyframework.ui.authenticator.R
+
+internal enum class ButtonStyle {
+    Primary,
+    Secondary
+}
 
 /**
  * The button displayed in Authenticator.
@@ -26,18 +30,31 @@ internal fun AuthenticatorButton(
     label: String = stringResource(R.string.amplify_ui_authenticator_button_submit),
     loadingIndicator: @Composable () -> Unit = { LoadingIndicator() },
     enabled: Boolean = true,
-    colors: ButtonColors = ButtonDefaults.buttonColors()
+    style: ButtonStyle = ButtonStyle.Primary
 ) {
-    Button(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
-        colors = colors,
-        enabled = enabled && !loading
-    ) {
-        if (loading) {
-            loadingIndicator()
-        } else {
-            Text(label)
+    if (style == ButtonStyle.Primary) {
+        Button(
+            modifier = modifier.fillMaxWidth(),
+            onClick = onClick,
+            enabled = enabled && !loading
+        ) {
+            if (loading) {
+                loadingIndicator()
+            } else {
+                Text(label)
+            }
+        }
+    } else {
+        OutlinedButton(
+            modifier = modifier.fillMaxWidth(),
+            onClick = onClick,
+            enabled = enabled && !loading
+        ) {
+            if (loading) {
+                loadingIndicator()
+            } else {
+                Text(label)
+            }
         }
     }
 }

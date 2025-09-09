@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,20 +71,25 @@ fun PasskeyPrompt(
                 }
             },
             loading = inProgress == Action.CreatingPasskey,
+            enabled = inProgress == null,
             label = stringResource(R.string.amplify_ui_authenticator_button_create_passkey),
             modifier = Modifier.testTag(TestTags.CreatePasskeyButton)
         )
 
-        OutlinedButton(
+        AuthenticatorButton(
             modifier = Modifier.fillMaxWidth().testTag(TestTags.SkipPasskeyButton),
-            onClick = { scope.launch {
-                inProgress = Action.Skipping
-                state.skip()
-                inProgress = null
-            } }
-        ) {
-            Text(stringResource(R.string.amplify_ui_authenticator_button_skip_passkey))
-        }
+            onClick = {
+                scope.launch {
+                    inProgress = Action.Skipping
+                    state.skip()
+                    inProgress = null
+                }
+            },
+            loading = inProgress == Action.Skipping,
+            enabled = inProgress == null,
+            label = stringResource(R.string.amplify_ui_authenticator_button_skip_passkey),
+            style = ButtonStyle.Secondary
+        )
 
         footerContent(state)
     }

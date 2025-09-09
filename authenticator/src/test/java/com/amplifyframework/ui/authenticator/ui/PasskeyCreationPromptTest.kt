@@ -71,12 +71,4 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
             PasskeyPrompt(state = mockPasskeyCreationPromptState())
         }
     }
-
-    @Test
-    @ScreenshotTest
-    fun `creating passkey state`() {
-        setContent {
-            PasskeyPrompt(state = mockPasskeyCreationPromptState(creatingPasskey = true))
-        }
-    }
 }

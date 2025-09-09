@@ -134,11 +134,9 @@ internal fun mockPasskeyCreatedState(
 )
 
 internal fun mockPasskeyCreationPromptState(
-    creatingPasskey: Boolean = false,
     onSubmit: suspend () -> Unit = {},
     onSkip: suspend () -> Unit = {}
 ) = PasskeyCreationPromptStateImpl(
     onSubmit = onSubmit,
-    onSkip = onSkip,
-    creatingPasskey = creatingPasskey
+    onSkip = onSkip
 )

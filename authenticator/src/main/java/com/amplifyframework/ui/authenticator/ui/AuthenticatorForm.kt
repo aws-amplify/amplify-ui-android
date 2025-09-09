@@ -56,5 +56,4 @@ internal fun AuthenticatorForm(
         }
         Spacer(modifier = Modifier.size(16.dp))
     }
-    }
 }

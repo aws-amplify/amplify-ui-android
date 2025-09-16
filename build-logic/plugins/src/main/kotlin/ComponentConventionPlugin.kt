@@ -37,8 +37,8 @@ class ComponentConventionPlugin : Plugin<Project> {
             pluginManager.apply("amplify.android.screenshots")
 
             tasks.withType<KotlinCompile>().configureEach {
-                kotlinOptions {
-                    freeCompilerArgs = freeCompilerArgs + amplifyInternalMarkers.map { "-opt-in=$it" }
+                compilerOptions {
+                    freeCompilerArgs.addAll(amplifyInternalMarkers.map { "-opt-in=$it" })
                 }
             }
         }

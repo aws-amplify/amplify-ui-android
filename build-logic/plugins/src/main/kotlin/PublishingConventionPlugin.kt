@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.plugins.signing.SigningExtension
@@ -128,6 +129,12 @@ class PublishingConventionPlugin : Plugin<Project> {
         }
 
         configure<SigningExtension> {
+            if (hasProperty("signingKeyId")) {
+                println("Getting signing info from protected source.")
+                extra["signing.keyId"] = findProperty("signingKeyId")
+                extra["signing.password"] = findProperty("signingPassword")
+                extra["signing.inMemoryKey"] = findProperty("signingInMemoryKey")
+            }
             isRequired = isReleaseBuild && gradle.taskGraph.hasTask("publish")
             if (hasProperty("signing.inMemoryKey")) {
                 val signingKey = findProperty("signing.inMemoryKey").toString().replace("\\n", "\n")

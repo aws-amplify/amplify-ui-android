@@ -321,59 +321,43 @@ public final class com/amplifyframework/ui/liveness/ui/ChallengeOptions {
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$CancelChallengeButtonKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$CancelChallengeButtonKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
-	public static field lambda-2 Lkotlin/jvm/functions/Function2;
 	public fun <init> ()V
-	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-1739561416$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-1862551778$liveness_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1074976397$liveness_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
-	public static field lambda-2 Lkotlin/jvm/functions/Function2;
-	public static field lambda-3 Lkotlin/jvm/functions/Function2;
-	public static field lambda-4 Lkotlin/jvm/functions/Function2;
-	public static field lambda-5 Lkotlin/jvm/functions/Function2;
 	public fun <init> ()V
-	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-3$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-4$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-5$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-1869992115$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-570705483$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1195035115$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1876488350$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$710423168$liveness_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function2;
-	public static field lambda-3 Lkotlin/jvm/functions/Function2;
-	public static field lambda-4 Lkotlin/jvm/functions/Function2;
-	public static field lambda-5 Lkotlin/jvm/functions/Function2;
 	public fun <init> ()V
-	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-3$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-4$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-5$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1098672121$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$324742654$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$348729199$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$56343374$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$917919958$liveness_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$RecordingIndicatorKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$RecordingIndicatorKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
-	public static field lambda-2 Lkotlin/jvm/functions/Function2;
-	public static field lambda-3 Lkotlin/jvm/functions/Function2;
 	public fun <init> ()V
-	public final fun getLambda-1$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-2$liveness_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-3$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-58030538$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1064246070$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1564390526$liveness_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/amplifyframework/ui/liveness/ui/FaceGuideKt {

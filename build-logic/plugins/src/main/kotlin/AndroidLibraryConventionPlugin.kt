@@ -13,18 +13,16 @@
  * permissions and limitations under the License.
  */
 
+import com.amplify.ui.configureAndroid
 import com.android.build.api.dsl.LibraryExtension
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
  * This convention plugin configures an Android library module
@@ -34,6 +32,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target.pluginManager) {
             apply("com.android.library")
+            apply("org.jetbrains.kotlin.plugin.compose")
             apply("org.jetbrains.kotlin.android")
             apply("amplify.android.ktlint")
         }
@@ -43,7 +42,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             group = POM_GROUP
             extensions.configure<LibraryExtension> {
-                configureAndroid(this)
+                target.configureAndroid(this)
+                defaultConfig {
+                    consumerProguardFiles += rootProject.file("configuration/consumer-rules.pro")
+                }
             }
 
             tasks.withType<JavaCompile>().configureEach {
@@ -60,64 +62,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             configure<KotlinProjectExtension> {
                 jvmToolchain(17)
-            }
-        }
-    }
-
-    private fun Project.configureAndroid(extension: LibraryExtension) {
-        val sdkVersionName = findProperty("VERSION_NAME") ?: rootProject.findProperty("VERSION_NAME")
-
-        if (hasProperty("signingKeyId")) {
-            println("Getting signing info from protected source.")
-            extra["signing.keyId"] = findProperty("signingKeyId")
-            extra["signing.password"] = findProperty("signingPassword")
-            extra["signing.inMemoryKey"] = findProperty("signingInMemoryKey")
-        }
-
-        extension.apply {
-            compileSdk = 34
-
-            buildFeatures {
-                buildConfig = true
-            }
-
-            defaultConfig {
-                minSdk = 24
-                testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-                testInstrumentationRunnerArguments += "clearPackageData" to "true"
-                consumerProguardFiles += rootProject.file("configuration/consumer-rules.pro")
-
-                testOptions {
-                    animationsDisabled = true
-                    unitTests {
-                        isIncludeAndroidResources = true
-                    }
-                }
-
-                buildConfigField("String", "VERSION_NAME", "\"$sdkVersionName\"")
-            }
-
-            lint {
-                warningsAsErrors = true
-                abortOnError = true
-                enable += listOf("UnusedResources")
-                disable += listOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
-            }
-
-            // Needed when running integration tests. The oauth2 library uses relies on two
-            // dependencies (Apache's httpcore and httpclient), both of which include
-            // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
-            packaging {
-                resources.excludes.add("META-INF/DEPENDENCIES")
-                resources.excludes.add("META-INF/LICENSE*.*")
-            }
-
-            buildFeatures {
-                compose = true
-            }
-
-            composeOptions {
-                kotlinCompilerExtensionVersion = "1.5.3"
             }
         }
     }

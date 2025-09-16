@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.ImeAction
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.MutableFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
+import com.amplifyframework.ui.authenticator.util.contentTypeForKey
 
 @Composable
 internal fun TextInputField(
@@ -40,8 +41,9 @@ internal fun TextInputField(
 
     val label = StringResolver.label(fieldConfig)
     val hint = StringResolver.hint(fieldConfig)
+
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.contentTypeForKey(fieldConfig.key),
         enabled = enabled,
         value = fieldState.content,
         onValueChange = { fieldState.content = it.take(fieldConfig.maxLength) },

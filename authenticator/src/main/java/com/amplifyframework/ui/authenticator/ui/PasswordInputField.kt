@@ -36,6 +36,7 @@ import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.MutablePasswordFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
+import com.amplifyframework.ui.authenticator.util.contentTypeForKey
 
 @Composable
 internal fun PasswordInputField(
@@ -55,7 +56,7 @@ internal fun PasswordInputField(
     )
 
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.contentTypeForKey(fieldConfig.key),
         enabled = enabled,
         value = fieldState.content,
         onValueChange = { fieldState.content = it },

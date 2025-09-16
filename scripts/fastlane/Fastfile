@@ -25,7 +25,7 @@ platform :android do |options|
           changelog_path: "#{project_root}/liveness/CHANGELOG.md",
           component_name: "Liveness",
           top_level_docs_to_update: ["#{project_root}/README.md"],
-          sample_build_files_to_update: ["#{project_root}/samples/liveness/build.gradle"],
+          sample_build_files_to_update: ["#{project_root}/samples/liveness/app/build.gradle.kts"],
           changelog_include_scopes: ["liveness", "Liveness", "all"],
           changelog_ignore_scopes: ["authenticator", "Authenticator"]
         },
@@ -37,7 +37,7 @@ platform :android do |options|
           changelog_path: "#{project_root}/authenticator/CHANGELOG.md",
           component_name: "Authenticator",
           top_level_docs_to_update: ["#{project_root}/README.md"],
-          sample_build_files_to_update: ["#{project_root}/samples/authenticator/build.gradle"],
+          sample_build_files_to_update: ["#{project_root}/samples/authenticator/app/build.gradle.kts"],
           changelog_include_scopes: ["Authenticator", "authenticator", "all"],
           changelog_ignore_scopes: ["liveness", "Liveness"]
         }

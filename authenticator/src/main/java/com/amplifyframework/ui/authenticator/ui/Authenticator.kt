@@ -31,6 +31,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,6 +57,7 @@ import com.amplifyframework.ui.authenticator.SignUpState
 import com.amplifyframework.ui.authenticator.SignedInState
 import com.amplifyframework.ui.authenticator.VerifyUserConfirmState
 import com.amplifyframework.ui.authenticator.VerifyUserState
+import com.amplifyframework.ui.authenticator.locals.LocalAuthenticatorStep
 import com.amplifyframework.ui.authenticator.rememberAuthenticatorState
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 
@@ -140,31 +142,35 @@ fun Authenticator(
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 ) {
-                    headerContent()
-                    when (targetState) {
-                        is LoadingState -> loadingContent()
-                        is SignInState -> signInContent(targetState)
-                        is SignInConfirmMfaState -> signInConfirmMfaContent(targetState)
-                        is SignInConfirmCustomState -> signInConfirmCustomContent(targetState)
-                        is SignInConfirmNewPasswordState -> signInConfirmNewPasswordContent(
-                            targetState
-                        )
-                        is SignInConfirmTotpCodeState -> signInConfirmTotpCodeContent(targetState)
-                        is SignInContinueWithTotpSetupState -> signInContinueWithTotpSetupContent(targetState)
-                        is SignInContinueWithEmailSetupState -> signInContinueWithEmailSetupContent(targetState)
-                        is SignInContinueWithMfaSetupSelectionState ->
-                            signInContinueWithMfaSetupSelectionContent(targetState)
-                        is SignInContinueWithMfaSelectionState -> signInContinueWithMfaSelectionContent(targetState)
-                        is SignUpState -> signUpContent(targetState)
-                        is PasswordResetState -> passwordResetContent(targetState)
-                        is PasswordResetConfirmState -> passwordResetConfirmContent(targetState)
-                        is ErrorState -> errorContent(targetState)
-                        is SignUpConfirmState -> signUpConfirmContent(targetState)
-                        is VerifyUserState -> verifyUserContent(targetState)
-                        is VerifyUserConfirmState -> verifyUserConfirmContent(targetState)
-                        else -> Unit
+                    CompositionLocalProvider(LocalAuthenticatorStep provides targetState.step) {
+                        headerContent()
+                        when (targetState) {
+                            is LoadingState -> loadingContent()
+                            is SignInState -> signInContent(targetState)
+                            is SignInConfirmMfaState -> signInConfirmMfaContent(targetState)
+                            is SignInConfirmCustomState -> signInConfirmCustomContent(targetState)
+                            is SignInConfirmNewPasswordState -> signInConfirmNewPasswordContent(
+                                targetState
+                            )
+
+                            is SignInConfirmTotpCodeState -> signInConfirmTotpCodeContent(targetState)
+                            is SignInContinueWithTotpSetupState -> signInContinueWithTotpSetupContent(targetState)
+                            is SignInContinueWithEmailSetupState -> signInContinueWithEmailSetupContent(targetState)
+                            is SignInContinueWithMfaSetupSelectionState ->
+                                signInContinueWithMfaSetupSelectionContent(targetState)
+
+                            is SignInContinueWithMfaSelectionState -> signInContinueWithMfaSelectionContent(targetState)
+                            is SignUpState -> signUpContent(targetState)
+                            is PasswordResetState -> passwordResetContent(targetState)
+                            is PasswordResetConfirmState -> passwordResetConfirmContent(targetState)
+                            is ErrorState -> errorContent(targetState)
+                            is SignUpConfirmState -> signUpConfirmContent(targetState)
+                            is VerifyUserState -> verifyUserContent(targetState)
+                            is VerifyUserConfirmState -> verifyUserConfirmContent(targetState)
+                            else -> Unit
+                        }
+                        footerContent()
                     }
-                    footerContent()
                 }
             }
             SnackbarHost(hostState = snackbarState, modifier = Modifier.align(Alignment.BottomCenter))

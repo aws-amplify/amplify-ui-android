@@ -88,7 +88,8 @@ internal class UnableToResetPasswordMessage(override val cause: AuthException) :
     AuthenticatorMessage.Error
 
 // Avoid recomputing the same error message multiple times
-private val cachedErrorMessages = mutableMapOf<KClass<out AuthException>, String>()
+private typealias ErrorCache = MutableMap<KClass<out AuthException>, String>
+private val cachedErrorMessages: ErrorCache = mutableMapOf()
 
 /**
  * An unknown error occurred.
@@ -96,15 +97,19 @@ private val cachedErrorMessages = mutableMapOf<KClass<out AuthException>, String
 internal class UnknownErrorMessage(override val cause: AuthException) :
     AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_unknown),
     AuthenticatorMessage.Error {
-    @SuppressLint("DiscouragedApi")
+
     override fun message(context: Context): String {
-        return cachedErrorMessages.getOrPut(cause::class) {
+        return message(context, cachedErrorMessages)
+    }
+
+    @SuppressLint("DiscouragedApi")
+    internal fun message(context: Context, cache: ErrorCache): String {
+        return cache.getOrPut(cause::class) {
             // Check if the customer application has defined a specific string for this Exception type. If not, return
             // the generic error message.
             val resourceName = cause.toResourceName()
             val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
-            val message = if (resourceId != 0) context.getString(resourceId) else super.message(context)
-            return message
+            if (resourceId != 0) context.getString(resourceId) else super.message(context)
         }
     }
 }

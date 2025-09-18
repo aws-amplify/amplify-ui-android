@@ -15,6 +15,7 @@
 
 package com.amplifyframework.ui.authenticator.strings
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
@@ -133,6 +134,7 @@ internal open class StringResolver {
         else -> ""
     }
 
+    @SuppressLint("DiscouragedApi")
     @Composable
     @ReadOnlyComposable
     open fun error(error: AuthException): String {
@@ -142,7 +144,7 @@ internal open class StringResolver {
             // the generic error message.
             val resourceName = error.toResourceName()
             val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
-            val message = if (resourceId != 0) context.getString(resourceId) else null
+            val message = if (resourceId != 0) stringResource(resourceId) else null
             message ?: stringResource(R.string.amplify_ui_authenticator_error_unknown)
         }
     }

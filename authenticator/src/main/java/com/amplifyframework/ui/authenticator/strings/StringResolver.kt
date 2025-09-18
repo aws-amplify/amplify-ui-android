@@ -141,7 +141,7 @@ internal open class StringResolver {
             // Check if the customer application has defined a specific string for this Exception type. If not, return
             // the generic error message.
             val resourceName = error.toResourceName()
-            val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+            val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
             val message = if (resourceId != 0) context.getString(resourceId) else null
             message ?: stringResource(R.string.amplify_ui_authenticator_error_unknown)
         }

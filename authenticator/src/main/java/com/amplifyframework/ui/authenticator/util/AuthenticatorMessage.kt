@@ -102,7 +102,7 @@ internal class UnknownErrorMessage(override val cause: AuthException) :
             // Check if the customer application has defined a specific string for this Exception type. If not, return
             // the generic error message.
             val resourceName = cause.toResourceName()
-            val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+            val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
             val message = if (resourceId != 0) context.getString(resourceId) else super.message(context)
             return message
         }

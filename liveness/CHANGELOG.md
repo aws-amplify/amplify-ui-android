@@ -1,3 +1,43 @@
+## [Release 1.6.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.6.0)
+
+### Bug Fixes
+- **liveness:** 16kb Page Support for Liveness ([#251](https://github.com/aws-amplify/amplify-ui-android/issues/251))
+
+[See all changes between 1.5.0 and 1.6.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.5.0...release_liveness_v1.6.0)
+
+## [Release 1.5.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.5.0)
+
+### Features
+- **liveness:** Add support for a no light liveness challenge ([#248](https://github.com/aws-amplify/amplify-ui-android/issues/248))
+
+### Bug Fixes
+- **liveness:** Update CameraX library to latest ([#230](https://github.com/aws-amplify/amplify-ui-android/issues/230))
+- **liveness:** Prevent crashing if there's an exception thrown by the SurfaceTexture ([#231](https://github.com/aws-amplify/amplify-ui-android/issues/231))
+
+[See all changes between 1.4.2 and 1.5.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.2...release_liveness_v1.5.0)
+
+## [Release 1.4.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.2)
+
+### Miscellaneous
+- **all:** Update Amplify dependency to 2.27.2 ([#226](https://github.com/aws-amplify/amplify-ui-android/issues/226))
+
+[See all changes between 1.4.1 and 1.4.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.1...release_liveness_v1.4.2)
+
+## [Release 1.4.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.1)
+
+### Bug Fixes
+- **all:** Upgrade Compose to latest BOM ([#222](https://github.com/aws-amplify/amplify-ui-android/issues/222))
+
+[See all changes between 1.4.0 and 1.4.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.4.0...release_liveness_v1.4.1)
+
+## [Release 1.4.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.4.0)
+
+### Bug Fixes
+- **liveness:** Detect failed camera opening ([#205](https://github.com/aws-amplify/amplify-ui-android/issues/205))
+- **liveness:** Prevent the "Create Liveness Session" button from flashing on screen transition ([#193](https://github.com/aws-amplify/amplify-ui-android/issues/193))
+
+[See all changes between 1.3.0 and 1.4.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.3.0...release_liveness_v1.4.0)
+
 ## [Release 1.3.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.3.0)
 
 

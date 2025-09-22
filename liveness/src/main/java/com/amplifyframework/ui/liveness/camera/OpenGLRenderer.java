@@ -383,8 +383,12 @@ final class OpenGLRenderer {
                             Log.d(TAG, "setOnFrameAvailableListener");
                         }
                         makeCurrent(mNativeContext);
-                        surfaceTexture.updateTexImage();
-                        renderLatest();
+                        try {
+                            surfaceTexture.updateTexImage();
+                            renderLatest();
+                        } catch(Exception e) {
+                            Log.e(TAG, "Received an exception while updating texture image", e);
+                        }
                     }
                 },
                 mExecutor.getHandler());

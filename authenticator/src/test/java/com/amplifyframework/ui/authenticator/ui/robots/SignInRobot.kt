@@ -15,11 +15,23 @@
 
 package com.amplifyframework.ui.authenticator.ui.robots
 
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.test.junit4.ComposeTestRule
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.testing.ComposeTest
 
 fun ComposeTest.signIn(func: SignInRobot.() -> Unit) = SignInRobot(composeTestRule).func()
 
 class SignInRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule) {
-    fun hasSubmitButton(expected: String) = assertExists("SignInButton", expected)
+    fun hasSubmitButton(expected: String) = assertExists(TestTags.SignInButton, expected)
+    fun hasUsernameContentType(contentType: ContentType) = hasContentType(FieldKey.Username, contentType)
+    fun hasPasswordContentType(contentType: ContentType) = hasContentType(FieldKey.Password, contentType)
+
+    fun setUsername(value: String) = setFieldContent(FieldKey.Username, value)
+    fun setPassword(value: String) = setFieldContent(FieldKey.Password, value)
+    fun clickShowPassword() = clickOnShowIcon(FieldKey.Password)
+    fun clickSubmitButton() = clickOnTag(TestTags.SignInButton)
+    fun clickForgotPassword() = clickOnTag(TestTags.ForgotPasswordButton)
+    fun clickCreateAccount() = clickOnTag(TestTags.CreateAccountButton)
 }

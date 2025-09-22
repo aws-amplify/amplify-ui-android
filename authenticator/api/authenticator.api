@@ -614,23 +614,38 @@ public abstract interface class com/amplifyframework/ui/authenticator/forms/Pass
 
 public abstract interface class com/amplifyframework/ui/authenticator/forms/SignUpFormBuilder {
 	public abstract fun birthdate (Z)V
+	public static synthetic fun birthdate$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun confirmPassword ()V
 	public abstract fun custom (Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)V
+	public static synthetic fun custom$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
 	public abstract fun date (Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;)V
+	public static synthetic fun date$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 	public abstract fun email (Z)V
+	public static synthetic fun email$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun familyName (Z)V
+	public static synthetic fun familyName$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun givenName (Z)V
+	public static synthetic fun givenName$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun middleName (Z)V
+	public static synthetic fun middleName$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun name (Z)V
+	public static synthetic fun name$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun nickname (Z)V
+	public static synthetic fun nickname$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun password ()V
 	public abstract fun phone (Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;)V
+	public static synthetic fun phone$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
 	public abstract fun phoneNumber (Z)V
+	public static synthetic fun phoneNumber$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun preferredUsername (Z)V
+	public static synthetic fun preferredUsername$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun profile (Z)V
+	public static synthetic fun profile$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 	public abstract fun text-DoiiZ34 (Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;III)V
+	public static synthetic fun text-DoiiZ34$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;Lcom/amplifyframework/ui/authenticator/forms/FieldKey;Ljava/lang/String;Ljava/lang/String;ZLkotlin/jvm/functions/Function1;IIIILjava/lang/Object;)V
 	public abstract fun username ()V
 	public abstract fun website (Z)V
+	public static synthetic fun website$default (Lcom/amplifyframework/ui/authenticator/forms/SignUpFormBuilder;ZILjava/lang/Object;)V
 }
 
 public final class com/amplifyframework/ui/authenticator/forms/SignUpFormBuilder$DefaultImpls {
@@ -686,252 +701,177 @@ public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorFormKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorFormKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$559431668$authenticator_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
-	public static field lambda-10 Lkotlin/jvm/functions/Function3;
-	public static field lambda-11 Lkotlin/jvm/functions/Function3;
-	public static field lambda-12 Lkotlin/jvm/functions/Function3;
-	public static field lambda-13 Lkotlin/jvm/functions/Function3;
-	public static field lambda-14 Lkotlin/jvm/functions/Function3;
-	public static field lambda-15 Lkotlin/jvm/functions/Function3;
-	public static field lambda-16 Lkotlin/jvm/functions/Function3;
-	public static field lambda-17 Lkotlin/jvm/functions/Function3;
-	public static field lambda-18 Lkotlin/jvm/functions/Function2;
-	public static field lambda-19 Lkotlin/jvm/functions/Function2;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
-	public static field lambda-4 Lkotlin/jvm/functions/Function3;
-	public static field lambda-5 Lkotlin/jvm/functions/Function3;
-	public static field lambda-6 Lkotlin/jvm/functions/Function3;
-	public static field lambda-7 Lkotlin/jvm/functions/Function3;
-	public static field lambda-8 Lkotlin/jvm/functions/Function3;
-	public static field lambda-9 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-10$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-11$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-12$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-13$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-14$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-15$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-16$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-17$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-18$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-19$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-4$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-5$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-6$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-7$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-8$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-9$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1364811249$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1534614155$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1534995609$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1589760345$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-173861027$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1772037977$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1828710841$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-35945593$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-655729473$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-70309625$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$127509735$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1684084125$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1696024992$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1943575719$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2094400221$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$614972265$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$634797031$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$711026261$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$792593797$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$CommonFooterKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$CommonFooterKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-744346671$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$DateInputFieldKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$DateInputFieldKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1269239885$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$717979280$authenticator_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasswordResetConfirmKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasswordResetConfirmKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
-	public static field lambda-4 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-4$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-619958235$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2015501719$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$491390608$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$748373482$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasswordResetKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasswordResetKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$195658049$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2139310812$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$28245747$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PhoneInputFieldKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$PhoneInputFieldKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function2;
-	public static field lambda-2 Lkotlin/jvm/functions/Function2;
-	public static field lambda-3 Lkotlin/jvm/functions/Function2;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-64258515$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$639673736$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$977961286$authenticator_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmCustomKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmCustomKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
-	public static field lambda-4 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-4$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1730871209$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-510574857$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$510410421$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$511748233$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmMfaKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmMfaKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
-	public static field lambda-4 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-4$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-2084828453$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1586038146$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1843908396$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1874002537$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmNewPasswordKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmNewPasswordKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-198539869$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1387660565$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2054432399$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmTotpCodeKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmTotpCodeKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1318600931$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1482963249$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithEmailSetupKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithEmailSetupKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1762638129$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2052219485$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithMfaSelectionKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithMfaSelectionKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1542441015$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1780027177$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithMfaSetupSelectionKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithMfaSetupSelectionKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1222372585$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1872115227$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithTotpSetupKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInContinueWithTotpSetupKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1664919031$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$145559207$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$50679257$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
-	public static field lambda-4 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-4$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1438989771$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1675013456$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1064931947$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$334014841$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignUpConfirmKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignUpConfirmKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
-	public static field lambda-4 Lkotlin/jvm/functions/Function3;
-	public static field lambda-5 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-4$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-5$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1240579799$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1493762396$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-169553072$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1912345600$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-372379173$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignUpKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignUpKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1180884033$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1911801139$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1643654452$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$VerifyUserConfirmKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$VerifyUserConfirmKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
-	public static field lambda-4 Lkotlin/jvm/functions/Function3;
-	public static field lambda-5 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-4$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-5$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1474924808$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1867542748$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-551924015$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1475118211$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1631466068$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$VerifyUserKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$VerifyUserKt;
-	public static field lambda-1 Lkotlin/jvm/functions/Function3;
-	public static field lambda-2 Lkotlin/jvm/functions/Function3;
-	public static field lambda-3 Lkotlin/jvm/functions/Function3;
 	public fun <init> ()V
-	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-2$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda-3$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1885994635$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-888074616$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$417795943$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/PasswordResetConfirmKt {

@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.authenticator
 
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
+import com.amplifyframework.auth.AuthCodeDeliveryDetails.DeliveryMedium
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthFactorType
 import com.amplifyframework.auth.AuthSession
@@ -25,8 +26,11 @@ import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.TOTPSetupDetails
 import com.amplifyframework.auth.result.AuthSignInResult
+import com.amplifyframework.auth.result.AuthSignUpResult
 import com.amplifyframework.auth.result.step.AuthNextSignInStep
+import com.amplifyframework.auth.result.step.AuthNextSignUpStep
 import com.amplifyframework.auth.result.step.AuthSignInStep
+import com.amplifyframework.auth.result.step.AuthSignUpStep
 import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
@@ -112,7 +116,36 @@ internal fun mockNextSignInStep(
     availableFactors
 )
 
+internal fun mockSignUpResult(
+    nextStep: AuthNextSignUpStep,
+    userId: String = "userId"
+) = AuthSignUpResult(
+    nextStep.signUpStep != AuthSignUpStep.CONFIRM_SIGN_UP_STEP,
+    nextStep,
+    userId
+)
+
+internal fun mockNextSignUpStep(
+    signUpStep: AuthSignUpStep = AuthSignUpStep.DONE,
+    additionalInfo: Map<String, String> = emptyMap(),
+    codeDeliveryDetails: AuthCodeDeliveryDetails? = null
+) = AuthNextSignUpStep(
+    signUpStep,
+    additionalInfo,
+    codeDeliveryDetails
+)
+
 internal fun mockUserAttributes(vararg attribute: Pair<AuthUserAttributeKey, String>) =
     attribute.map { AuthUserAttribute(it.first, it.second) }
 
 internal fun mockUser(userId: String = "userId", username: String = "username") = AuthUser(userId, username)
+
+internal fun mockAuthCodeDeliveryDetails(
+    destination: String = "123-123-1234",
+    deliveryMedium: DeliveryMedium = DeliveryMedium.SMS,
+    attributeName: String? = AuthUserAttributeKey.phoneNumber().keyString
+) = AuthCodeDeliveryDetails(
+    destination,
+    deliveryMedium,
+    attributeName
+)

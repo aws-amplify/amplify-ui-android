@@ -16,7 +16,9 @@
 package com.amplifyframework.ui.authenticator
 
 import android.app.Application
+import androidx.lifecycle.viewmodel.compose.viewModel
 import aws.smithy.kotlin.runtime.http.HttpException
+import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthUserAttributeKey.email
 import com.amplifyframework.auth.AuthUserAttributeKey.emailVerified
 import com.amplifyframework.auth.MFAType
@@ -27,6 +29,8 @@ import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.step.AuthNextResetPasswordStep
 import com.amplifyframework.auth.result.step.AuthResetPasswordStep
 import com.amplifyframework.auth.result.step.AuthSignInStep
+import com.amplifyframework.auth.result.step.AuthSignUpStep
+import com.amplifyframework.hub.HubEvent
 import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult.Error
@@ -44,7 +48,11 @@ import io.mockk.every
 import io.mockk.mockk
 import java.net.UnknownHostException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -64,10 +72,13 @@ class AuthenticatorViewModelTest {
 
     private val viewModel = AuthenticatorViewModel(application, authProvider)
 
+    private val hubFlow = MutableSharedFlow<HubEvent<*>>(replay = 0)
+
     @Before
     fun setup() {
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration()
         coEvery { authProvider.getCurrentUser() } returns Success(mockUser())
+        coEvery { authProvider.authStatusEvents() } returns hubFlow
     }
 
 //region start tests
@@ -477,6 +488,76 @@ class AuthenticatorViewModelTest {
 
         // Assert step does not change
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+    }
+
+    @Test
+    fun `moves to SignedInState when receiving SignedIn event`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        runCurrent()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+        hubFlow.emit(HubEvent.create(AuthChannelEventName.SIGNED_IN.name))
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+    }
+
+    @Test
+    fun `does not advance to signed in if sign in is in progress when SignedIn event is received`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } coAnswers {
+            delay(1000) // delay so that the sign in does not complete until the clock is advanced
+            Success(mockSignInResult())
+        }
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        runCurrent()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+
+        backgroundScope.launch { viewModel.signIn("username", "password") }
+
+        hubFlow.emit(HubEvent.create(AuthChannelEventName.SIGNED_IN.name))
+
+        // Since sign in is in progress we should not move to SignedIn until after it completes
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
+        advanceUntilIdle() // advance the clock to complete sign in
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+    }
+
+    @Test
+    fun `does not advance to SignedIn when SignedIn event is received in a post-sign-in state`() = runTest {
+        coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
+        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
+            verificationMechanisms = setOf(VerificationMechanism.Email)
+        )
+        coEvery { authProvider.fetchUserAttributes() } returns Success(
+            mockUserAttributes(email() to "email", emailVerified() to "false")
+        )
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.signIn("username", "password")
+
+        viewModel.currentStep shouldBe AuthenticatorStep.VerifyUser
+        hubFlow.emit(HubEvent.create(AuthChannelEventName.SIGNED_IN.name))
+        viewModel.currentStep shouldBe AuthenticatorStep.VerifyUser // stay in current state
+    }
+
+//endregion
+//region sign up tests
+
+    @Test
+    fun `user can autoSignIn after sign up`() = runTest {
+        val result = mockSignUpResult(nextStep = mockNextSignUpStep(signUpStep = AuthSignUpStep.COMPLETE_AUTO_SIGN_IN))
+        coEvery { authProvider.signUp("username", "password", any()) } returns Success(result)
+        coEvery { authProvider.autoSignIn() } returns Success(mockSignInResult())
+
+        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.signUp("username", "password", emptyList())
+        advanceUntilIdle()
+
+        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
     }
 
 //endregion

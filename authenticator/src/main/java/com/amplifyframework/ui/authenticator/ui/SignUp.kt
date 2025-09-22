@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -52,19 +53,25 @@ fun SignUp(
             onClick = { scope.launch { state.signUp() } },
             loading = !state.form.enabled,
             label = stringResource(R.string.amplify_ui_authenticator_button_signup),
-            modifier = Modifier.testTag("SignUpButton")
+            modifier = Modifier.testTag(TestTags.SignUpButton)
         )
         footerContent(state)
     }
 }
 
 @Composable
-fun SignUpFooter(
-    state: SignUpState,
-    modifier: Modifier = Modifier
-) {
+fun SignUpFooter(state: SignUpState, modifier: Modifier = Modifier) {
+    // If we navigate away from the screen via some reason other that submitting the form then cancel any changes
+    // in autofill manager so that user won't be prompted to update their saved password
+    val autofillManager = LocalAutofillManager.current
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        TextButton(onClick = { state.moveTo(AuthenticatorStep.SignIn) }) {
+        TextButton(
+            modifier = Modifier.testTag(TestTags.BackToSignInButton),
+            onClick = {
+                autofillManager?.cancel()
+                state.moveTo(AuthenticatorStep.SignIn)
+            }
+        ) {
             Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
         }
     }

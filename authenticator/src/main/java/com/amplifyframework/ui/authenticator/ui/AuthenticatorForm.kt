@@ -48,7 +48,7 @@ internal fun AuthenticatorForm(
     ) {
         state.fields.values.forEach { field ->
             AuthenticatorField(
-                modifier = Modifier.fillMaxWidth().testTag(field.config.key.toString()),
+                modifier = Modifier.fillMaxWidth().testTag(field.config.key.testTag),
                 fieldConfig = field.config,
                 fieldState = field.state,
                 formState = state

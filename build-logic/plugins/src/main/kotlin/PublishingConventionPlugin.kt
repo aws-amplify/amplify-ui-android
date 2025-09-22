@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.plugins.signing.SigningExtension
@@ -117,6 +118,7 @@ class PublishingConventionPlugin : Plugin<Project> {
 
             repositories {
                 maven {
+                    name = "ossrh-staging-api"
                     url = if (isReleaseBuild) releaseRepositoryUrl else snapshotRepositoryUrl
                     credentials {
                         username = sonatypeUsername
@@ -127,6 +129,12 @@ class PublishingConventionPlugin : Plugin<Project> {
         }
 
         configure<SigningExtension> {
+            if (hasProperty("signingKeyId")) {
+                println("Getting signing info from protected source.")
+                extra["signing.keyId"] = findProperty("signingKeyId")
+                extra["signing.password"] = findProperty("signingPassword")
+                extra["signing.inMemoryKey"] = findProperty("signingInMemoryKey")
+            }
             isRequired = isReleaseBuild && gradle.taskGraph.hasTask("publish")
             if (hasProperty("signing.inMemoryKey")) {
                 val signingKey = findProperty("signing.inMemoryKey").toString().replace("\\n", "\n")
@@ -148,7 +156,7 @@ class PublishingConventionPlugin : Plugin<Project> {
         get() = URI.create(
             getPropertyOrDefault(
                 "RELEASE_REPOSITORY_URL",
-                "https://aws.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
             )
         )
 
@@ -156,7 +164,7 @@ class PublishingConventionPlugin : Plugin<Project> {
         get() = URI.create(
             getPropertyOrDefault(
                 "SNAPSHOT_REPOSITORY_URL",
-                "https://aws.oss.sonatype.org/content/repositories/snapshots/"
+                "https://ossrh-staging-api.central.sonatype.com/content/repositories/snapshots/"
             )
         )
 

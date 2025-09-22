@@ -18,7 +18,6 @@ package com.amplifyframework.ui.sample.authenticator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -40,28 +39,28 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.AuthenticatorState
 import com.amplifyframework.ui.authenticator.SignedInState
 import com.amplifyframework.ui.authenticator.rememberAuthenticatorState
 import com.amplifyframework.ui.authenticator.ui.Authenticator
+import com.amplifyframework.ui.sample.authenticator.data.ThemeDatastore
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+    private val themeDatastore by lazy { ThemeDatastore(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val inDarkMode = isSystemInDarkTheme()
-            var currentTheme by remember { mutableStateOf(SupportedTheme.Default) }
-            var darkMode by remember { mutableStateOf(inDarkMode) }
+            val currentTheme by themeDatastore.theme.collectAsState(SupportedTheme.Default)
+            val darkMode by themeDatastore.darkMode.collectAsState(false)
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+            val scope = rememberCoroutineScope()
 
             val authenticatorState = rememberAuthenticatorState()
 
@@ -75,8 +74,8 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.padding(16.dp),
                                     currentTheme = currentTheme,
                                     darkMode = darkMode,
-                                    onChangeCurrentTheme = { currentTheme = it },
-                                    onChangeDarkMode = { darkMode = it }
+                                    onChangeCurrentTheme = { scope.launch { themeDatastore.saveTheme(it) } },
+                                    onChangeDarkMode = { scope.launch { themeDatastore.saveDarkMode(it) } }
                                 )
                             }
                         }
@@ -91,10 +90,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SampleAppContent(
-    drawerState: DrawerState,
-    authenticatorState: AuthenticatorState
-) {
+fun SampleAppContent(drawerState: DrawerState, authenticatorState: AuthenticatorState) {
     val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {

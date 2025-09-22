@@ -22,15 +22,18 @@ public final class com/amplifyframework/ui/authenticator/BuildConfig {
 
 public final class com/amplifyframework/ui/authenticator/ErrorState : com/amplifyframework/ui/authenticator/AuthenticatorStepState {
 	public static final field $stable I
-	public fun <init> (Lcom/amplifyframework/auth/AuthException;)V
+	public fun <init> (Lcom/amplifyframework/auth/AuthException;Lkotlin/jvm/functions/Function1;)V
+	public synthetic fun <init> (Lcom/amplifyframework/auth/AuthException;Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Lcom/amplifyframework/auth/AuthException;
-	public final fun copy (Lcom/amplifyframework/auth/AuthException;)Lcom/amplifyframework/ui/authenticator/ErrorState;
-	public static synthetic fun copy$default (Lcom/amplifyframework/ui/authenticator/ErrorState;Lcom/amplifyframework/auth/AuthException;ILjava/lang/Object;)Lcom/amplifyframework/ui/authenticator/ErrorState;
+	public final fun copy (Lcom/amplifyframework/auth/AuthException;Lkotlin/jvm/functions/Function1;)Lcom/amplifyframework/ui/authenticator/ErrorState;
+	public static synthetic fun copy$default (Lcom/amplifyframework/ui/authenticator/ErrorState;Lcom/amplifyframework/auth/AuthException;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/amplifyframework/ui/authenticator/ErrorState;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCanRetry ()Z
 	public final fun getError ()Lcom/amplifyframework/auth/AuthException;
 	public fun getStep ()Lcom/amplifyframework/ui/authenticator/enums/AuthenticatorStep$Error;
 	public synthetic fun getStep ()Lcom/amplifyframework/ui/authenticator/enums/AuthenticatorStep;
 	public fun hashCode ()I
+	public final fun retry (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -687,6 +690,13 @@ public final class com/amplifyframework/ui/authenticator/ui/AuthenticatorKt {
 
 public final class com/amplifyframework/ui/authenticator/ui/AuthenticatorLoadingKt {
 	public static final fun AuthenticatorLoading (Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorErrorKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorErrorKt;
+	public static field lambda-1 Lkotlin/jvm/functions/Function3;
+	public fun <init> ()V
+	public final fun getLambda-1$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorFormKt {

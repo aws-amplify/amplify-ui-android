@@ -24,7 +24,7 @@ import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.auth.result.AuthWebAuthnCredential
-import com.amplifyframework.ui.authenticator.enums.AuthFactor
+import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.MutableFormState

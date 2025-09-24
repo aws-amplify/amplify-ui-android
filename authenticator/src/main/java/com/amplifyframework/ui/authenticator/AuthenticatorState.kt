@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
@@ -46,7 +47,8 @@ import kotlinx.coroutines.flow.onEach
 fun rememberAuthenticatorState(
     initialStep: AuthenticatorInitialStep = AuthenticatorStep.SignIn,
     signUpForm: SignUpFormBuilder.() -> Unit = {},
-    totpOptions: TotpOptions? = null
+    totpOptions: TotpOptions? = null,
+    authenticationFlow: AuthenticationFlow = AuthenticationFlow.Password
 ): AuthenticatorState {
     val viewModel = viewModel<AuthenticatorViewModel>()
     val scope = rememberCoroutineScope()
@@ -54,7 +56,8 @@ fun rememberAuthenticatorState(
         val configuration = AuthenticatorConfiguration(
             initialStep = initialStep,
             signUpForm = signUpForm,
-            totpOptions = totpOptions
+            totpOptions = totpOptions,
+            authenticationFlow = authenticationFlow
         )
 
         viewModel.start(configuration)
@@ -102,9 +105,7 @@ interface AuthenticatorState {
     val messages: Flow<AuthenticatorMessage>
 }
 
-internal class AuthenticatorStateImpl constructor(
-    private val viewModel: AuthenticatorViewModel
-) : AuthenticatorState {
+internal class AuthenticatorStateImpl constructor(private val viewModel: AuthenticatorViewModel) : AuthenticatorState {
     override var stepState by mutableStateOf<AuthenticatorStepState>(LoadingState)
 
     override val messages: Flow<AuthenticatorMessage>

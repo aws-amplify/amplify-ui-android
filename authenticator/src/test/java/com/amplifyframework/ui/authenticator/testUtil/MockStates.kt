@@ -34,6 +34,7 @@ import com.amplifyframework.ui.authenticator.states.SignInContinueWithEmailSetup
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSelectionStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSetupSelectionStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithTotpSetupStateImpl
+import com.amplifyframework.ui.authenticator.states.SignInConfirmPasswordStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInStateImpl
 import com.amplifyframework.ui.authenticator.states.SignUpStateImpl
 
@@ -136,3 +137,15 @@ internal fun mockPasskeyCreationPromptState(onSubmit: suspend () -> Unit = {}, o
         onSubmit = onSubmit,
         onSkip = onSkip
     )
+
+internal fun mockSignInConfirmPasswordState(
+    username: String = "testuser",
+    signInMethod: SignInMethod = SignInMethod.Username,
+    onSubmit: suspend (String) -> Unit = { },
+    onMoveTo: (AuthenticatorInitialStep) -> Unit = { }
+) = SignInConfirmPasswordStateImpl(
+    username = username,
+    signInMethod = signInMethod,
+    onSubmit = onSubmit,
+    onMoveTo = onMoveTo
+)

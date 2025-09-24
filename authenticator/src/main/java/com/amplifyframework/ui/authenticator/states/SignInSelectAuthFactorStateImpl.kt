@@ -3,20 +3,22 @@ package com.amplifyframework.ui.authenticator.states
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.amplifyframework.ui.authenticator.SignInSelectFactorState
+import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.enums.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.enums.containsPassword
 
-internal class SignInSelectFactorStateImpl(
+internal class SignInSelectAuthFactorStateImpl(
     override val username: String,
+    val signInMethod: SignInMethod,
     override val availableAuthFactors: Set<AuthFactor>,
     private val onSubmit: suspend (authFactor: AuthFactor) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
 ) : BaseStateImpl(),
-    SignInSelectFactorState {
-    override val step: AuthenticatorStep = AuthenticatorStep.SignInSelectFactor
+    SignInSelectAuthFactorState {
+    override val step: AuthenticatorStep = AuthenticatorStep.SignInSelectAuthFactor
 
     override var selectedFactor: AuthFactor? by mutableStateOf(null)
 
@@ -40,5 +42,8 @@ internal class SignInSelectFactorStateImpl(
     }
 }
 
-internal fun SignInSelectFactorState.getPasswordFactor(): AuthFactor =
+internal fun SignInSelectAuthFactorState.getPasswordFactor(): AuthFactor =
     availableAuthFactors.first { it is AuthFactor.Password }
+
+internal val SignInSelectAuthFactorState.signInMethod: SignInMethod
+    get() = (this as SignInSelectAuthFactorStateImpl).signInMethod

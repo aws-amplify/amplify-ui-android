@@ -10,11 +10,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.SignInConfirmPasswordState
+import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
+import com.amplifyframework.ui.authenticator.forms.FieldKey
+import com.amplifyframework.ui.authenticator.states.signInMethod
+import com.amplifyframework.ui.authenticator.strings.StringResolver
 import com.amplifyframework.ui.authenticator.util.AuthenticatorUiConstants
 import kotlinx.coroutines.launch
 
@@ -34,12 +39,15 @@ fun SignInConfirmPassword(
             .padding(horizontal = 16.dp)
     ) {
         headerContent(state)
+        val usernameLabel = StringResolver.fieldName(state.signInMethod.toFieldKey())
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(FieldKey.Username.testTag),
             value = state.username,
             onValueChange = {},
-            label = { Text("Username") }, // todo proper labelling
-            enabled = false
+            label = { Text(usernameLabel) },
+            readOnly = true
         )
         Spacer(modifier = Modifier.size(AuthenticatorUiConstants.spaceBetweenFields))
         AuthenticatorForm(
@@ -47,7 +55,9 @@ fun SignInConfirmPassword(
         )
         AuthenticatorButton(
             onClick = { scope.launch { state.signIn() } },
-            loading = !state.form.enabled
+            loading = !state.form.enabled,
+            label = stringResource(R.string.amplify_ui_authenticator_button_signin),
+            modifier = Modifier.testTag(TestTags.SignInButton)
         )
         footerContent(state)
     }

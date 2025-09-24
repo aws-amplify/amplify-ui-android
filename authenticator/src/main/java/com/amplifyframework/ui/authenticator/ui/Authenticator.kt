@@ -54,7 +54,7 @@ import com.amplifyframework.ui.authenticator.SignInContinueWithEmailSetupState
 import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSelectionState
 import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSetupSelectionState
 import com.amplifyframework.ui.authenticator.SignInContinueWithTotpSetupState
-import com.amplifyframework.ui.authenticator.SignInSelectFactorState
+import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState
 import com.amplifyframework.ui.authenticator.SignInState
 import com.amplifyframework.ui.authenticator.SignUpConfirmState
 import com.amplifyframework.ui.authenticator.SignUpState
@@ -151,7 +151,7 @@ fun Authenticator(
                         when (targetState) {
                             is LoadingState -> loadingContent()
                             is SignInState -> signInContent(targetState)
-                            is SignInSelectFactorState -> SignInSelectFactor(targetState)
+                            is SignInSelectAuthFactorState -> SignInSelectAuthFactor(targetState)
                             is SignInConfirmMfaState -> signInConfirmMfaContent(targetState)
                             is SignInConfirmCustomState -> signInConfirmCustomContent(targetState)
                             is SignInConfirmNewPasswordState -> signInConfirmNewPasswordContent(

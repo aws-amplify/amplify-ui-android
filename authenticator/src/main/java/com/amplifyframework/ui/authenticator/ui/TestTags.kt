@@ -32,6 +32,11 @@ internal object TestTags {
     const val SkipPasskeyButton = "SkipPasskeyButton"
     const val AuthenticatorTitle = "AuthenticatorTitle"
 
+    const val AuthFactorPassword = "AuthFactorPassword"
+    const val AuthFactorSms = "AuthFactorSms"
+    const val AuthFactorEmail = "AuthFactorEmail"
+    const val AuthFactorPasskey = "AuthFactorPasskey"
+
     const val ShowPasswordIcon = "ShowPasswordIcon"
 }
 

@@ -1,8 +1,5 @@
 package com.amplifyframework.ui.authenticator.ui
 
-import android.widget.Space
-import androidx.compose.animation.core.animateValueAsState
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,28 +9,31 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.R
-import com.amplifyframework.ui.authenticator.SignInSelectFactorState
+import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState
+import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.enums.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.enums.containsPassword
+import com.amplifyframework.ui.authenticator.locals.LocalStringResolver
 import com.amplifyframework.ui.authenticator.states.getPasswordFactor
+import com.amplifyframework.ui.authenticator.states.signInMethod
+import com.amplifyframework.ui.authenticator.strings.StringResolver
 import com.amplifyframework.ui.authenticator.util.AuthenticatorUiConstants
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignInSelectFactor(
-    state: SignInSelectFactorState,
+fun SignInSelectAuthFactor(
+    state: SignInSelectAuthFactorState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (SignInSelectFactorState) -> Unit = {
+    headerContent: @Composable (SignInSelectAuthFactorState) -> Unit = {
         AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_select_factor))
     },
-    footerContent: @Composable (SignInSelectFactorState) -> Unit = { SignInSelectFactorFooter(it) }
+    footerContent: @Composable (SignInSelectAuthFactorState) -> Unit = { SignInSelectFactorFooter(it) }
 ) {
     val scope = rememberCoroutineScope()
     Column(
@@ -41,17 +41,17 @@ fun SignInSelectFactor(
     ) {
         headerContent(state)
 
+        val usernameLabel = StringResolver.fieldName(state.signInMethod.toFieldKey())
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             value = state.username,
             onValueChange =  {},
-            label = { Text("Username") }, // todo proper labelling
+            label = { Text(usernameLabel) },
             enabled = false
         )
         Spacer(modifier = Modifier.size(AuthenticatorUiConstants.spaceBetweenFields))
         AuthenticatorForm(
-            state = state.form,
-            bottomSpace = 0.dp
+            state = state.form
         )
 
         if (state.availableAuthFactors.containsPassword()) {
@@ -60,12 +60,12 @@ fun SignInSelectFactor(
                 loading = state.selectedFactor == state.getPasswordFactor(),
                 enabled = state.selectedFactor == null,
                 label = stringResource(R.string.amplify_ui_authenticator_button_signin_password),
-                modifier = Modifier.testTag("SignInPasswordButton")
+                modifier = Modifier.testTag(TestTags.AuthFactorPassword)
             )
 
             if (state.availableAuthFactors.size > 1) {
                 DividerWithText(
-                    text = "or", // todo string resource
+                    text = stringResource(R.string.amplify_ui_authenticator_or),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -77,7 +77,7 @@ fun SignInSelectFactor(
                 loading = state.selectedFactor == AuthFactor.WebAuthn,
                 enabled = state.selectedFactor == null,
                 label = stringResource(R.string.amplify_ui_authenticator_button_signin_passkey),
-                modifier = Modifier.testTag("SignInPasskeyButton")
+                modifier = Modifier.testTag(TestTags.AuthFactorPasskey)
             )
         }
         if (state.availableAuthFactors.contains(AuthFactor.EmailOtp)) {
@@ -86,7 +86,7 @@ fun SignInSelectFactor(
                 loading = state.selectedFactor == AuthFactor.EmailOtp,
                 enabled = state.selectedFactor == null,
                 label = stringResource(R.string.amplify_ui_authenticator_button_signin_email),
-                modifier = Modifier.testTag("SignInEmailButton")
+                modifier = Modifier.testTag(TestTags.AuthFactorEmail)
             )
         }
         if (state.availableAuthFactors.contains(AuthFactor.SmsOtp)) {
@@ -95,7 +95,7 @@ fun SignInSelectFactor(
                 loading = state.selectedFactor == AuthFactor.SmsOtp,
                 enabled = state.selectedFactor == null,
                 label = stringResource(R.string.amplify_ui_authenticator_button_signin_sms),
-                modifier = Modifier.testTag("SignInSmsButton")
+                modifier = Modifier.testTag(TestTags.AuthFactorSms)
             )
         }
         footerContent(state)
@@ -103,7 +103,7 @@ fun SignInSelectFactor(
 }
 
 @Composable
-fun SignInSelectFactorFooter(state: SignInSelectFactorState, modifier: Modifier = Modifier) = BackToSignInFooter(
+fun SignInSelectFactorFooter(state: SignInSelectAuthFactorState, modifier: Modifier = Modifier) = BackToSignInFooter(
     modifier = modifier,
     onClickBackToSignIn = { state.moveTo(AuthenticatorStep.SignIn) }
 )

@@ -99,7 +99,7 @@ interface SignInState : AuthenticatorStepState {
  * The user has entered their username and must select the authentication factor they'd like to use to sign in
  */
 @Stable
-interface SignInSelectFactorState: AuthenticatorStepState {
+interface SignInSelectAuthFactorState: AuthenticatorStepState {
     /**
      * The input form state holder for this step.
      */

@@ -1,3 +1,11 @@
+## [Release 1.7.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.7.0)
+
+### Features
+- **all:** Update Kotlin language version to 2.2.0 ([#256](https://github.com/aws-amplify/amplify-ui-android/issues/256))
+- **authenticator:** Allow customer to override error strings per exception type ([#266](https://github.com/aws-amplify/amplify-ui-android/issues/266))
+
+[See all changes between 1.6.0 and 1.7.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.6.0...release_authenticator_v1.7.0)
+
 ## [Release 1.6.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.6.0)
 
 ### Features

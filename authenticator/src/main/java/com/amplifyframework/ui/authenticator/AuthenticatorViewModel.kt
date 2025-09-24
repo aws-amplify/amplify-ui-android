@@ -79,6 +79,7 @@ import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
+import com.amplifyframework.ui.authenticator.util.UnsupportedNextStepException
 import com.amplifyframework.ui.authenticator.util.isConnectivityIssue
 import com.amplifyframework.ui.authenticator.util.toFieldError
 import kotlinx.coroutines.channels.BufferOverflow
@@ -92,7 +93,6 @@ import org.jetbrains.annotations.VisibleForTesting
 
 internal class AuthenticatorViewModel(application: Application, private val authProvider: AuthProvider) :
     AndroidViewModel(application) {
-
     // Constructor for compose viewModels provider
     constructor(application: Application) : this(application, RealAuthProvider())
 
@@ -218,6 +218,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
     }
 
     private suspend fun handleSignUpFailure(error: AuthException) = handleAuthException(error)
+
     private suspend fun handleSignUpConfirmFailure(error: AuthException) = handleAuthException(error)
 
     private suspend fun handleSignUpSuccess(username: String, password: String, result: AuthSignUpResult) {
@@ -439,10 +440,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
             )
             else -> {
                 // Generic error for any other next steps that may be added in the future
-                val exception = AuthException(
-                    "Unsupported next step $nextStep.",
-                    "Authenticator does not support this Authentication flow, disable it to use Authenticator."
-                )
+                val exception = UnsupportedNextStepException(nextStep)
                 logger.error("Unsupported next step $nextStep", exception)
                 sendMessage(UnknownErrorMessage(exception))
             }

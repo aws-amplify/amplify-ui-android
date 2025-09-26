@@ -42,4 +42,7 @@
 
     <!-- Passkey Created Screen -->
     <string name="amplify_ui_authenticator_existing_passkeys">Existing Passkeys</string>
+
+    <!-- Select Auth Factor Screen -->
+    <string name="amplify_ui_authenticator_or">or</string>
 </resources>

@@ -16,6 +16,8 @@
 <resources>
     <!-- Titles -->
     <string name="amplify_ui_authenticator_title_signin">Sign In</string>
+    <string name="amplify_ui_authenticator_title_select_factor">Choose how to sign in</string>
+    <string name="amplify_ui_authenticator_title_signin_confirm_password">Enter your password</string>
     <string name="amplify_ui_authenticator_title_signin_confirm_mfa">Verify your sign-in</string>
     <string name="amplify_ui_authenticator_title_signin_confirm_new_password">Change your password to sign in</string>
     <string name="amplify_ui_authenticator_title_signup">Create Account</string>

@@ -24,14 +24,14 @@ import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.authenticator.ui.testTag
 import com.amplifyframework.ui.testing.ComposeTest
 
-fun ComposeTest.signInSelectAuthFactor(func: SignInSelectAuthFactorRobot.() -> Unit) = 
+fun ComposeTest.signInSelectAuthFactor(func: SignInSelectAuthFactorRobot.() -> Unit) =
     SignInSelectAuthFactorRobot(composeTestRule).func()
 
 class SignInSelectAuthFactorRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule) {
     fun hasUsername(expected: String) = composeTestRule.onNode(
         hasTestTag(FieldKey.Username.testTag) and hasText(expected)
     ).assertExists()
-    
+
     fun hasPasswordButton() = composeTestRule.onNode(hasTestTag(TestTags.AuthFactorPassword)).assertExists()
     fun hasPasskeyButton() = composeTestRule.onNode(hasTestTag(TestTags.AuthFactorPasskey)).assertExists()
     fun hasEmailButton() = composeTestRule.onNode(hasTestTag(TestTags.AuthFactorEmail)).assertExists()

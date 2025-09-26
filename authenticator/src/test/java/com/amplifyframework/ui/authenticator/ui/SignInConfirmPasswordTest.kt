@@ -87,7 +87,9 @@ class SignInConfirmPasswordTest : AuthenticatorUiTest() {
     @ScreenshotTest
     fun `ready to submit with email`() {
         setContent {
-            SignInConfirmPassword(state = mockSignInConfirmPasswordState(username = "test@test.com", signInMethod = SignInMethod.Email))
+            SignInConfirmPassword(
+                state = mockSignInConfirmPasswordState(username = "test@test.com", signInMethod = SignInMethod.Email)
+            )
         }
         signInConfirmPassword {
             setPassword("password123")
@@ -98,7 +100,12 @@ class SignInConfirmPasswordTest : AuthenticatorUiTest() {
     @ScreenshotTest
     fun `ready to submit with phonenumber`() {
         setContent {
-            SignInConfirmPassword(state = mockSignInConfirmPasswordState(username = "+19021231234", signInMethod = SignInMethod.PhoneNumber))
+            SignInConfirmPassword(
+                state = mockSignInConfirmPasswordState(
+                    username = "+19021231234",
+                    signInMethod = SignInMethod.PhoneNumber
+                )
+            )
         }
         signInConfirmPassword {
             setPassword("password123")

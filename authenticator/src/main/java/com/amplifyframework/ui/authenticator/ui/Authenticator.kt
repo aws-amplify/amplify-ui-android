@@ -42,9 +42,9 @@ import com.amplifyframework.ui.authenticator.AuthenticatorStepState
 import com.amplifyframework.ui.authenticator.ErrorState
 import com.amplifyframework.ui.authenticator.LoadingState
 import com.amplifyframework.ui.authenticator.PasskeyCreatedState
+import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState
 import com.amplifyframework.ui.authenticator.PasswordResetConfirmState
 import com.amplifyframework.ui.authenticator.PasswordResetState
-import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState
 import com.amplifyframework.ui.authenticator.SignInConfirmCustomState
 import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
 import com.amplifyframework.ui.authenticator.SignInConfirmNewPasswordState

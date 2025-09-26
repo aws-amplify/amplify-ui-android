@@ -20,7 +20,6 @@ import com.amplifyframework.ui.authenticator.enums.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.enums.containsPassword
 import com.amplifyframework.ui.authenticator.forms.FieldKey
-import com.amplifyframework.ui.authenticator.locals.LocalStringResolver
 import com.amplifyframework.ui.authenticator.states.getPasswordFactor
 import com.amplifyframework.ui.authenticator.states.signInMethod
 import com.amplifyframework.ui.authenticator.strings.StringResolver
@@ -47,7 +46,7 @@ fun SignInSelectAuthFactor(
                 .fillMaxWidth()
                 .testTag(FieldKey.Username.testTag),
             value = state.username,
-            onValueChange =  {},
+            onValueChange = {},
             label = { Text(usernameLabel) },
             enabled = false
         )
@@ -102,7 +101,7 @@ private fun AuthFactorButton(
 }
 
 private val AuthFactor.signInResourceId: Int
-    get() = when(this) {
+    get() = when (this) {
         is AuthFactor.Password -> R.string.amplify_ui_authenticator_button_signin_password
         AuthFactor.SmsOtp -> R.string.amplify_ui_authenticator_button_signin_sms
         AuthFactor.EmailOtp -> R.string.amplify_ui_authenticator_button_signin_email

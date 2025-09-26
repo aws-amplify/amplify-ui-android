@@ -19,16 +19,16 @@ import com.amplifyframework.auth.AuthFactorType
 
 sealed interface AuthFactor {
     data class Password(val srp: Boolean = true) : AuthFactor
-    data object EmailOtp: AuthFactor
-    data object SmsOtp: AuthFactor
-    data object WebAuthn: AuthFactor
+    data object EmailOtp : AuthFactor
+    data object SmsOtp : AuthFactor
+    data object WebAuthn : AuthFactor
 }
 
 internal fun AuthFactor.toAuthFactorType() = when (this) {
     AuthFactor.EmailOtp -> AuthFactorType.EMAIL_OTP
     AuthFactor.SmsOtp -> AuthFactorType.SMS_OTP
     AuthFactor.WebAuthn -> AuthFactorType.WEB_AUTHN
-    is AuthFactor.Password -> if(srp) AuthFactorType.PASSWORD_SRP else AuthFactorType.PASSWORD
+    is AuthFactor.Password -> if (srp) AuthFactorType.PASSWORD_SRP else AuthFactorType.PASSWORD
 }
 
 internal fun AuthFactorType.toAuthFactor() = when (this) {

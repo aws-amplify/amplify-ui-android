@@ -45,7 +45,7 @@ internal val FieldKey.testTag: String
     get() = this.toString()
 
 internal val AuthFactor.testTag: String
-    get() = when(this) {
+    get() = when (this) {
         is AuthFactor.Password -> TestTags.AuthFactorPassword
         AuthFactor.SmsOtp -> TestTags.AuthFactorSms
         AuthFactor.EmailOtp -> TestTags.AuthFactorEmail

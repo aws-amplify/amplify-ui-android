@@ -23,7 +23,7 @@ import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.authenticator.ui.testTag
 import com.amplifyframework.ui.testing.ComposeTest
 
-fun ComposeTest.signInConfirmPassword(func: SignInConfirmPasswordRobot.() -> Unit) = 
+fun ComposeTest.signInConfirmPassword(func: SignInConfirmPasswordRobot.() -> Unit) =
     SignInConfirmPasswordRobot(composeTestRule).func()
 
 class SignInConfirmPasswordRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule) {
@@ -32,7 +32,7 @@ class SignInConfirmPasswordRobot(rule: ComposeTestRule) : ScreenLevelRobot(rule)
         hasTestTag(FieldKey.Username.testTag) and hasText(expected)
     ).assertExists()
     fun hasBackToSignInButton() = composeTestRule.onNode(hasTestTag(TestTags.BackToSignInButton)).assertExists()
-    
+
     fun setPassword(value: String) = setFieldContent(FieldKey.Password, value)
     fun clickShowPassword() = clickOnShowIcon(FieldKey.Password)
     fun clickSubmitButton() = clickOnTag(TestTags.SignInButton)

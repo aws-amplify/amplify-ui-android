@@ -19,6 +19,7 @@ import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.enums.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.enums.containsPassword
+import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.locals.LocalStringResolver
 import com.amplifyframework.ui.authenticator.states.getPasswordFactor
 import com.amplifyframework.ui.authenticator.states.signInMethod
@@ -35,7 +36,6 @@ fun SignInSelectAuthFactor(
     },
     footerContent: @Composable (SignInSelectAuthFactorState) -> Unit = { SignInSelectFactorFooter(it) }
 ) {
-    val scope = rememberCoroutineScope()
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ) {
@@ -43,7 +43,9 @@ fun SignInSelectAuthFactor(
 
         val usernameLabel = StringResolver.fieldName(state.signInMethod.toFieldKey())
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(FieldKey.Username.testTag),
             value = state.username,
             onValueChange =  {},
             label = { Text(usernameLabel) },
@@ -55,14 +57,7 @@ fun SignInSelectAuthFactor(
         )
 
         if (state.availableAuthFactors.containsPassword()) {
-            AuthenticatorButton(
-                onClick = { scope.launch { state.select(state.getPasswordFactor()) } },
-                loading = state.selectedFactor == state.getPasswordFactor(),
-                enabled = state.selectedFactor == null,
-                label = stringResource(R.string.amplify_ui_authenticator_button_signin_password),
-                modifier = Modifier.testTag(TestTags.AuthFactorPassword)
-            )
-
+            AuthFactorButton(authFactor = state.getPasswordFactor(), state = state)
             if (state.availableAuthFactors.size > 1) {
                 DividerWithText(
                     text = stringResource(R.string.amplify_ui_authenticator_or),
@@ -72,31 +67,13 @@ fun SignInSelectAuthFactor(
         }
 
         if (state.availableAuthFactors.contains(AuthFactor.WebAuthn)) {
-            AuthenticatorButton(
-                onClick = { scope.launch { state.select(AuthFactor.WebAuthn) } },
-                loading = state.selectedFactor == AuthFactor.WebAuthn,
-                enabled = state.selectedFactor == null,
-                label = stringResource(R.string.amplify_ui_authenticator_button_signin_passkey),
-                modifier = Modifier.testTag(TestTags.AuthFactorPasskey)
-            )
+            AuthFactorButton(authFactor = AuthFactor.WebAuthn, state = state)
         }
         if (state.availableAuthFactors.contains(AuthFactor.EmailOtp)) {
-            AuthenticatorButton(
-                onClick = { scope.launch { state.select(AuthFactor.EmailOtp) } },
-                loading = state.selectedFactor == AuthFactor.EmailOtp,
-                enabled = state.selectedFactor == null,
-                label = stringResource(R.string.amplify_ui_authenticator_button_signin_email),
-                modifier = Modifier.testTag(TestTags.AuthFactorEmail)
-            )
+            AuthFactorButton(authFactor = AuthFactor.EmailOtp, state = state)
         }
         if (state.availableAuthFactors.contains(AuthFactor.SmsOtp)) {
-            AuthenticatorButton(
-                onClick = { scope.launch { state.select(AuthFactor.SmsOtp) } },
-                loading = state.selectedFactor == AuthFactor.SmsOtp,
-                enabled = state.selectedFactor == null,
-                label = stringResource(R.string.amplify_ui_authenticator_button_signin_sms),
-                modifier = Modifier.testTag(TestTags.AuthFactorSms)
-            )
+            AuthFactorButton(authFactor = AuthFactor.SmsOtp, state = state)
         }
         footerContent(state)
     }
@@ -107,3 +84,27 @@ fun SignInSelectFactorFooter(state: SignInSelectAuthFactorState, modifier: Modif
     modifier = modifier,
     onClickBackToSignIn = { state.moveTo(AuthenticatorStep.SignIn) }
 )
+
+@Composable
+private fun AuthFactorButton(
+    authFactor: AuthFactor,
+    state: SignInSelectAuthFactorState,
+    modifier: Modifier = Modifier
+) {
+    val scope = rememberCoroutineScope()
+    AuthenticatorButton(
+        onClick = { scope.launch { state.select(authFactor) } },
+        loading = state.selectedFactor == authFactor,
+        enabled = state.selectedFactor == null,
+        label = stringResource(authFactor.signInResourceId),
+        modifier = modifier.testTag(authFactor.testTag)
+    )
+}
+
+private val AuthFactor.signInResourceId: Int
+    get() = when(this) {
+        is AuthFactor.Password -> R.string.amplify_ui_authenticator_button_signin_password
+        AuthFactor.SmsOtp -> R.string.amplify_ui_authenticator_button_signin_sms
+        AuthFactor.EmailOtp -> R.string.amplify_ui_authenticator_button_signin_email
+        AuthFactor.WebAuthn -> R.string.amplify_ui_authenticator_button_signin_passkey
+    }

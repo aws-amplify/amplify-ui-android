@@ -15,6 +15,7 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
+import com.amplifyframework.ui.authenticator.enums.AuthFactor
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 @Suppress("ConstPropertyName")
@@ -42,3 +43,11 @@ internal object TestTags {
 
 internal val FieldKey.testTag: String
     get() = this.toString()
+
+internal val AuthFactor.testTag: String
+    get() = when(this) {
+        is AuthFactor.Password -> TestTags.AuthFactorPassword
+        AuthFactor.SmsOtp -> TestTags.AuthFactorSms
+        AuthFactor.EmailOtp -> TestTags.AuthFactorEmail
+        AuthFactor.WebAuthn -> TestTags.AuthFactorPasskey
+    }

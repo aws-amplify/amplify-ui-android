@@ -21,7 +21,7 @@ import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
-import com.amplifyframework.ui.authenticator.enums.AuthFactor
+import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
 import com.amplifyframework.ui.authenticator.mockAuthCodeDeliveryDetails
@@ -46,9 +46,14 @@ internal fun mockSignInState() = SignInStateImpl(
     onMoveTo = { }
 )
 
-internal fun mockSignUpState() = SignUpStateImpl(
-    signInMethod = SignInMethod.Username,
-    signUpAttributes = listOf(AuthUserAttributeKey.email()),
+internal fun mockSignUpState(
+    signInMethod: SignInMethod = SignInMethod.Username,
+    signUpAttributes: List<AuthUserAttributeKey> = listOf(AuthUserAttributeKey.email()),
+    requirePasswordField: Boolean = true
+) = SignUpStateImpl(
+    signInMethod = signInMethod,
+    signUpAttributes = signUpAttributes,
+    requirePasswordField = requirePasswordField,
     passwordCriteria = PasswordCriteria(8, false, false, false, false),
     signUpForm = FormData(emptyList()),
     onSubmit = { _, _, _ -> },

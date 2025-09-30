@@ -15,7 +15,7 @@
 
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.enums.AuthFactor
+import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 @Suppress("ConstPropertyName")

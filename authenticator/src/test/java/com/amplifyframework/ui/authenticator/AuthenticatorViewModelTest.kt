@@ -571,7 +571,7 @@ class AuthenticatorViewModelTest {
     }
 
     @Test
-    fun `Password reset confirmation succeeds, sign in succeeds, state should be signed in`() = runTest {
+    fun `Password reset confirmation succeeds, state should be sign in`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.resetPassword(any()) } returns Success(
             AuthResetPasswordResult(
@@ -581,13 +581,12 @@ class AuthenticatorViewModelTest {
         )
 
         coEvery { authProvider.confirmResetPassword(any(), any(), any()) } returns Success(Unit)
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
 
         viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
 
         viewModel.resetPassword("username")
         viewModel.confirmResetPassword("username", "password", "code")
-        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
     @Test
@@ -652,6 +651,7 @@ class AuthenticatorViewModelTest {
             viewModel.resetPassword("username")
         }
     }
+
 //endregion
 //region helpers
     private val AuthenticatorViewModel.currentStep: AuthenticatorStep

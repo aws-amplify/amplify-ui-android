@@ -15,18 +15,25 @@
 
 package com.amplifyframework.ui.authenticator.util
 
+import android.app.Activity
+import aws.sdk.kotlin.services.cognitoidentityprovider.getUserAuthFactors
+import aws.sdk.kotlin.services.cognitoidentityprovider.model.AuthFactorType as KotlinAuthFactorType
 import com.amplifyframework.auth.AWSCognitoAuthMetadataType
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthException
+import com.amplifyframework.auth.AuthFactorType
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
+import com.amplifyframework.auth.cognito.AWSCognitoAuthSession
 import com.amplifyframework.auth.cognito.PasswordProtectionSettings
 import com.amplifyframework.auth.cognito.UsernameAttribute
 import com.amplifyframework.auth.cognito.VerificationMechanism as AmplifyVerificationMechanism
+import com.amplifyframework.auth.cognito.exceptions.configuration.InvalidUserPoolConfigurationException
+import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.options.AuthConfirmSignInOptions
 import com.amplifyframework.auth.options.AuthSignInOptions
 import com.amplifyframework.auth.options.AuthSignUpOptions
@@ -34,6 +41,7 @@ import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.AuthSignInResult
 import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.auth.result.AuthSignUpResult
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.hub.HubChannel
 import com.amplifyframework.hub.HubEvent
@@ -81,6 +89,10 @@ internal interface AuthProvider {
 
     suspend fun fetchAuthSession(): AmplifyResult<AuthSession>
 
+    suspend fun createPasskey(activity: Activity): AmplifyResult<Unit>
+
+    suspend fun getPasskeys(): AmplifyResult<List<AuthWebAuthnCredential>>
+
     suspend fun fetchUserAttributes(): AmplifyResult<List<AuthUserAttribute>>
 
     suspend fun confirmUserAttribute(key: AuthUserAttributeKey, confirmationCode: String): AmplifyResult<Unit>
@@ -88,6 +100,8 @@ internal interface AuthProvider {
     suspend fun resendUserAttributeConfirmationCode(key: AuthUserAttributeKey): AmplifyResult<AuthCodeDeliveryDetails>
 
     suspend fun getCurrentUser(): AmplifyResult<AuthUser>
+
+    suspend fun getAvailableAuthFactors(): AmplifyResult<List<AuthFactorType>>
 
     fun authStatusEvents(): Flow<HubEvent<*>>
 
@@ -197,6 +211,21 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
+    override suspend fun createPasskey(activity: Activity) = suspendCoroutine { continuation ->
+        Amplify.Auth.associateWebAuthnCredential(
+            activity,
+            { continuation.resume(AmplifyResult.Success(Unit)) },
+            { continuation.resume(AmplifyResult.Error(it)) }
+        )
+    }
+
+    override suspend fun getPasskeys(): AmplifyResult<List<AuthWebAuthnCredential>> = suspendCoroutine { continuation ->
+        Amplify.Auth.listWebAuthnCredentials(
+            { continuation.resume(AmplifyResult.Success(it.credentials)) },
+            { continuation.resume(AmplifyResult.Error(it)) }
+        )
+    }
+
     override suspend fun fetchUserAttributes() = suspendCoroutine { continuation ->
         Amplify.Auth.fetchUserAttributes(
             { continuation.resume(AmplifyResult.Success(it)) },
@@ -228,6 +257,42 @@ internal class RealAuthProvider : AuthProvider {
             { continuation.resume(AmplifyResult.Success(it)) },
             { continuation.resume(AmplifyResult.Error(it)) }
         )
+    }
+
+    override suspend fun getAvailableAuthFactors(): AmplifyResult<List<AuthFactorType>> {
+        // Get the identity provider client from Amplify
+        val client = getCognitoPlugin()?.escapeHatch?.cognitoIdentityProviderClient ?: return AmplifyResult.Error(
+            InvalidUserPoolConfigurationException()
+        )
+
+        // Get the user's access token
+        val token = when (val authSession = fetchAuthSession()) {
+            is AmplifyResult.Error -> return authSession
+            is AmplifyResult.Success -> {
+                val cognitoSession = authSession.data as AWSCognitoAuthSession
+                cognitoSession.accessToken
+            }
+        }
+
+        // Fetch the list of auth factors
+        val response = try {
+            client.getUserAuthFactors { accessToken = token }
+        } catch (e: Exception) {
+            return AmplifyResult.Error(UnknownException("Could not fetch auth factors", e))
+        }
+
+        // Map the factors to Amplify types
+        val factors = response.configuredUserAuthFactors?.mapNotNull { factor ->
+            when (factor) {
+                KotlinAuthFactorType.EmailOtp -> AuthFactorType.EMAIL_OTP
+                KotlinAuthFactorType.Password -> AuthFactorType.PASSWORD
+                KotlinAuthFactorType.SmsOtp -> AuthFactorType.SMS_OTP
+                KotlinAuthFactorType.WebAuthn -> AuthFactorType.WEB_AUTHN
+                else -> null
+            }
+        } ?: emptyList()
+
+        return AmplifyResult.Success(factors)
     }
 
     override fun authStatusEvents(): Flow<HubEvent<*>> = callbackFlow {

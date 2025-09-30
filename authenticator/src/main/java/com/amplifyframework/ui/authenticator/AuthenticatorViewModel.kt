@@ -149,13 +149,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
                 ::moveTo
             )
 
-            // Fetch the current session to determine if the user is already authenticated
-            val result = authProvider.fetchAuthSession()
-            when {
-                result is AmplifyResult.Error -> handleGeneralFailure(result.error)
-                result is AmplifyResult.Success && result.data.isSignedIn -> handleSignedIn()
-                else -> moveTo(configuration.initialStep)
-            }
+            checkInitialLogin()
         }
 
         // Respond to any events from Amplify Auth
@@ -166,6 +160,20 @@ internal class AuthenticatorViewModel(application: Application, private val auth
                     AuthChannelEventName.SIGNED_OUT.name -> handleSignedOut()
                 }
             }
+        }
+    }
+
+    private suspend fun checkInitialLogin() {
+        // Fetch the current session to determine if the user is already authenticated
+        val result = authProvider.fetchAuthSession()
+        when {
+            // Allow user to retry a failure from fetchAuthSession
+            result is AmplifyResult.Error -> handleRetryableGeneralFailure(
+                error = result.error,
+                onRetry = { viewModelScope.launch { checkInitialLogin() }.join() }
+            )
+            result is AmplifyResult.Success && result.data.isSignedIn -> handleSignedIn()
+            else -> moveTo(configuration.initialStep)
         }
     }
 
@@ -637,7 +645,10 @@ internal class AuthenticatorViewModel(application: Application, private val auth
                     logger.error("Current signed in user session has expired, signing out.")
                     signOut()
                 } else {
-                    handleGeneralFailure(result.error)
+                    handleRetryableGeneralFailure(
+                        error = result.error,
+                        onRetry = { viewModelScope.launch { handleSignedIn() }.join() }
+                    )
                 }
             }
 
@@ -676,6 +687,11 @@ internal class AuthenticatorViewModel(application: Application, private val auth
     private fun handleGeneralFailure(error: AuthException) {
         logger.error(error.toString())
         moveTo(ErrorState(error))
+    }
+
+    private fun handleRetryableGeneralFailure(error: AuthException, onRetry: suspend () -> Unit) {
+        logger.error(error.toString())
+        moveTo(ErrorState(error, onRetry))
     }
 
     private suspend fun sendMessage(event: AuthenticatorMessage) {

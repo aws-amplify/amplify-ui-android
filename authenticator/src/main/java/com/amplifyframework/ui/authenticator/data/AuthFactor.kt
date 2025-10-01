@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.amplifyframework.ui.authenticator.enums
+package com.amplifyframework.ui.authenticator.data
 
 import com.amplifyframework.auth.AuthFactorType
 

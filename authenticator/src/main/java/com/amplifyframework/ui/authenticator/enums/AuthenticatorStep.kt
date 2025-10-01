@@ -47,6 +47,16 @@ abstract class AuthenticatorStep internal constructor() {
     object SignIn : AuthenticatorInitialStep()
 
     /**
+     * The user has entered their username and must select the authentication factor they'd like to use to sign in
+     */
+    object SignInSelectAuthFactor : AuthenticatorStep()
+
+    /**
+     * A user has entered their username and must enter their password to continue signing in
+     */
+    object SignInConfirmPassword : AuthenticatorStep()
+
+    /**
      * The user has completed the initial Sign In step, and needs to enter the confirmation code from a custom
      * challenge to complete the sign in process.
      */

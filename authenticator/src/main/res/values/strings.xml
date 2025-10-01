@@ -36,4 +36,10 @@
     <string name="amplify_ui_authenticator_mfa_sms">Text Message (SMS)</string>
     <string name="amplify_ui_authenticator_mfa_totp">Authenticator App (TOTP)</string>
     <string name="amplify_ui_authenticator_mfa_email">Email Message</string>
+
+    <!-- Passkey Creation Prompt Screen -->
+    <string name="amplify_ui_authenticator_passkey_prompt_content">Passkeys are WebAuthn credentials that validate your identity using biometric data like touch or facial recognition or device authentication like passwords or PINs, serving as a secure password replacement.</string>
+
+    <!-- Passkey Created Screen -->
+    <string name="amplify_ui_authenticator_existing_passkeys">Existing Passkeys</string>
 </resources>

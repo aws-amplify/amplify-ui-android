@@ -121,6 +121,14 @@ internal class AuthenticatorViewModel(application: Application, private val auth
     // Is there a current Amplify call in progress that could result in a signed in event?
     private var expectingSignInEvent: Boolean = false
 
+    // The current activity is used for WebAuthn sign-in when using passwordless functionality
+    private var activityReference: WeakReference<Activity> = WeakReference(null)
+    var activity: Activity?
+        get() = activityReference.get()
+        set(value) {
+            activityReference = WeakReference(value)
+        }
+
     fun start(configuration: AuthenticatorConfiguration) {
         if (::configuration.isInitialized) {
             return

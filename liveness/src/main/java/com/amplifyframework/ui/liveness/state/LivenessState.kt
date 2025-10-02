@@ -231,7 +231,7 @@ internal data class LivenessState(
             }
         }
 
-        if (readyForOval) {
+        if (readyForOval && initialFaceDistanceCheckPassed) {
             if (initialStreamFace == null) {
                 val face = InitialStreamFace(faceRect, System.currentTimeMillis())
                 onCaptureReady()

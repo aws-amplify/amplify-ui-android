@@ -1,3 +1,13 @@
+## [Release 1.7.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.7.0)
+
+### Features
+- **all:** Update Kotlin language version to 2.2.0 ([#256](https://github.com/aws-amplify/amplify-ui-android/issues/256))
+
+### Bug Fixes
+- **liveness:** Prevent challenge from restarting ([#271](https://github.com/aws-amplify/amplify-ui-android/issues/271))
+
+[See all changes between 1.6.0 and 1.7.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.6.0...release_liveness_v1.7.0)
+
 ## [Release 1.6.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.6.0)
 
 ### Bug Fixes

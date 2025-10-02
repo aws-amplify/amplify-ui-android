@@ -311,7 +311,6 @@ internal data class LivenessState(
     }
 
     fun onStartViewComplete() {
-        livenessCheckState = LivenessCheckState.Running()
         showingStartView = false
     }
 }

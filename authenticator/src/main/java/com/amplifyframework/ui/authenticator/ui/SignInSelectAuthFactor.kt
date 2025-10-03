@@ -16,9 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState
 import com.amplifyframework.ui.authenticator.auth.toFieldKey
-import com.amplifyframework.ui.authenticator.enums.AuthFactor
+import com.amplifyframework.ui.authenticator.data.AuthFactor
+import com.amplifyframework.ui.authenticator.data.containsPassword
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
-import com.amplifyframework.ui.authenticator.enums.containsPassword
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.states.getPasswordFactor
 import com.amplifyframework.ui.authenticator.states.signInMethod
@@ -33,7 +33,7 @@ fun SignInSelectAuthFactor(
     headerContent: @Composable (SignInSelectAuthFactorState) -> Unit = {
         AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_select_factor))
     },
-    footerContent: @Composable (SignInSelectAuthFactorState) -> Unit = { SignInSelectFactorFooter(it) }
+    footerContent: @Composable (SignInSelectAuthFactorState) -> Unit = { SignInSelectAuthFactorFooter(it) }
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)
@@ -79,10 +79,11 @@ fun SignInSelectAuthFactor(
 }
 
 @Composable
-fun SignInSelectFactorFooter(state: SignInSelectAuthFactorState, modifier: Modifier = Modifier) = BackToSignInFooter(
-    modifier = modifier,
-    onClickBackToSignIn = { state.moveTo(AuthenticatorStep.SignIn) }
-)
+fun SignInSelectAuthFactorFooter(state: SignInSelectAuthFactorState, modifier: Modifier = Modifier) =
+    BackToSignInFooter(
+        modifier = modifier,
+        onClickBackToSignIn = { state.moveTo(AuthenticatorStep.SignIn) }
+    )
 
 @Composable
 private fun AuthFactorButton(

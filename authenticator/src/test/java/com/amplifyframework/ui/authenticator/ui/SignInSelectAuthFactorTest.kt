@@ -16,7 +16,7 @@
 package com.amplifyframework.ui.authenticator.ui
 
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
-import com.amplifyframework.ui.authenticator.enums.AuthFactor
+import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockSignInSelectAuthFactorState
 import com.amplifyframework.ui.authenticator.ui.robots.signInSelectAuthFactor

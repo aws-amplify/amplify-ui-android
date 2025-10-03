@@ -18,7 +18,7 @@ package com.amplifyframework.ui.authenticator.ui.robots
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import com.amplifyframework.ui.authenticator.enums.AuthFactor
+import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 import com.amplifyframework.ui.authenticator.ui.TestTags
 import com.amplifyframework.ui.authenticator.ui.testTag

@@ -52,11 +52,11 @@ import kotlinx.coroutines.flow.callbackFlow
  * An abstraction of the Amplify.Auth API that allows us to use coroutines with no exceptions
  */
 internal interface AuthProvider {
-    suspend fun signIn(username: String, password: String): AmplifyResult<AuthSignInResult>
+    suspend fun signIn(username: String, password: String?): AmplifyResult<AuthSignInResult>
 
     suspend fun confirmSignIn(challengeResponse: String): AmplifyResult<AuthSignInResult>
 
-    suspend fun signUp(username: String, password: String, options: AuthSignUpOptions): AmplifyResult<AuthSignUpResult>
+    suspend fun signUp(username: String, password: String?, options: AuthSignUpOptions): AmplifyResult<AuthSignUpResult>
 
     suspend fun confirmSignUp(username: String, code: String): AmplifyResult<AuthSignUpResult>
 
@@ -106,7 +106,7 @@ internal class RealAuthProvider : AuthProvider {
         cognitoPlugin?.addToUserAgent(AWSCognitoAuthMetadataType.Authenticator, BuildConfig.VERSION_NAME)
     }
 
-    override suspend fun signIn(username: String, password: String) = suspendCoroutine { continuation ->
+    override suspend fun signIn(username: String, password: String?) = suspendCoroutine { continuation ->
         Amplify.Auth.signIn(
             username,
             password,
@@ -123,7 +123,7 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
-    override suspend fun signUp(username: String, password: String, options: AuthSignUpOptions) =
+    override suspend fun signUp(username: String, password: String?, options: AuthSignUpOptions) =
         suspendCoroutine { continuation ->
             Amplify.Auth.signUp(
                 username,

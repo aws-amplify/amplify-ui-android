@@ -35,6 +35,7 @@ import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
+import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
@@ -45,11 +46,13 @@ import io.mockk.mockk
 internal fun mockAuthenticatorConfiguration(
     initialStep: AuthenticatorInitialStep = AuthenticatorStep.SignIn,
     signUpForm: SignUpFormBuilder.() -> Unit = {},
-    totpOptions: TotpOptions? = null
+    totpOptions: TotpOptions? = null,
+    authenticationFlow: AuthenticationFlow = AuthenticationFlow.Password
 ) = AuthenticatorConfiguration(
     initialStep = initialStep,
     signUpForm = signUpForm,
-    totpOptions = totpOptions
+    totpOptions = totpOptions,
+    authenticationFlow = authenticationFlow
 )
 
 internal fun mockAmplifyAuthConfiguration(
@@ -116,10 +119,7 @@ internal fun mockNextSignInStep(
     availableFactors
 )
 
-internal fun mockSignUpResult(
-    nextStep: AuthNextSignUpStep,
-    userId: String = "userId"
-) = AuthSignUpResult(
+internal fun mockSignUpResult(nextStep: AuthNextSignUpStep, userId: String = "userId") = AuthSignUpResult(
     nextStep.signUpStep != AuthSignUpStep.CONFIRM_SIGN_UP_STEP,
     nextStep,
     userId

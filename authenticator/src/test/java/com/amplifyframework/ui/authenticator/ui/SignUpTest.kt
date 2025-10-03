@@ -17,6 +17,8 @@ package com.amplifyframework.ui.authenticator.ui
 
 import androidx.compose.ui.autofill.AutofillManager
 import androidx.compose.ui.autofill.ContentType
+import com.amplifyframework.auth.AuthUserAttributeKey
+import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldError
 import com.amplifyframework.ui.authenticator.forms.FieldKey
@@ -192,5 +194,27 @@ class SignUpTest : AuthenticatorUiTest() {
             setEmail("email@email.com")
         }
         state.form.setFieldError(FieldKey.Email, FieldError.InvalidFormat)
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `passwordless with email`() {
+        val state = mockSignUpState(signInMethod = SignInMethod.Email, requirePasswordField = false)
+        setContent {
+            SignUp(state = state)
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `passwordless with username`() {
+        val state = mockSignUpState(
+            signInMethod = SignInMethod.Username,
+            signUpAttributes = listOf(AuthUserAttributeKey.email()),
+            requirePasswordField = false
+        )
+        setContent {
+            SignUp(state = state)
+        }
     }
 }

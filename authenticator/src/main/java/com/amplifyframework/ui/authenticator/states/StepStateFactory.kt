@@ -23,6 +23,8 @@ import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.ui.authenticator.AuthenticatorConfiguration
 import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
+import com.amplifyframework.ui.authenticator.data.AuthFactor
+import com.amplifyframework.ui.authenticator.data.signInRequiresPassword
 import com.amplifyframework.ui.authenticator.data.signUpRequiresPassword
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
@@ -39,16 +41,31 @@ internal class StepStateFactory(
         onSignOut = onSignOut
     )
 
-    fun newSignInState(onSubmit: suspend (username: String, password: String) -> Unit) = SignInStateImpl(
+    fun newSignInState(onSubmit: suspend (username: String, password: String?) -> Unit) = SignInStateImpl(
         signInMethod = authConfiguration.signInMethod,
+        showPasswordField = configuration.authenticationFlow.signInRequiresPassword,
         onSubmit = onSubmit,
         onMoveTo = onMoveTo
     )
 
+    fun newSignInSelectFactorState(
+        username: String,
+        availableFactors: Set<AuthFactor>,
+        onSelect: suspend (AuthFactor) -> Unit
+    ) = SignInSelectAuthFactorStateImpl(
+        username = username,
+        signInMethod = authConfiguration.signInMethod,
+        availableAuthFactors = availableFactors,
+        onSubmit = onSelect,
+        onMoveTo = onMoveTo
+    )
+
     fun newSignInMfaState(
+        longCode: Boolean,
         codeDeliveryDetails: AuthCodeDeliveryDetails?,
         onSubmit: suspend (confirmationCode: String) -> Unit
     ) = SignInConfirmMfaStateImpl(
+        expectedDigits = if (longCode) 8 else 6,
         deliveryDetails = codeDeliveryDetails,
         onSubmit = onSubmit,
         onMoveTo = onMoveTo
@@ -68,6 +85,14 @@ internal class StepStateFactory(
     fun newSignInConfirmNewPasswordState(onSubmit: suspend (password: String) -> Unit) =
         SignInConfirmNewPasswordStateImpl(
             passwordCriteria = authConfiguration.passwordCriteria,
+            onSubmit = onSubmit,
+            onMoveTo = onMoveTo
+        )
+
+    fun newSignInConfirmPasswordState(username: String, onSubmit: suspend (password: String) -> Unit) =
+        SignInConfirmPasswordStateImpl(
+            username = username,
+            signInMethod = authConfiguration.signInMethod,
             onSubmit = onSubmit,
             onMoveTo = onMoveTo
         )

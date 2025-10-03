@@ -206,12 +206,12 @@ internal class FormBuilderImpl : SignUpFormBuilder {
         )
     }
 
-    fun confirmationCode() {
+    fun confirmationCode(digits: Int = 6) {
         this += FieldConfig.Text(
             key = FieldKey.ConfirmationCode,
-            validator = FieldValidators.confirmationCode(),
+            validator = FieldValidators.confirmationCode(digits),
             keyboardType = KeyboardType.Number,
-            maxLength = 6
+            maxLength = digits
         )
     }
 

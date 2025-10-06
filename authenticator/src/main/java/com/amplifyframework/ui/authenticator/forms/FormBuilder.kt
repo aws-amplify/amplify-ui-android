@@ -23,9 +23,7 @@ import com.amplifyframework.ui.authenticator.auth.toFieldKey
 
 internal data class FormData(val fields: List<FieldConfig>)
 
-internal fun buildForm(func: FormBuilderImpl.() -> Unit): FormData {
-    return FormBuilderImpl().apply(func).build()
-}
+internal fun buildForm(func: FormBuilderImpl.() -> Unit): FormData = FormBuilderImpl().apply(func).build()
 
 /**
  * Builder API for supplying custom form metadata for the signup form.
@@ -39,12 +37,12 @@ interface SignUpFormBuilder {
     /**
      * Adds the standard password field.
      */
-    fun password()
+    fun password(required: Boolean = true)
 
     /**
      * Adds the standard password confirmation field.
      */
-    fun confirmPassword()
+    fun confirmPassword(required: Boolean = true)
 
     /**
      * Adds the standard email field.
@@ -187,18 +185,23 @@ internal class FormBuilderImpl : SignUpFormBuilder {
         )
     }
 
-    override fun password() = password(validator = FieldValidators.None)
+    override fun password(required: Boolean) = password(
+        required = required,
+        validator = FieldValidators.None
+    )
 
-    fun password(validator: FieldValidator) {
+    fun password(validator: FieldValidator, required: Boolean = true) {
         this += FieldConfig.Password(
             key = FieldKey.Password,
+            required = required,
             validator = validator
         )
     }
 
-    override fun confirmPassword() {
+    override fun confirmPassword(required: Boolean) {
         this += FieldConfig.Password(
             key = FieldKey.ConfirmPassword,
+            required = required,
             validator = FieldValidators.confirmPassword()
         )
     }
@@ -317,13 +320,7 @@ internal class FormBuilderImpl : SignUpFormBuilder {
         )
     }
 
-    override fun date(
-        key: FieldKey,
-        label: String,
-        hint: String?,
-        required: Boolean,
-        validator: FieldValidator
-    ) {
+    override fun date(key: FieldKey, label: String, hint: String?, required: Boolean, validator: FieldValidator) {
         this += FieldConfig.Date(
             key = key,
             label = label,
@@ -333,13 +330,7 @@ internal class FormBuilderImpl : SignUpFormBuilder {
         )
     }
 
-    override fun phone(
-        key: FieldKey,
-        label: String,
-        hint: String?,
-        required: Boolean,
-        validator: FieldValidator
-    ) {
+    override fun phone(key: FieldKey, label: String, hint: String?, required: Boolean, validator: FieldValidator) {
         this += FieldConfig.PhoneNumber(
             key = key,
             label = label,
@@ -392,10 +383,7 @@ internal class FormBuilderImpl : SignUpFormBuilder {
         fields.putAll(map)
     }
 
-    fun markRequiredFields(
-        signInMethod: SignInMethod,
-        requiredKeys: List<AuthUserAttributeKey>
-    ) {
+    fun markRequiredFields(signInMethod: SignInMethod, requiredKeys: List<AuthUserAttributeKey>) {
         fields.replaceAll { fieldKey, config ->
             if (fieldKey is FieldKey.UserAttributeKey && requiredKeys.contains(fieldKey.attributeKey)) {
                 config.required()

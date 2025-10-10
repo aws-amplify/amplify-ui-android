@@ -55,6 +55,7 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -82,6 +83,7 @@ internal class LivenessCoordinator(
 
     private val attemptCounter = AttemptCounter()
     private val analysisExecutor = Executors.newSingleThreadExecutor()
+    private val coordinatorScope = MainScope()
 
     val livenessState = LivenessState(
         sessionId = sessionId,
@@ -153,7 +155,7 @@ internal class LivenessCoordinator(
     }
 
     private fun launchCamera(camera: Camera) {
-        MainScope().launch {
+        coordinatorScope.launch {
             delay(5_000)
             if (!previewTextureView.hasReceivedUpdate) {
                 val faceLivenessException = FaceLivenessDetectionException(
@@ -163,7 +165,7 @@ internal class LivenessCoordinator(
                 processSessionError(faceLivenessException, true)
             }
         }
-        MainScope().launch {
+        coordinatorScope.launch {
             getCameraProvider(context).apply {
                 if (lifecycleOwner.lifecycle.currentState != Lifecycle.State.DESTROYED) {
                     unbindAll()
@@ -241,7 +243,8 @@ internal class LivenessCoordinator(
                         FaceLivenessDetectionException.UnsupportedChallengeTypeException(throwable = error) to true
                     else -> FaceLivenessDetectionException(
                         error.message ?: "Unknown error.",
-                        error.recoverySuggestion, error
+                        error.recoverySuggestion,
+                        error
                     ) to false
                 }
                 processSessionError(faceLivenessException, shouldStopLivenessSession)
@@ -250,7 +253,7 @@ internal class LivenessCoordinator(
     }
 
     private fun unbindCamera(context: Context) {
-        MainScope().launch {
+        coordinatorScope.launch {
             getCameraProvider(context).apply {
                 unbindAll()
             }
@@ -303,7 +306,7 @@ internal class LivenessCoordinator(
 
     private fun stopEncoder(onComplete: () -> Unit) {
         encoder.stop {
-            MainScope().launch {
+            coordinatorScope.launch {
                 onComplete()
             }
         }
@@ -322,16 +325,16 @@ internal class LivenessCoordinator(
         livenessState.onDestroy(true, webSocketCloseCode)
         unbindCamera(context)
         analysisExecutor.shutdown()
+        coordinatorScope.cancel()
     }
 
-    private suspend fun getCameraProvider(context: Context): ProcessCameraProvider =
-        suspendCoroutine { continuation ->
-            ProcessCameraProvider.getInstance(context).also { cameraProvider ->
-                cameraProvider.addListener({
-                    continuation.resume(cameraProvider.get())
-                }, ContextCompat.getMainExecutor(context))
-            }
+    private suspend fun getCameraProvider(context: Context): ProcessCameraProvider = suspendCoroutine { continuation ->
+        ProcessCameraProvider.getInstance(context).also { cameraProvider ->
+            cameraProvider.addListener({
+                continuation.resume(cameraProvider.get())
+            }, ContextCompat.getMainExecutor(context))
         }
+    }
 
     companion object {
         const val TARGET_FPS_MIN = 24

@@ -54,10 +54,12 @@ import java.util.Date
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 
 internal typealias OnMuxedSegment = (bytes: ByteArray, timestamp: Long) -> Unit
 internal typealias OnChallengeComplete = () -> Unit
@@ -83,7 +85,7 @@ internal class LivenessCoordinator(
 
     private val attemptCounter = AttemptCounter()
     private val analysisExecutor = Executors.newSingleThreadExecutor()
-    private val coordinatorScope = MainScope()
+    private val coordinatorScope = MainScope() + CoroutineName("LivenessCoordinator")
 
     val livenessState = LivenessState(
         sessionId = sessionId,

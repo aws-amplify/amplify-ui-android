@@ -27,6 +27,8 @@ import androidx.annotation.WorkerThread
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.util.isKeyFrame
 import java.io.File
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 internal class LivenessVideoEncoder private constructor(
     width: Int,
@@ -212,7 +214,7 @@ internal class LivenessVideoEncoder private constructor(
         }
     }
 
-    fun stop(onComplete: () -> Unit) {
+    suspend fun stop() = suspendCoroutine { continuation ->
         encoderHandler.post {
             encoding = false
             livenessMuxer?.stop()
@@ -220,11 +222,11 @@ internal class LivenessVideoEncoder private constructor(
             if (LOGGING_ENABLED) {
                 Log.i(TAG, "Stopping encoder")
             }
-            onComplete()
+            continuation.resume(Unit)
         }
     }
 
-    fun destroy() {
+    suspend fun destroy() = suspendCoroutine { continuation ->
         encoderHandler.post {
             if (LOGGING_ENABLED) {
                 Log.i(TAG, "Destroying encoder")
@@ -241,6 +243,8 @@ internal class LivenessVideoEncoder private constructor(
                 // may already be stopped
             }
             encoder.release()
+
+            continuation.resume(Unit)
         }
     }
 }

@@ -56,6 +56,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -255,10 +256,8 @@ internal class LivenessCoordinator(
     }
 
     private fun unbindCamera(context: Context) {
-        coordinatorScope.launch {
-            getCameraProvider(context).apply {
-                unbindAll()
-            }
+        coordinatorScope.launch(NonCancellable) {
+            getCameraProvider(context).unbindAll()
         }
     }
 
@@ -299,19 +298,14 @@ internal class LivenessCoordinator(
 
     fun processLivenessCheckComplete() {
         livenessState.onLivenessChallengeComplete()
-        stopEncoder { livenessState.onFullChallengeComplete() }
+        coordinatorScope.launch {
+            encoder.stop()
+            livenessState.onFullChallengeComplete()
+        }
     }
 
     private fun processFinalEventsSent() {
         unbindCamera(context)
-    }
-
-    private fun stopEncoder(onComplete: () -> Unit) {
-        encoder.stop {
-            coordinatorScope.launch {
-                onComplete()
-            }
-        }
     }
 
     /**
@@ -320,7 +314,8 @@ internal class LivenessCoordinator(
      */
     fun destroy(context: Context) {
         // Destroy all resources so a new coordinator can safely be created
-        encoder.stop {
+        coordinatorScope.launch(NonCancellable) {
+            encoder.stop()
             encoder.destroy()
         }
         val webSocketCloseCode = if (!disconnectEventReceived) WebSocketCloseCode.DISPOSED else null

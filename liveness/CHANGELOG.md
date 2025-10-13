@@ -1,3 +1,10 @@
+## [Release 1.7.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.7.1)
+
+### Bug Fixes
+- **liveness:** LivenessCoordinator uses a coroutine scope that cancels on destroy ([#275](https://github.com/aws-amplify/amplify-ui-android/issues/275))
+
+[See all changes between 1.7.0 and 1.7.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.7.0...release_liveness_v1.7.1)
+
 ## [Release 1.7.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.7.0)
 
 ### Features

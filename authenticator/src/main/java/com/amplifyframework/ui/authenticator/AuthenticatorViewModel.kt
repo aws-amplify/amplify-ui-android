@@ -76,6 +76,7 @@ import com.amplifyframework.ui.authenticator.states.BaseStateImpl
 import com.amplifyframework.ui.authenticator.states.StepStateFactory
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
 import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
+import com.amplifyframework.ui.authenticator.util.AuthFlowSessionExpiredMessage
 import com.amplifyframework.ui.authenticator.util.AuthProvider
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 import com.amplifyframework.ui.authenticator.util.CannotSendCodeMessage
@@ -92,6 +93,7 @@ import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
 import com.amplifyframework.ui.authenticator.util.authFlow
 import com.amplifyframework.ui.authenticator.util.callingActivity
+import com.amplifyframework.ui.authenticator.util.isAuthFlowSessionExpiredError
 import com.amplifyframework.ui.authenticator.util.isConnectivityIssue
 import com.amplifyframework.ui.authenticator.util.preferredFirstFactor
 import com.amplifyframework.ui.authenticator.util.toFieldError
@@ -325,7 +327,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
             .callingActivity(activity)
             .build()
         when (val result = authProvider.confirmSignIn(challengeResponse, options)) {
-            is AmplifyResult.Error -> handleSignInFailure(info, result.error)
+            is AmplifyResult.Error -> handleConfirmSignInFailure(info, result.error)
             is AmplifyResult.Success -> handleSignInSuccess(info, result.data)
         }
     }
@@ -352,6 +354,17 @@ internal class AuthenticatorViewModel(application: Application, private val auth
             is PasswordResetRequiredException -> handleResetRequiredSignIn(info.username)
             is NotAuthorizedException -> sendMessage(InvalidLoginMessage(error))
             else -> handleAuthException(error)
+        }
+    }
+
+    private suspend fun handleConfirmSignInFailure(info: UserInfo, error: AuthException) {
+        if (configuration.authenticationFlow is AuthenticationFlow.UserChoice &&
+            error.isAuthFlowSessionExpiredError()
+        ) {
+            moveTo(AuthenticatorStep.SignIn)
+            sendMessage(AuthFlowSessionExpiredMessage(error))
+        } else {
+            handleSignInFailure(info, error)
         }
     }
 
@@ -403,7 +416,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
         moveTo(newState)
     }
 
-    private suspend fun handleTotpSetupRequired(info: UserInfo, totpSetupDetails: TOTPSetupDetails?) {
+    private fun handleTotpSetupRequired(info: UserInfo, totpSetupDetails: TOTPSetupDetails?) {
         if (totpSetupDetails == null) {
             val exception = AuthException("Missing TOTPSetupDetails", "Please open a bug with Amplify")
             handleGeneralFailure(exception)

@@ -136,9 +136,9 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Inst
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt;
 	public fun <init> ()V
-	public final fun getLambda$1098672121$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$324742654$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$348729199$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$414441816$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$56343374$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$917919958$liveness_release ()Lkotlin/jvm/functions/Function3;
 }

@@ -1,6 +1,7 @@
 ## [Release 1.8.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.8.0)
 
-
+### Features
+- **all:** Update compose bom and reintroduce material icons lib ([#278](https://github.com/aws-amplify/amplify-ui-android/issues/278))
 
 [See all changes between 1.7.1 and 1.8.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.7.1...release_liveness_v1.8.0)
 

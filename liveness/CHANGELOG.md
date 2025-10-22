@@ -1,3 +1,9 @@
+## [Release 1.7.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.7.2)
+
+
+
+[See all changes between 1.7.1 and 1.7.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.7.1...release_liveness_v1.7.2)
+
 ## [Release 1.7.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.7.1)
 
 ### Bug Fixes

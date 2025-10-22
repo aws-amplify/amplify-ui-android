@@ -10,7 +10,8 @@ androidx-activity = "1.6.1"
 androidx-navigation = "2.5.3"
 binary-compatibility = "0.18.1"
 cameraX = "1.4.2"
-compose-bom = "2025.06.01"
+compose-bom = "2025.10.00"
+compose-material-icons = "1.7.8"
 coroutines = "1.7.3"
 desugar = "2.1.5"
 futures = "1.1.0"
@@ -54,6 +55,7 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 # Compose
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 androidx-compose-material = { module = "androidx.compose.material3:material3" }
+androidx-compose-material-icons = { module = "androidx.compose.material:material-icons-core", version.ref = "compose-material-icons" }
 androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }

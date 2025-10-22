@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.amplifyframework.auth.AuthException
@@ -143,7 +144,7 @@ internal open class StringResolver {
             // Check if the customer application has defined a specific string for this Exception type. If not, return
             // the generic error message.
             val resourceName = error.toResourceName()
-            val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
+            val resourceId = LocalResources.current.getIdentifier(resourceName, "string", context.packageName)
             val message = if (resourceId != 0) stringResource(resourceId) else null
             message ?: stringResource(R.string.amplify_ui_authenticator_error_unknown)
         }

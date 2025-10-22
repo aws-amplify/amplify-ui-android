@@ -729,7 +729,7 @@ public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$DateInputFieldKt;
 	public fun <init> ()V
 	public final fun getLambda$-1269239885$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$717979280$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-1322695825$authenticator_release ()Lkotlin/jvm/functions/Function2;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasswordResetConfirmKt {
@@ -752,7 +752,7 @@ public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PhoneInputFieldKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$PhoneInputFieldKt;
 	public fun <init> ()V
-	public final fun getLambda$-64258515$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$1117974220$authenticator_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$639673736$authenticator_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$977961286$authenticator_release ()Lkotlin/jvm/functions/Function2;
 }

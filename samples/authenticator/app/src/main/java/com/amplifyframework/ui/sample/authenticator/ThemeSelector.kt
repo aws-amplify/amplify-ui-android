@@ -18,6 +18,7 @@ package com.amplifyframework.ui.sample.authenticator
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -30,7 +31,8 @@ import com.amplifyframework.ui.sample.authenticator.theme.default.AppTheme
 
 enum class SupportedTheme {
     Default,
-    Amplify
+    Amplify,
+    Dynamic
 }
 
 @Composable
@@ -42,7 +44,8 @@ fun ThemeSelector(
     onChangeDarkMode: (Boolean) -> Unit
 ) {
     Column(modifier = modifier) {
-        SupportedTheme.values().forEach { theme ->
+        Text("Theme", style = MaterialTheme.typography.titleMedium)
+        SupportedTheme.entries.forEach { theme ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(selected = theme == currentTheme, onClick = { onChangeCurrentTheme(theme) })
                 Text(modifier = Modifier.padding(start = 8.dp), text = theme.name)
@@ -58,7 +61,8 @@ fun ThemeSelector(
 @Composable
 fun ApplyTheme(theme: SupportedTheme, darkMode: Boolean, content: @Composable () -> Unit) {
     when (theme) {
-        SupportedTheme.Default -> AppTheme(darkTheme = darkMode, content = content)
+        SupportedTheme.Default -> AppTheme(darkTheme = darkMode, dynamicColor = false, content = content)
         SupportedTheme.Amplify -> AmplifyTheme(useDarkTheme = darkMode, content = content)
+        SupportedTheme.Dynamic -> AppTheme(darkTheme = darkMode, dynamicColor = true, content = content)
     }
 }

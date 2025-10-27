@@ -6,6 +6,7 @@ android {
     namespace = "com.amplifyframework.ui.authenticator"
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles += file("consumer-rules.pro")
     }
 
     compileOptions {

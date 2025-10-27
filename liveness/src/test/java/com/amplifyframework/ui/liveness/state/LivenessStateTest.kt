@@ -152,8 +152,8 @@ internal class LivenessStateTest {
     }
 
     @Test
-    fun `beginning state is running`() {
-        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
+    fun `beginning state is initial`() {
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Initial)
     }
 
     @Test
@@ -263,9 +263,26 @@ internal class LivenessStateTest {
     }
 
     @Test
-    fun `challenge runs after retrieving session info`() {
-        val faceLivenessSession = mockk<FaceLivenessSession>(relaxed = true)
+    fun `challenge runs after retrieving session info and detected face far enough away`() {
+        val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
+        val challenges = listOf<FaceLivenessSessionChallenge>(faceTargetChallenge)
+        every { faceTargetChallenge.faceTargetMatching.faceDistanceThresholdMin } returns 1f
+        val faceLivenessSession = FaceLivenessSession(
+            challengeId = "12345",
+            challengeType = FaceLivenessChallengeType.FaceMovementAndLightChallenge,
+            challenges = challenges,
+            onVideoEvent = { },
+            onChallengeResponseEvent = { },
+            stopLivenessSession = { }
+        )
         livenessState.onLivenessSessionReady(faceLivenessSession)
+
+        val faceRect = RectF(20f, 20f, 100f, 100f)
+        val leftEye = FaceDetector.Landmark(25f, 40f)
+        val rightEye = FaceDetector.Landmark(75f, 40f)
+        val mouth = FaceDetector.Landmark(40f, 80f)
+        livenessState.onFrameFaceUpdate(faceRect, leftEye, rightEye, mouth)
+
         assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
         assertTrue(livenessState.readyForOval)
     }
@@ -392,7 +409,7 @@ internal class LivenessStateTest {
         val rightEye = FaceDetector.Landmark(75f, 40f)
         val mouth = FaceDetector.Landmark(40f, 80f)
         livenessState.onFrameFaceUpdate(faceRect, leftEye, rightEye, mouth)
-        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Running)
+        assertTrue(livenessState.livenessCheckState is LivenessCheckState.Initial)
     }
 
     @Test

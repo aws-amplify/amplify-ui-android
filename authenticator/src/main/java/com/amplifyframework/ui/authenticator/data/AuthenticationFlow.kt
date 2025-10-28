@@ -68,6 +68,6 @@ internal val AuthenticationFlow.signInRequiresPassword: Boolean get() = when (th
 }
 
 internal fun AuthenticationFlow.toAuthFlowType() = when (this) {
-    is AuthenticationFlow.Password -> AuthFlowType.USER_SRP_AUTH
-    is AuthenticationFlow.UserChoice -> AuthFlowType.USER_AUTH
+    is AuthenticationFlow.Password -> null // Use whatever is defined in the user's config file
+    is AuthenticationFlow.UserChoice -> AuthFlowType.USER_AUTH // Requires USER_AUTH
 }

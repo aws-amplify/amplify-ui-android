@@ -51,7 +51,6 @@ internal operator fun FieldValidator.plus(other: FieldValidator): FieldValidator
 internal object FieldValidators {
 
     private val usernamePattern = """[\p{L}\p{M}\p{S}\p{N}\p{P}]+""".toPattern()
-    private val confirmationCodePattern = """\d{6}""".toPattern()
     private val specialRegex = """[\^\$\{}\*\.\[\]\{}\(\)\?\-"!@#%&/\\,><':;|_~`+=\s]+""".toRegex()
     private val numbersRegex = "\\d+".toRegex()
     private val upperRegex = "[A-Z]+".toRegex()
@@ -105,7 +104,9 @@ internal object FieldValidators {
         }
     }
 
-    internal fun confirmationCode() = pattern(confirmationCodePattern)
+    internal fun confirmationCode(
+        digits: Int
+    ) = pattern("\\d{$digits}".toPattern())
 
     internal fun password(
         criteria: PasswordCriteria

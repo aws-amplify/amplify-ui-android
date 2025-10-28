@@ -24,14 +24,17 @@ import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 internal class SignInStateImpl(
     private val signInMethod: SignInMethod,
-    private val onSubmit: suspend (username: String, password: String) -> Unit,
+    showPasswordField: Boolean,
+    private val onSubmit: suspend (username: String, password: String?) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
 ) : BaseStateImpl(), SignInState {
 
     init {
         form.addFields {
             fieldForSignInMethod(signInMethod)
-            password()
+            if (showPasswordField) {
+                password()
+            }
         }
     }
 
@@ -40,7 +43,7 @@ internal class SignInStateImpl(
 
     override suspend fun signIn() = doSubmit {
         val username = form.getTrimmed(signInMethod.toFieldKey())!!
-        val password = form.getTrimmed(FieldKey.Password)!!
+        val password = form.getTrimmed(FieldKey.Password)
         onSubmit(username, password)
     }
 }

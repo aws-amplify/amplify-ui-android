@@ -52,9 +52,7 @@ interface AuthenticatorMessage {
     }
 }
 
-internal abstract class AuthenticatorMessageImpl(
-    private val resource: Int
-) : AuthenticatorMessage {
+internal abstract class AuthenticatorMessageImpl(private val resource: Int) : AuthenticatorMessage {
 
     override val message: String
         @Composable
@@ -83,48 +81,56 @@ internal object CodeSentMessage :
 /**
  * The user cannot reset their password because their account is in an invalid state.
  */
-internal class UnableToResetPasswordMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_cannot_reset_password), AuthenticatorMessage.Error
+internal class UnableToResetPasswordMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_cannot_reset_password),
+    AuthenticatorMessage.Error
 
 /**
  * An unknown error occurred.
  */
-internal class UnknownErrorMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_unknown), AuthenticatorMessage.Error
+internal class UnknownErrorMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_unknown),
+    AuthenticatorMessage.Error
 
 /**
  * The username or password were incorrect.
  */
-internal class InvalidLoginMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_invalid_signin), AuthenticatorMessage.Error
+internal class InvalidLoginMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_invalid_signin),
+    AuthenticatorMessage.Error
 
 /**
  * The server could not send a confirmation code to the user.
  */
-internal class CannotSendCodeMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_send_code), AuthenticatorMessage.Error
+internal class CannotSendCodeMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_send_code),
+    AuthenticatorMessage.Error
 
 /**
  * The entered confirmation code has expired.
  */
-internal class ExpiredCodeMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_expired_code), AuthenticatorMessage.Error
+internal class ExpiredCodeMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_expired_code),
+    AuthenticatorMessage.Error
 
 /**
  * The device may not have connectivity.
  */
-internal class NetworkErrorMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network), AuthenticatorMessage.Error
+internal class NetworkErrorMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_network),
+    AuthenticatorMessage.Error
 
 /**
  * User tried an action too many times.
  */
-internal class LimitExceededMessage(
-    override val cause: AuthException
-) : AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_limit_exceeded), AuthenticatorMessage.Error
+internal class LimitExceededMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_limit_exceeded),
+    AuthenticatorMessage.Error
+
+/**
+ * The user's authentication flow session has expired, indicating that they took too long to provide an auth factor.
+ * The session duration is configured in your user pool's app client.
+ */
+internal class AuthFlowSessionExpiredMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_session_expired),
+    AuthenticatorMessage.Error

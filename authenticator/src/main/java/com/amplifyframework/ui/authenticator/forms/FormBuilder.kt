@@ -211,7 +211,7 @@ internal class FormBuilderImpl : SignUpFormBuilder {
             key = FieldKey.ConfirmationCode,
             validator = FieldValidators.confirmationCode(),
             keyboardType = KeyboardType.Number,
-            maxLength = 6
+            maxLength = 8
         )
     }
 

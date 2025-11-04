@@ -37,6 +37,8 @@ import com.amplifyframework.auth.cognito.exceptions.service.PasswordResetRequire
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotConfirmedException
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotFoundException
 import com.amplifyframework.auth.cognito.exceptions.service.UsernameExistsException
+import com.amplifyframework.auth.cognito.options.AWSCognitoAuthConfirmSignInOptions
+import com.amplifyframework.auth.cognito.options.AWSCognitoAuthSignInOptions
 import com.amplifyframework.auth.exceptions.NotAuthorizedException
 import com.amplifyframework.auth.exceptions.SessionExpiredException
 import com.amplifyframework.auth.exceptions.UnknownException
@@ -52,7 +54,12 @@ import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.auth.toAttributeKey
 import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.auth.toVerifiedAttributeKey
+import com.amplifyframework.ui.authenticator.data.AuthFactor
+import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
 import com.amplifyframework.ui.authenticator.data.UserInfo
+import com.amplifyframework.ui.authenticator.data.challengeResponse
+import com.amplifyframework.ui.authenticator.data.toAuthFactors
+import com.amplifyframework.ui.authenticator.data.toAuthFlowType
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.enums.SignInSource
@@ -69,6 +76,7 @@ import com.amplifyframework.ui.authenticator.states.BaseStateImpl
 import com.amplifyframework.ui.authenticator.states.StepStateFactory
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
 import com.amplifyframework.ui.authenticator.util.AuthConfigurationResult
+import com.amplifyframework.ui.authenticator.util.AuthFlowSessionExpiredMessage
 import com.amplifyframework.ui.authenticator.util.AuthProvider
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
 import com.amplifyframework.ui.authenticator.util.CannotSendCodeMessage
@@ -83,7 +91,11 @@ import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
 import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
+import com.amplifyframework.ui.authenticator.util.authFlow
+import com.amplifyframework.ui.authenticator.util.callingActivity
+import com.amplifyframework.ui.authenticator.util.isAuthFlowSessionExpiredError
 import com.amplifyframework.ui.authenticator.util.isConnectivityIssue
+import com.amplifyframework.ui.authenticator.util.preferredFirstFactor
 import com.amplifyframework.ui.authenticator.util.toFieldError
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.channels.BufferOverflow
@@ -272,7 +284,8 @@ internal class AuthenticatorViewModel(application: Application, private val auth
     }
 
     private suspend fun handleSignedUp(info: UserInfo) = startSignInJob {
-        when (val result = authProvider.signIn(info.username, info.password)) {
+        val options = getSignInOptions()
+        when (val result = authProvider.signIn(info.username, info.password, options)) {
             is AmplifyResult.Error -> {
                 moveTo(AuthenticatorStep.SignIn)
                 handleSignInFailure(info, result.error)
@@ -295,21 +308,35 @@ internal class AuthenticatorViewModel(application: Application, private val auth
     }
 
     private suspend fun startSignIn(info: UserInfo) = startSignInJob {
-        when (val result = authProvider.signIn(info.username, info.password)) {
+        val options = getSignInOptions()
+        when (val result = authProvider.signIn(info.username, info.password, options)) {
             is AmplifyResult.Error -> handleSignInFailure(info, result.error)
             is AmplifyResult.Success -> handleSignInSuccess(info, result.data)
         }
     }
 
+    private fun getSignInOptions(preferredFirstFactorOverride: AuthFactor? = null) =
+        AWSCognitoAuthSignInOptions.builder()
+            .authFlow(configuration.authenticationFlow.toAuthFlowType())
+            .callingActivity(activity)
+            .preferredFirstFactor(configuration.authenticationFlow, preferredFirstFactorOverride)
+            .build()
+
     private suspend fun confirmSignIn(info: UserInfo, challengeResponse: String) = startSignInJob {
-        when (val result = authProvider.confirmSignIn(challengeResponse)) {
-            is AmplifyResult.Error -> handleSignInFailure(info, result.error)
+        val options = AWSCognitoAuthConfirmSignInOptions.builder()
+            .callingActivity(activity)
+            .build()
+        when (val result = authProvider.confirmSignIn(challengeResponse, options)) {
+            is AmplifyResult.Error -> handleConfirmSignInFailure(info, result.error)
             is AmplifyResult.Success -> handleSignInSuccess(info, result.data)
         }
     }
 
     private suspend fun setNewSignInPassword(info: UserInfo, newPassword: String) = startSignInJob {
-        when (val result = authProvider.confirmSignIn(newPassword)) {
+        val options = AWSCognitoAuthConfirmSignInOptions.builder()
+            .callingActivity(activity)
+            .build()
+        when (val result = authProvider.confirmSignIn(newPassword, options)) {
             // an error here is more similar to a sign up error
             is AmplifyResult.Error -> handleSignUpFailure(result.error)
             is AmplifyResult.Success -> {
@@ -327,6 +354,17 @@ internal class AuthenticatorViewModel(application: Application, private val auth
             is PasswordResetRequiredException -> handleResetRequiredSignIn(info.username)
             is NotAuthorizedException -> sendMessage(InvalidLoginMessage(error))
             else -> handleAuthException(error)
+        }
+    }
+
+    private suspend fun handleConfirmSignInFailure(info: UserInfo, error: AuthException) {
+        if (configuration.authenticationFlow is AuthenticationFlow.UserChoice &&
+            error.isAuthFlowSessionExpiredError()
+        ) {
+            moveTo(AuthenticatorStep.SignIn)
+            sendMessage(AuthFlowSessionExpiredMessage(error))
+        } else {
+            handleSignInFailure(info, error)
         }
     }
 
@@ -352,7 +390,33 @@ internal class AuthenticatorViewModel(application: Application, private val auth
         }
     }
 
-    private suspend fun handleTotpSetupRequired(info: UserInfo, totpSetupDetails: TOTPSetupDetails?) {
+    private suspend fun handleFactorSelectionRequired(info: UserInfo, availableFactors: Set<AuthFactor>?) {
+        if (availableFactors == null) {
+            val exception = AuthException("Missing available AuthFactorTypes", "Please open a bug with Amplify")
+            handleGeneralFailure(exception)
+            return
+        }
+
+        // Auto-select a single auth factor
+        if (availableFactors.size == 1) {
+            confirmSignIn(info, availableFactors.first().challengeResponse)
+            return
+        }
+
+        val newState = stateFactory.newSignInSelectFactorState(
+            username = info.username,
+            availableFactors = availableFactors,
+            onSelect = { authFactor ->
+                val passwordField = (currentState as? BaseStateImpl)?.form?.fields?.get(Password)
+                val password = passwordField?.state?.content
+                val newInfo = info.copy(password = password)
+                confirmSignIn(newInfo, authFactor.challengeResponse)
+            }
+        )
+        moveTo(newState)
+    }
+
+    private fun handleTotpSetupRequired(info: UserInfo, totpSetupDetails: TOTPSetupDetails?) {
         if (totpSetupDetails == null) {
             val exception = AuthException("Missing TOTPSetupDetails", "Please open a bug with Amplify")
             handleGeneralFailure(exception)
@@ -444,6 +508,23 @@ internal class AuthenticatorViewModel(application: Application, private val auth
                     confirmSignIn(info, confirmationCode)
                 }
             )
+            AuthSignInStep.CONTINUE_SIGN_IN_WITH_FIRST_FACTOR_SELECTION ->
+                handleFactorSelectionRequired(
+                    info,
+                    result.nextStep.availableFactors?.toAuthFactors()
+                )
+            AuthSignInStep.CONFIRM_SIGN_IN_WITH_PASSWORD -> {
+                if (info.password != null) {
+                    confirmSignIn(info, info.password)
+                } else {
+                    moveTo(
+                        stateFactory.newSignInConfirmPasswordState(username = info.username) { password ->
+                            val newInfo = info.copy(password = password)
+                            confirmSignIn(newInfo, password)
+                        }
+                    )
+                }
+            }
             else -> {
                 // Generic error for any other next steps that may be added in the future
                 val exception = AuthException(
@@ -532,7 +613,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
         }
     }
 
-    private suspend fun handlePasswordResetComplete(username: String? = null, password: String? = null) {
+    private suspend fun handlePasswordResetComplete() {
         logger.debug("Password reset complete")
         sendMessage(PasswordResetMessage)
         moveTo(stateFactory.newSignInState(this::signIn))

@@ -27,6 +27,8 @@ import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.auth.cognito.PasswordProtectionSettings
 import com.amplifyframework.auth.cognito.UsernameAttribute
 import com.amplifyframework.auth.cognito.VerificationMechanism as AmplifyVerificationMechanism
+import com.amplifyframework.auth.options.AuthConfirmSignInOptions
+import com.amplifyframework.auth.options.AuthSignInOptions
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.AuthSignInResult
@@ -52,9 +54,12 @@ import kotlinx.coroutines.flow.callbackFlow
  * An abstraction of the Amplify.Auth API that allows us to use coroutines with no exceptions
  */
 internal interface AuthProvider {
-    suspend fun signIn(username: String, password: String?): AmplifyResult<AuthSignInResult>
+    suspend fun signIn(username: String, password: String?, options: AuthSignInOptions): AmplifyResult<AuthSignInResult>
 
-    suspend fun confirmSignIn(challengeResponse: String): AmplifyResult<AuthSignInResult>
+    suspend fun confirmSignIn(
+        challengeResponse: String,
+        options: AuthConfirmSignInOptions
+    ): AmplifyResult<AuthSignInResult>
 
     suspend fun signUp(username: String, password: String?, options: AuthSignUpOptions): AmplifyResult<AuthSignUpResult>
 
@@ -106,22 +111,26 @@ internal class RealAuthProvider : AuthProvider {
         cognitoPlugin?.addToUserAgent(AWSCognitoAuthMetadataType.Authenticator, BuildConfig.VERSION_NAME)
     }
 
-    override suspend fun signIn(username: String, password: String?) = suspendCoroutine { continuation ->
-        Amplify.Auth.signIn(
-            username,
-            password,
-            { continuation.resume(AmplifyResult.Success(it)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun signIn(username: String, password: String?, options: AuthSignInOptions) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.signIn(
+                username,
+                password,
+                options,
+                { continuation.resume(AmplifyResult.Success(it)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
-    override suspend fun confirmSignIn(challengeResponse: String) = suspendCoroutine { continuation ->
-        Amplify.Auth.confirmSignIn(
-            challengeResponse,
-            { continuation.resume(AmplifyResult.Success(it)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun confirmSignIn(challengeResponse: String, options: AuthConfirmSignInOptions) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.confirmSignIn(
+                challengeResponse,
+                options,
+                { continuation.resume(AmplifyResult.Success(it)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
     override suspend fun signUp(username: String, password: String?, options: AuthSignUpOptions) =
         suspendCoroutine { continuation ->

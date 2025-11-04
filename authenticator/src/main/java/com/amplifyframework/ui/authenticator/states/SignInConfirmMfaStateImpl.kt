@@ -22,7 +22,6 @@ import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 internal class SignInConfirmMfaStateImpl(
-    expectedDigits: Int,
     override val deliveryDetails: AuthCodeDeliveryDetails?,
     private val onSubmit: suspend (confirmationCode: String) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
@@ -31,7 +30,7 @@ internal class SignInConfirmMfaStateImpl(
 
     init {
         form.addFields {
-            confirmationCode(digits = expectedDigits)
+            confirmationCode()
         }
     }
 

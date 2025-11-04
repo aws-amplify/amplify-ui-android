@@ -51,6 +51,7 @@ internal operator fun FieldValidator.plus(other: FieldValidator): FieldValidator
 internal object FieldValidators {
 
     private val usernamePattern = """[\p{L}\p{M}\p{S}\p{N}\p{P}]+""".toPattern()
+    private val confirmationCodePattern = """\d{6}|\d{8}""".toPattern()
     private val specialRegex = """[\^\$\{}\*\.\[\]\{}\(\)\?\-"!@#%&/\\,><':;|_~`+=\s]+""".toRegex()
     private val numbersRegex = "\\d+".toRegex()
     private val upperRegex = "[A-Z]+".toRegex()
@@ -62,25 +63,17 @@ internal object FieldValidators {
      */
     val None: FieldValidator = { null }
 
-    internal fun required(
-        error: FieldError = FieldError.MissingRequired
-    ): FieldValidator = {
+    internal fun required(error: FieldError = FieldError.MissingRequired): FieldValidator = {
         if (content.isBlank()) error else null
     }
 
-    private fun matchingField(
-        other: FieldKey,
-        error: FieldError
-    ): FieldValidator = {
+    private fun matchingField(other: FieldKey, error: FieldError): FieldValidator = {
         if (content != formContent[other]) error else null
     }
 
     fun confirmPassword() = matchingField(Password, PasswordsDoNotMatch)
 
-    private fun pattern(
-        pattern: Pattern,
-        error: FieldError = InvalidFormat
-    ): FieldValidator = {
+    private fun pattern(pattern: Pattern, error: FieldError = InvalidFormat): FieldValidator = {
         if (content.isNotBlank() && !pattern.matcher(content).matches()) error else null
     }
 
@@ -89,9 +82,7 @@ internal object FieldValidators {
     fun phoneNumber() = pattern(Patterns.PHONE)
     fun webUrl() = pattern(Patterns.WEB_URL)
 
-    fun date(
-        error: FieldError = InvalidFormat
-    ): FieldValidator = {
+    fun date(error: FieldError = InvalidFormat): FieldValidator = {
         if (content.isNotBlank()) {
             try {
                 dateFormat.parse(content)
@@ -104,13 +95,9 @@ internal object FieldValidators {
         }
     }
 
-    internal fun confirmationCode(
-        digits: Int
-    ) = pattern("\\d{$digits}".toPattern())
+    internal fun confirmationCode() = pattern(confirmationCodePattern)
 
-    internal fun password(
-        criteria: PasswordCriteria
-    ): FieldValidator = {
+    internal fun password(criteria: PasswordCriteria): FieldValidator = {
         if (content.isNotBlank()) {
             val potentialErrors = mutableListOf<PasswordError>()
             if (content.length < criteria.length) {

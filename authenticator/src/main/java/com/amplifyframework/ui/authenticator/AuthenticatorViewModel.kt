@@ -475,7 +475,6 @@ internal class AuthenticatorViewModel(application: Application, private val auth
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE,
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_OTP -> moveTo(
                 stateFactory.newSignInMfaState(
-                    longCode = configuration.authenticationFlow is AuthenticationFlow.UserChoice,
                     codeDeliveryDetails = result.nextStep.codeDeliveryDetails
                 ) { confirmationCode -> confirmSignIn(info, confirmationCode) }
             )

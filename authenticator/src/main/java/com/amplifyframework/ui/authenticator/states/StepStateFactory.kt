@@ -61,11 +61,9 @@ internal class StepStateFactory(
     )
 
     fun newSignInMfaState(
-        longCode: Boolean,
         codeDeliveryDetails: AuthCodeDeliveryDetails?,
         onSubmit: suspend (confirmationCode: String) -> Unit
     ) = SignInConfirmMfaStateImpl(
-        expectedDigits = if (longCode) 8 else 6,
         deliveryDetails = codeDeliveryDetails,
         onSubmit = onSubmit,
         onMoveTo = onMoveTo

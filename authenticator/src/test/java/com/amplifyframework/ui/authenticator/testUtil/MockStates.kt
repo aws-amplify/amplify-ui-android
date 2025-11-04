@@ -118,15 +118,12 @@ internal fun mockSignInContinueWithTotpSetupState(
     onMoveTo = onMoveTo
 )
 
-internal fun mockSignInConfirmMfaState(
-    deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails(),
-    digits: Int = 6
-) = SignInConfirmMfaStateImpl(
-    expectedDigits = digits,
-    deliveryDetails = deliveryDetails,
-    onSubmit = { },
-    onMoveTo = { }
-)
+internal fun mockSignInConfirmMfaState(deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()) =
+    SignInConfirmMfaStateImpl(
+        deliveryDetails = deliveryDetails,
+        onSubmit = { },
+        onMoveTo = { }
+    )
 
 internal fun mockSignInContinueWithMfaSetupSelectionState(
     allowedMfaTypes: Set<MFAType> = setOf(MFAType.TOTP, MFAType.SMS, MFAType.EMAIL)

@@ -40,11 +40,13 @@ import com.amplifyframework.ui.authenticator.states.SignInSelectAuthFactorStateI
 import com.amplifyframework.ui.authenticator.states.SignInStateImpl
 import com.amplifyframework.ui.authenticator.states.SignUpStateImpl
 
-internal fun mockSignInState() = SignInStateImpl(
-    signInMethod = SignInMethod.Username,
-    onSubmit = { _, _ -> },
-    onMoveTo = { }
-)
+internal fun mockSignInState(signInMethod: SignInMethod = SignInMethod.Username, showPasswordField: Boolean = true) =
+    SignInStateImpl(
+        signInMethod = signInMethod,
+        showPasswordField = showPasswordField,
+        onSubmit = { _, _ -> },
+        onMoveTo = { }
+    )
 
 internal fun mockSignUpState(
     signInMethod: SignInMethod = SignInMethod.Username,

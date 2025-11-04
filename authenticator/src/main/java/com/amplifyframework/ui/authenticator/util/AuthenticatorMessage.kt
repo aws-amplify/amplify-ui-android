@@ -148,3 +148,11 @@ internal class NetworkErrorMessage(override val cause: AuthException) :
 internal class LimitExceededMessage(override val cause: AuthException) :
     AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_limit_exceeded),
     AuthenticatorMessage.Error
+
+/**
+ * The user's authentication flow session has expired, indicating that they took too long to provide an auth factor.
+ * The session duration is configured in your user pool's app client.
+ */
+internal class AuthFlowSessionExpiredMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_session_expired),
+    AuthenticatorMessage.Error

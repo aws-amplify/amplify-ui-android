@@ -47,7 +47,7 @@ fun SignInConfirmPassword(
             value = state.username,
             onValueChange = {},
             label = { Text(usernameLabel) },
-            readOnly = true
+            enabled = false
         )
         Spacer(modifier = Modifier.size(AuthenticatorUiConstants.spaceBetweenFields))
         AuthenticatorForm(

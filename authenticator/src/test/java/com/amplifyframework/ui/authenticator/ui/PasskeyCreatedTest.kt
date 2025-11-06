@@ -1,6 +1,7 @@
 package com.amplifyframework.ui.authenticator.ui
 
 import com.amplifyframework.auth.result.AuthWebAuthnCredential
+import com.amplifyframework.ui.authenticator.PasskeyCreatedState.Action
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockPasskeyCreatedState
 import com.amplifyframework.ui.authenticator.ui.robots.passkeyCreated
@@ -78,6 +79,17 @@ class PasskeyCreatedTest : AuthenticatorUiTest() {
         )
         setContent {
             PasskeyCreated(state = mockPasskeyCreatedState(passkeys = passkeys))
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `done selected`() {
+        val passkey = mockk<AuthWebAuthnCredential> {
+            every { friendlyName } returns "Test Passkey"
+        }
+        setContent {
+            PasskeyCreated(state = mockPasskeyCreatedState(passkeys = listOf(passkey), action = Action.Done()))
         }
     }
 }

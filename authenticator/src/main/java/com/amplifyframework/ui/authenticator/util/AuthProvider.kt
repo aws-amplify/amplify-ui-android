@@ -21,7 +21,6 @@ import aws.sdk.kotlin.services.cognitoidentityprovider.model.AuthFactorType as K
 import com.amplifyframework.auth.AWSCognitoAuthMetadataType
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
-import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthFactorType
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.AuthUser
@@ -350,9 +349,4 @@ internal class RealAuthProvider : AuthProvider {
         requiresUpper = requiresUpper,
         requiresLower = requiresLower
     )
-}
-
-internal sealed interface AmplifyResult<out T : Any> {
-    data class Success<out T : Any>(val data: T) : AmplifyResult<T>
-    data class Error(val error: AuthException) : AmplifyResult<Nothing>
 }

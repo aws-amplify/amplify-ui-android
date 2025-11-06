@@ -21,6 +21,7 @@ import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.ui.authenticator.AuthenticatorConfiguration
 import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
 import com.amplifyframework.ui.authenticator.data.AuthFactor
@@ -196,4 +197,16 @@ internal class StepStateFactory(
         onResendCode = onResendCode,
         onSkip = onSkip
     )
+
+    fun newPasskeyPromptState(onSubmit: suspend () -> Unit, onSkip: suspend () -> Unit) =
+        PasskeyCreationPromptStateImpl(
+            onSubmit = onSubmit,
+            onSkip = onSkip
+        )
+
+    fun newPasskeyCreatedState(passkeys: List<AuthWebAuthnCredential>, onDone: suspend () -> Unit) =
+        PasskeyCreatedStateImpl(
+            passkeys = passkeys,
+            onDone = onDone
+        )
 }

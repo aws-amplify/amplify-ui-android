@@ -1,5 +1,6 @@
 package com.amplifyframework.ui.authenticator.ui
 
+import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState.Action
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockPasskeyCreationPromptState
 import com.amplifyframework.ui.authenticator.ui.robots.passkeyCreationPrompt
@@ -69,6 +70,26 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     fun `default state`() {
         setContent {
             PasskeyPrompt(state = mockPasskeyCreationPromptState())
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `creating passkey`() {
+        setContent {
+            PasskeyPrompt(
+                state = mockPasskeyCreationPromptState(action = Action.CreatePasskey())
+            )
+        }
+    }
+
+    @Test
+    @ScreenshotTest
+    fun `skipping passkey creation`() {
+        setContent {
+            PasskeyPrompt(
+                state = mockPasskeyCreationPromptState(action = Action.Skip())
+            )
         }
     }
 }

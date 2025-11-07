@@ -1,6 +1,5 @@
 package com.amplifyframework.ui.authenticator.util
 
-import com.amplifyframework.auth.AuthFactorType
 import com.amplifyframework.ui.authenticator.AuthenticatorConfiguration
 import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
 import com.amplifyframework.ui.authenticator.data.PasskeyPrompt
@@ -30,8 +29,8 @@ internal class PasskeyPromptCheck(private val authProvider: AuthProvider, privat
         }
 
     // Check if the user already has a passkey registered
-    private suspend fun userHasPasskey() = when (val result = authProvider.getAvailableAuthFactors()) {
+    private suspend fun userHasPasskey() = when (val result = authProvider.getPasskeys()) {
         is AmplifyResult.Error -> true // Assume user already has passkey on error so we don't incorrectly prompt them
-        is AmplifyResult.Success -> result.data.any { it == AuthFactorType.WEB_AUTHN }
+        is AmplifyResult.Success -> result.data.isNotEmpty()
     }
 }

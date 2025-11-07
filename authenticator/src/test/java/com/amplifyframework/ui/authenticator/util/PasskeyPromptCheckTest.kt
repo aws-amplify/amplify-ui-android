@@ -1,6 +1,5 @@
 package com.amplifyframework.ui.authenticator.util
 
-import com.amplifyframework.auth.AuthFactorType
 import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.ui.authenticator.AuthenticatorConfiguration
 import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
@@ -19,8 +18,7 @@ import org.junit.Test
 class PasskeyPromptCheckTest {
 
     private val authProvider = mockk<AuthProvider> {
-        coEvery { getAvailableAuthFactors() } returns
-            AmplifyResult.Success(listOf(AuthFactorType.PASSWORD_SRP, AuthFactorType.SMS_OTP))
+        coEvery { getPasskeys() } returns AmplifyResult.Success(emptyList())
     }
     private val osBuild = mockk<OsBuild> {
         every { sdkInt } returns 30
@@ -67,20 +65,18 @@ class PasskeyPromptCheckTest {
         val userInfo = mockUserInfo()
         val config = mockAuthenticatorConfiguration()
 
-        coEvery { authProvider.getAvailableAuthFactors() } returns AmplifyResult.Success(
-            listOf(AuthFactorType.PASSWORD, AuthFactorType.WEB_AUTHN)
-        )
+        coEvery { authProvider.getPasskeys() } returns AmplifyResult.Success(listOf(mockk()))
 
         val result = passkeyPromptCheck.shouldPromptForPasskey(userInfo, config)
         result.shouldBeFalse()
     }
 
     @Test
-    fun `shouldPromptForPasskey returns false when getAvailableAuthFactors returns error`() = runTest {
+    fun `shouldPromptForPasskey returns false when getPasskeys returns error`() = runTest {
         val userInfo = mockUserInfo()
         val config = mockAuthenticatorConfiguration()
 
-        coEvery { authProvider.getAvailableAuthFactors() } returns AmplifyResult.Error(
+        coEvery { authProvider.getPasskeys() } returns AmplifyResult.Error(
             UnknownException("Network error")
         )
 
@@ -105,30 +101,6 @@ class PasskeyPromptCheckTest {
         val config = mockAuthenticatorConfiguration()
 
         every { osBuild.sdkInt } returns 28
-
-        val result = passkeyPromptCheck.shouldPromptForPasskey(userInfo, config)
-        result.shouldBeTrue()
-    }
-
-    @Test
-    fun `shouldPromptForPasskey returns true when auth factor list is empty`() = runTest {
-        val userInfo = mockUserInfo()
-        val config = mockAuthenticatorConfiguration()
-
-        coEvery { authProvider.getAvailableAuthFactors() } returns AmplifyResult.Success(emptyList())
-
-        val result = passkeyPromptCheck.shouldPromptForPasskey(userInfo, config)
-        result.shouldBeTrue()
-    }
-
-    @Test
-    fun `shouldPromptForPasskey returns true when auth factors don't have webAuthn`() = runTest {
-        val userInfo = mockUserInfo()
-        val config = mockAuthenticatorConfiguration()
-
-        coEvery { authProvider.getAvailableAuthFactors() } returns AmplifyResult.Success(
-            AuthFactorType.entries - AuthFactorType.WEB_AUTHN
-        )
 
         val result = passkeyPromptCheck.shouldPromptForPasskey(userInfo, config)
         result.shouldBeTrue()

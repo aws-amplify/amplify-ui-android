@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 - **liveness:** Prevent crash on detachPreviewSurface is context is null ([#255](https://github.com/aws-amplify/amplify-ui-android/issues/255))
+- **liveness:** Update LiteRT to fix < Android 8 support for Liveness ([#283](https://github.com/aws-amplify/amplify-ui-android/issues/283))
 
 [See all changes between 1.8.0 and 1.8.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.8.0...release_liveness_v1.8.1)
 

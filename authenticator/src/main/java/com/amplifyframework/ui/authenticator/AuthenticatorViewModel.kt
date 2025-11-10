@@ -414,7 +414,10 @@ internal class AuthenticatorViewModel(
             return
         }
 
-        var updatedInfo = info.copy(selectedAuthFactor = null)
+        // Use has not selected an auth factor yet.
+        // We need to keep track of a mutating selection here as `onSelect` may be called multiple times as user
+        // retries after encountering an error (e.g. incorrect password, passkey error, etc).
+        var currentUserInfo = info.copy(selectedAuthFactor = null)
 
         val newState = stateFactory.newSignInSelectFactorState(
             username = info.username,
@@ -427,14 +430,18 @@ internal class AuthenticatorViewModel(
                     null
                 }
 
-                if (updatedInfo.selectedAuthFactor != null) {
-                    // User has already selected an auth factor so we need to restart the flow over
-                    updatedInfo = info.copy(selectedAuthFactor = authFactor)
-                    startSignIn(updatedInfo, preferredFirstFactorOverride = authFactor)
+                // If a user has already previously selected an auth factor then we need to restart the sign in
+                // flow in order to select a factor again.
+                val flowRestartRequired = currentUserInfo.selectedAuthFactor != null
+
+                currentUserInfo = info.copy(password = password, selectedAuthFactor = authFactor)
+
+                if (flowRestartRequired) {
+                    // Call signIn to restart the flow but select the same factor
+                    startSignIn(currentUserInfo, preferredFirstFactorOverride = authFactor)
                 } else {
                     // Use confirmSignIn to select an auth factor for the first time
-                    updatedInfo = info.copy(password = password, selectedAuthFactor = authFactor)
-                    confirmSignIn(updatedInfo, authFactor.challengeResponse)
+                    confirmSignIn(currentUserInfo, authFactor.challengeResponse)
                 }
             }
         )

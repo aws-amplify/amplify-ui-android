@@ -358,6 +358,7 @@ internal class AuthenticatorViewModel(
         // UserNotConfirmed and PasswordResetRequired are special cases where we need
         // to enter different flows
         when (error) {
+            is UserCancelledException -> Unit // This is an expected error, user can simply retry
             is UserNotConfirmedException -> handleUnconfirmedSignIn(info)
             is PasswordResetRequiredException -> handleResetRequiredSignIn(info.username)
             is NotAuthorizedException -> sendMessage(InvalidLoginMessage(error))

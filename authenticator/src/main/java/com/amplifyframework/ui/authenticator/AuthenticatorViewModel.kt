@@ -19,6 +19,7 @@ import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.amplifyframework.AmplifyException
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthUser
@@ -547,11 +548,26 @@ internal class AuthenticatorViewModel(
     }
 
     private suspend fun checkForPasskeyPrompt(info: UserInfo) {
-        val activityRef = activity
-        if (activityRef != null && passkeyCheck.shouldPromptForPasskey(userInfo = info, config = configuration)) {
+        if (passkeyCheck.shouldPromptForPasskey(userInfo = info, config = configuration)) {
             moveTo(
                 stateFactory.newPasskeyPromptState(
-                    onSubmit = { createPasskey(activityRef) },
+                    onSubmit = {
+                        val activityRef = activity
+                        if (activityRef == null) {
+                            // This shouldn't happen, it indicates a bug. If it does the user can retry or choose to
+                            // skip
+                            sendMessage(
+                                UnknownErrorMessage(
+                                    AuthException(
+                                        message = "Missing activity reference",
+                                        recoverySuggestion = AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION
+                                    )
+                                )
+                            )
+                        } else {
+                            createPasskey(activityRef)
+                        }
+                    },
                     onSkip = ::checkVerificationMechanisms
                 )
             )

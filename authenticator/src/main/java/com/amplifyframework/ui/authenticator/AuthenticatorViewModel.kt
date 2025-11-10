@@ -434,7 +434,7 @@ internal class AuthenticatorViewModel(
                 // flow in order to select a factor again.
                 val flowRestartRequired = currentUserInfo.selectedAuthFactor != null
 
-                currentUserInfo = info.copy(password = password, selectedAuthFactor = authFactor)
+                currentUserInfo = currentUserInfo.copy(password = password, selectedAuthFactor = authFactor)
 
                 if (flowRestartRequired) {
                     // Call signIn to restart the flow but select the same factor

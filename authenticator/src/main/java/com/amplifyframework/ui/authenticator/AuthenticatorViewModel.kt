@@ -316,8 +316,8 @@ internal class AuthenticatorViewModel(
         startSignIn(info)
     }
 
-    private suspend fun startSignIn(info: UserInfo) = startSignInJob {
-        val options = getSignInOptions()
+    private suspend fun startSignIn(info: UserInfo, preferredFirstFactorOverride: AuthFactor? = null) = startSignInJob {
+        val options = getSignInOptions(preferredFirstFactorOverride = preferredFirstFactorOverride)
         when (val result = authProvider.signIn(info.username, info.password, options)) {
             is AmplifyResult.Error -> handleSignInFailure(info, result.error)
             is AmplifyResult.Success -> handleSignInSuccess(info, result.data)
@@ -409,18 +409,33 @@ internal class AuthenticatorViewModel(
 
         // Auto-select a single auth factor
         if (availableFactors.size == 1) {
-            confirmSignIn(info, availableFactors.first().challengeResponse)
+            val newInfo = info.copy(selectedAuthFactor = availableFactors.first())
+            confirmSignIn(newInfo, availableFactors.first().challengeResponse)
             return
         }
+
+        var updatedInfo = info.copy(selectedAuthFactor = null)
 
         val newState = stateFactory.newSignInSelectFactorState(
             username = info.username,
             availableFactors = availableFactors,
             onSelect = { authFactor ->
-                val passwordField = (currentState as? BaseStateImpl)?.form?.fields?.get(Password)
-                val password = passwordField?.state?.content
-                val newInfo = info.copy(password = password)
-                confirmSignIn(newInfo, authFactor.challengeResponse)
+                val password = if (authFactor is AuthFactor.Password) {
+                    val passwordField = (currentState as? BaseStateImpl)?.form?.fields?.get(Password)
+                    passwordField?.state?.content
+                } else {
+                    null
+                }
+
+                if (updatedInfo.selectedAuthFactor != null) {
+                    // User has already selected an auth factor so we need to restart the flow over
+                    updatedInfo = info.copy(selectedAuthFactor = authFactor)
+                    startSignIn(updatedInfo, preferredFirstFactorOverride = authFactor)
+                } else {
+                    // Use confirmSignIn to select an auth factor for the first time
+                    updatedInfo = info.copy(password = password, selectedAuthFactor = authFactor)
+                    confirmSignIn(updatedInfo, authFactor.challengeResponse)
+                }
             }
         )
         moveTo(newState)

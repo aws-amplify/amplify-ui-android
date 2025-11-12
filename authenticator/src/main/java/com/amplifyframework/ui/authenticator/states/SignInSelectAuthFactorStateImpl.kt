@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState
+import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState.Action
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.data.containsPassword
@@ -17,10 +18,11 @@ internal class SignInSelectAuthFactorStateImpl(
     private val onSubmit: suspend (authFactor: AuthFactor) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
 ) : BaseStateImpl(),
-    SignInSelectAuthFactorState {
+    SignInSelectAuthFactorState,
+    MutableActionState<Action> {
     override val step: AuthenticatorStep = AuthenticatorStep.SignInSelectAuthFactor
 
-    override var selectedFactor: AuthFactor? by mutableStateOf(null)
+    override var action: Action? by mutableStateOf(null)
 
     init {
         if (availableAuthFactors.containsPassword()) {
@@ -30,15 +32,13 @@ internal class SignInSelectAuthFactorStateImpl(
 
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)
 
-    override suspend fun select(authFactor: AuthFactor) {
+    override suspend fun select(authFactor: AuthFactor) = withAction(Action.SelectFactor(authFactor)) {
         // Clear errors
         form.fields.values.forEach { it.state.error = null }
 
-        selectedFactor = authFactor
         form.enabled = false
         onSubmit(authFactor)
         form.enabled = true
-        selectedFactor = null
     }
 }
 

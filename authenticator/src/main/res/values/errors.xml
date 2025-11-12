@@ -16,6 +16,8 @@
 <resources>
     <!-- Sign In Errors -->
     <string name="amplify_ui_authenticator_error_invalid_signin">Username or Password is incorrect</string>
+    <!-- Passkey Errors -->
+    <string name="amplify_ui_authenticator_error_passkey_creation">Passkey creation failed</string>
     <!-- General Errors -->
     <string name="amplify_ui_authenticator_error_cannot_reset_password">User password cannot be reset in the current state</string>
     <string name="amplify_ui_authenticator_error_send_code">Could not send verification code</string>

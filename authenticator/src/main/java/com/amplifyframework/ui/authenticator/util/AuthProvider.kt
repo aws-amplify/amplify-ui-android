@@ -15,10 +15,10 @@
 
 package com.amplifyframework.ui.authenticator.util
 
+import android.app.Activity
 import com.amplifyframework.auth.AWSCognitoAuthMetadataType
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
-import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
@@ -34,6 +34,7 @@ import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.AuthSignInResult
 import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.auth.result.AuthSignUpResult
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.hub.HubChannel
 import com.amplifyframework.hub.HubEvent
@@ -80,6 +81,10 @@ internal interface AuthProvider {
     suspend fun signOut(): AuthSignOutResult
 
     suspend fun fetchAuthSession(): AmplifyResult<AuthSession>
+
+    suspend fun createPasskey(activity: Activity): AmplifyResult<Unit>
+
+    suspend fun getPasskeys(): AmplifyResult<List<AuthWebAuthnCredential>>
 
     suspend fun fetchUserAttributes(): AmplifyResult<List<AuthUserAttribute>>
 
@@ -197,6 +202,21 @@ internal class RealAuthProvider : AuthProvider {
         )
     }
 
+    override suspend fun createPasskey(activity: Activity) = suspendCoroutine { continuation ->
+        Amplify.Auth.associateWebAuthnCredential(
+            activity,
+            { continuation.resume(AmplifyResult.Success(Unit)) },
+            { continuation.resume(AmplifyResult.Error(it)) }
+        )
+    }
+
+    override suspend fun getPasskeys(): AmplifyResult<List<AuthWebAuthnCredential>> = suspendCoroutine { continuation ->
+        Amplify.Auth.listWebAuthnCredentials(
+            { continuation.resume(AmplifyResult.Success(it.credentials)) },
+            { continuation.resume(AmplifyResult.Error(it)) }
+        )
+    }
+
     override suspend fun fetchUserAttributes() = suspendCoroutine { continuation ->
         Amplify.Auth.fetchUserAttributes(
             { continuation.resume(AmplifyResult.Success(it)) },
@@ -285,9 +305,4 @@ internal class RealAuthProvider : AuthProvider {
         requiresUpper = requiresUpper,
         requiresLower = requiresLower
     )
-}
-
-internal sealed interface AmplifyResult<out T : Any> {
-    data class Success<out T : Any>(val data: T) : AmplifyResult<T>
-    data class Error(val error: AuthException) : AmplifyResult<Nothing>
 }

@@ -41,6 +41,17 @@ interface AuthenticatorStepState {
 }
 
 /**
+ * A state holder for the UI that has multiple possible actions that may be in progress.
+ */
+@Stable
+interface AuthenticatorActionState<T> {
+    /**
+     * The action in progress, or null if state is idle
+     */
+    val action: T?
+}
+
+/**
  * The Authenticator is loading the current state of the user's Auth session.
  */
 @Immutable
@@ -99,7 +110,17 @@ interface SignInState : AuthenticatorStepState {
  * The user has entered their username and must select the authentication factor they'd like to use to sign in
  */
 @Stable
-interface SignInSelectAuthFactorState : AuthenticatorStepState {
+interface SignInSelectAuthFactorState :
+    AuthenticatorStepState,
+    AuthenticatorActionState<SignInSelectAuthFactorState.Action> {
+
+    sealed interface Action {
+        /**
+         * User has selected an auth factor
+         */
+        data class SelectFactor(val factor: AuthFactor) : Action
+    }
+
     /**
      * The input form state holder for this step.
      */
@@ -114,11 +135,6 @@ interface SignInSelectAuthFactorState : AuthenticatorStepState {
      * The available types to select how to sign in.
      */
     val availableAuthFactors: Set<AuthFactor>
-
-    /**
-     * The factor the user selected and is currently being processed
-     */
-    val selectedFactor: AuthFactor?
 
     /**
      * Move the user to a different [AuthenticatorInitialStep].
@@ -530,7 +546,21 @@ interface VerifyUserConfirmState : AuthenticatorStepState {
  * via biometrics
  */
 @Stable
-interface PasskeyCreationPromptState : AuthenticatorStepState {
+interface PasskeyCreationPromptState :
+    AuthenticatorStepState,
+    AuthenticatorActionState<PasskeyCreationPromptState.Action> {
+    sealed interface Action {
+        /**
+         * User is creating a passkey
+         */
+        class CreatePasskey : Action
+
+        /**
+         * User has selected the Skip button
+         */
+        class Skip : Action
+    }
+
     /**
      * Create a passkey
      */
@@ -546,7 +576,16 @@ interface PasskeyCreationPromptState : AuthenticatorStepState {
  * The user is being shown a confirmation screen after creating a passkey
  */
 @Stable
-interface PasskeyCreatedState : AuthenticatorStepState {
+interface PasskeyCreatedState :
+    AuthenticatorStepState,
+    AuthenticatorActionState<PasskeyCreatedState.Action> {
+    sealed interface Action {
+        /**
+         * User has selected the Done button
+         */
+        class Done : Action
+    }
+
     /**
      * A list of existing passkeys for this user, including the one they've just created
      */

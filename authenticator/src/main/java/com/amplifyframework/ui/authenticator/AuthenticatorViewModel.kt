@@ -19,6 +19,7 @@ import android.app.Activity
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.amplifyframework.AmplifyException
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthUser
@@ -34,6 +35,7 @@ import com.amplifyframework.auth.cognito.exceptions.service.InvalidParameterExce
 import com.amplifyframework.auth.cognito.exceptions.service.InvalidPasswordException
 import com.amplifyframework.auth.cognito.exceptions.service.LimitExceededException
 import com.amplifyframework.auth.cognito.exceptions.service.PasswordResetRequiredException
+import com.amplifyframework.auth.cognito.exceptions.service.UserCancelledException
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotConfirmedException
 import com.amplifyframework.auth.cognito.exceptions.service.UserNotFoundException
 import com.amplifyframework.auth.cognito.exceptions.service.UsernameExistsException
@@ -87,6 +89,8 @@ import com.amplifyframework.ui.authenticator.util.InvalidLoginMessage
 import com.amplifyframework.ui.authenticator.util.LimitExceededMessage
 import com.amplifyframework.ui.authenticator.util.MissingConfigurationException
 import com.amplifyframework.ui.authenticator.util.NetworkErrorMessage
+import com.amplifyframework.ui.authenticator.util.PasskeyCreationFailedMessage
+import com.amplifyframework.ui.authenticator.util.PasskeyPromptCheck
 import com.amplifyframework.ui.authenticator.util.PasswordResetMessage
 import com.amplifyframework.ui.authenticator.util.RealAuthProvider
 import com.amplifyframework.ui.authenticator.util.UnableToResetPasswordMessage
@@ -94,6 +98,7 @@ import com.amplifyframework.ui.authenticator.util.UnknownErrorMessage
 import com.amplifyframework.ui.authenticator.util.UnsupportedNextStepException
 import com.amplifyframework.ui.authenticator.util.authFlow
 import com.amplifyframework.ui.authenticator.util.callingActivity
+import com.amplifyframework.ui.authenticator.util.getOrDefault
 import com.amplifyframework.ui.authenticator.util.isAuthFlowSessionExpiredError
 import com.amplifyframework.ui.authenticator.util.isConnectivityIssue
 import com.amplifyframework.ui.authenticator.util.preferredFirstFactor
@@ -108,8 +113,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
 
-internal class AuthenticatorViewModel(application: Application, private val authProvider: AuthProvider) :
-    AndroidViewModel(application) {
+internal class AuthenticatorViewModel(
+    application: Application,
+    private val authProvider: AuthProvider,
+    private val passkeyCheck: PasskeyPromptCheck = PasskeyPromptCheck(authProvider)
+) : AndroidViewModel(application) {
+
     // Constructor for compose viewModels provider
     constructor(application: Application) : this(application, RealAuthProvider())
 
@@ -140,13 +149,14 @@ internal class AuthenticatorViewModel(application: Application, private val auth
 
     // The current activity is used for WebAuthn sign-in when using passwordless functionality
     private var activityReference: WeakReference<Activity> = WeakReference(null)
-    var activity: Activity?
+    private var activity: Activity?
         get() = activityReference.get()
         set(value) {
             activityReference = WeakReference(value)
         }
 
-    fun start(configuration: AuthenticatorConfiguration) {
+    fun start(configuration: AuthenticatorConfiguration, activity: Activity?) {
+        this.activity = activity
         if (::configuration.isInitialized) {
             return
         }
@@ -216,7 +226,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
     suspend fun signUp(username: String, password: String?, attributes: List<AuthUserAttribute>) {
         viewModelScope.launch {
             val options = AuthSignUpOptions.builder().userAttributes(attributes).build()
-            val info = UserInfo(username = username, password = password, signInSource = SignInSource.SignUp)
+            val info = UserInfo(username = username, password = password, signInSource = SignInSource.AutoSignIn)
 
             when (val result = authProvider.signUp(username, password, options)) {
                 is AmplifyResult.Error -> handleSignUpFailure(result.error)
@@ -351,6 +361,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
         // UserNotConfirmed and PasswordResetRequired are special cases where we need
         // to enter different flows
         when (error) {
+            is UserCancelledException -> Unit // This is an expected error, user can simply retry
             is UserNotConfirmedException -> handleUnconfirmedSignIn(info)
             is PasswordResetRequiredException -> handleResetRequiredSignIn(info.username)
             is NotAuthorizedException -> sendMessage(InvalidLoginMessage(error))
@@ -472,7 +483,7 @@ internal class AuthenticatorViewModel(application: Application, private val auth
 
     private suspend fun handleSignInSuccess(info: UserInfo, result: AuthSignInResult) {
         when (val nextStep = result.nextStep.signInStep) {
-            AuthSignInStep.DONE -> checkVerificationMechanisms()
+            AuthSignInStep.DONE -> checkForPasskeyPrompt(info)
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE,
             AuthSignInStep.CONFIRM_SIGN_IN_WITH_OTP -> moveTo(
                 stateFactory.newSignInMfaState(
@@ -531,6 +542,53 @@ internal class AuthenticatorViewModel(application: Application, private val auth
                 val exception = UnsupportedNextStepException(nextStep)
                 logger.error("Unsupported next step $nextStep", exception)
                 sendMessage(UnknownErrorMessage(exception))
+            }
+        }
+    }
+
+    private suspend fun checkForPasskeyPrompt(info: UserInfo) {
+        if (passkeyCheck.shouldPromptForPasskey(userInfo = info, config = configuration)) {
+            moveTo(
+                stateFactory.newPasskeyPromptState(
+                    onSubmit = {
+                        val activityRef = activity
+                        if (activityRef == null) {
+                            // This shouldn't happen, it indicates a bug. If it does the user can retry or choose to
+                            // skip
+                            sendMessage(
+                                UnknownErrorMessage(
+                                    AuthException(
+                                        message = "Missing activity reference",
+                                        recoverySuggestion = AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION
+                                    )
+                                )
+                            )
+                        } else {
+                            createPasskey(activityRef)
+                        }
+                    },
+                    onSkip = ::checkVerificationMechanisms
+                )
+            )
+        } else {
+            checkVerificationMechanisms()
+        }
+    }
+
+    private suspend fun createPasskey(activityRef: Activity) {
+        when (val result = authProvider.createPasskey(activityRef)) {
+            is AmplifyResult.Error -> when (result.error) {
+                is UserCancelledException -> Unit // This is expected, user can retry or skip
+                else -> sendMessage(PasskeyCreationFailedMessage(result.error)) // User can retry/skip
+            }
+            is AmplifyResult.Success -> {
+                val passkeys = authProvider.getPasskeys().getOrDefault { emptyList() }
+                moveTo(
+                    stateFactory.newPasskeyCreatedState(
+                        passkeys = passkeys,
+                        onDone = ::checkVerificationMechanisms
+                    )
+                )
             }
         }
     }

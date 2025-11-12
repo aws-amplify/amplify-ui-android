@@ -156,3 +156,10 @@ internal class LimitExceededMessage(override val cause: AuthException) :
 internal class AuthFlowSessionExpiredMessage(override val cause: AuthException) :
     AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_session_expired),
     AuthenticatorMessage.Error
+
+/**
+ * The passkey creation failed
+ */
+internal class PasskeyCreationFailedMessage(override val cause: AuthException) :
+    AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_passkey_creation),
+    AuthenticatorMessage.Error

@@ -23,6 +23,8 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
@@ -79,13 +81,16 @@ internal fun AuthenticatorFieldError(
     error: FieldError?,
     modifier: Modifier = Modifier
 ) {
+    var lastError by remember { mutableStateOf<FieldError?>(null) }
+    if (error != null) lastError = error
+
     AnimatedVisibility(
         modifier = modifier,
         visible = error != null,
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically()
     ) {
-        val text = error?.let { StringResolver.error(config = fieldConfig, error = it) } ?: ""
+        val text = lastError?.let { StringResolver.error(config = fieldConfig, error = it) } ?: ""
         Text(text = text)
     }
 }

@@ -19,6 +19,8 @@ import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthWebAuthnCredential
+import com.amplifyframework.ui.authenticator.PasskeyCreatedState
+import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.data.AuthFactor
@@ -135,17 +137,21 @@ internal fun mockSignInContinueWithMfaSetupSelectionState(
 
 internal fun mockPasskeyCreatedState(
     passkeys: List<AuthWebAuthnCredential> = emptyList(),
-    onDone: suspend () -> Unit = {}
+    onDone: suspend () -> Unit = {},
+    action: PasskeyCreatedState.Action? = null
 ) = PasskeyCreatedStateImpl(
     passkeys = passkeys,
     onDone = onDone
-)
+).apply { this.action = action }
 
-internal fun mockPasskeyCreationPromptState(onSubmit: suspend () -> Unit = {}, onSkip: suspend () -> Unit = {}) =
-    PasskeyCreationPromptStateImpl(
-        onSubmit = onSubmit,
-        onSkip = onSkip
-    )
+internal fun mockPasskeyCreationPromptState(
+    onSubmit: suspend () -> Unit = {},
+    onSkip: suspend () -> Unit = {},
+    action: PasskeyCreationPromptState.Action? = null
+) = PasskeyCreationPromptStateImpl(
+    onSubmit = onSubmit,
+    onSkip = onSkip
+).apply { this.action = action }
 
 internal fun mockSignInConfirmPasswordState(
     username: String = "testuser",

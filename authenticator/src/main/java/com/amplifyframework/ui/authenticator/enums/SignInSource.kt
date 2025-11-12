@@ -5,8 +5,5 @@ internal enum class SignInSource {
     SignIn,
 
     // Automatic sign in after completing sign up
-    SignUp,
-
-    // Signed in outside of Authenticator
-    External
+    AutoSignIn
 }

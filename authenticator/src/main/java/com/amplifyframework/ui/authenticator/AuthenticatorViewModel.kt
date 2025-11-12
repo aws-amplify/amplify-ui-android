@@ -402,7 +402,8 @@ internal class AuthenticatorViewModel(
 
     private suspend fun handleFactorSelectionRequired(info: UserInfo, availableFactors: Set<AuthFactor>?) {
         if (availableFactors == null) {
-            val exception = AuthException("Missing available AuthFactorTypes", "Please open a bug with Amplify")
+            val exception =
+                AuthException("Missing available AuthFactorTypes", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
             handleGeneralFailure(exception)
             return
         }
@@ -450,7 +451,7 @@ internal class AuthenticatorViewModel(
 
     private fun handleTotpSetupRequired(info: UserInfo, totpSetupDetails: TOTPSetupDetails?) {
         if (totpSetupDetails == null) {
-            val exception = AuthException("Missing TOTPSetupDetails", "Please open a bug with Amplify")
+            val exception = AuthException("Missing TOTPSetupDetails", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
             handleGeneralFailure(exception)
             return
         }
@@ -467,7 +468,9 @@ internal class AuthenticatorViewModel(
 
     private suspend fun handleMfaSetupSelectionRequired(info: UserInfo, allowedMfaTypes: Set<MFAType>?) {
         if (allowedMfaTypes.isNullOrEmpty()) {
-            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
+            handleGeneralFailure(
+                AuthException("Missing allowedMfaTypes", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
+            )
             return
         }
 
@@ -489,7 +492,9 @@ internal class AuthenticatorViewModel(
 
     private suspend fun handleMfaSelectionRequired(info: UserInfo, allowedMfaTypes: Set<MFAType>?) {
         if (allowedMfaTypes.isNullOrEmpty()) {
-            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
+            handleGeneralFailure(
+                AuthException("Missing allowedMfaTypes", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
+            )
             return
         }
 

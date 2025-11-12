@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState
+import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState.Action
 import com.amplifyframework.ui.authenticator.auth.toFieldKey
 import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.data.containsPassword
@@ -92,11 +93,12 @@ private fun AuthFactorButton(
     state: SignInSelectAuthFactorState,
     modifier: Modifier = Modifier
 ) {
+    val action = state.action
     val scope = rememberCoroutineScope()
     AuthenticatorButton(
         onClick = { scope.launch { state.select(authFactor) } },
-        loading = state.selectedFactor == authFactor,
-        enabled = state.selectedFactor == null,
+        loading = action is Action.SelectFactor && action.factor == authFactor,
+        enabled = action == null,
         label = stringResource(authFactor.signInResourceId),
         modifier = modifier.testTag(authFactor.testTag)
     )

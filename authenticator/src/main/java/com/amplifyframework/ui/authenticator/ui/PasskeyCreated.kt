@@ -12,11 +12,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -24,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.ui.authenticator.PasskeyCreatedState
+import com.amplifyframework.ui.authenticator.PasskeyCreatedState.Action
 import com.amplifyframework.ui.authenticator.R
 import kotlinx.coroutines.launch
 
@@ -71,18 +68,11 @@ fun PasskeyCreated(
             Spacer(modifier = Modifier.size(16.dp))
         }
 
-        var enabled by remember { mutableStateOf(true) }
         AuthenticatorButton(
-            onClick = {
-                scope.launch {
-                    enabled = false
-                    state.done()
-                    enabled = true
-                }
-            },
-            loading = !enabled,
-            label = stringResource(R.string.amplify_ui_authenticator_button_continue),
-            modifier = Modifier.testTag(TestTags.ContinueButton)
+            modifier = Modifier.testTag(TestTags.ContinueButton),
+            onClick = { scope.launch { state.done() } },
+            loading = state.action is Action.Done,
+            label = stringResource(R.string.amplify_ui_authenticator_button_continue)
         )
 
         footerContent(state)

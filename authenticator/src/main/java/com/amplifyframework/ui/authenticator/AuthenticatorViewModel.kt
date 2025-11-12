@@ -318,8 +318,8 @@ internal class AuthenticatorViewModel(
         startSignIn(info)
     }
 
-    private suspend fun startSignIn(info: UserInfo) = startSignInJob {
-        val options = getSignInOptions()
+    private suspend fun startSignIn(info: UserInfo, preferredFirstFactorOverride: AuthFactor? = null) = startSignInJob {
+        val options = getSignInOptions(preferredFirstFactorOverride = preferredFirstFactorOverride)
         when (val result = authProvider.signIn(info.username, info.password, options)) {
             is AmplifyResult.Error -> handleSignInFailure(info, result.error)
             is AmplifyResult.Success -> handleSignInSuccess(info, result.data)
@@ -404,25 +404,48 @@ internal class AuthenticatorViewModel(
 
     private suspend fun handleFactorSelectionRequired(info: UserInfo, availableFactors: Set<AuthFactor>?) {
         if (availableFactors == null) {
-            val exception = AuthException("Missing available AuthFactorTypes", "Please open a bug with Amplify")
+            val exception =
+                AuthException("Missing available AuthFactorTypes", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
             handleGeneralFailure(exception)
             return
         }
 
         // Auto-select a single auth factor
         if (availableFactors.size == 1) {
-            confirmSignIn(info, availableFactors.first().challengeResponse)
+            val newInfo = info.copy(selectedAuthFactor = availableFactors.first())
+            confirmSignIn(newInfo, availableFactors.first().challengeResponse)
             return
         }
+
+        // User has not selected an auth factor yet.
+        // We need to keep track of a mutating selection here as `onSelect` may be called multiple times as user
+        // retries after encountering an error (e.g. incorrect password, passkey error, etc).
+        var currentUserInfo = info.copy(selectedAuthFactor = null)
 
         val newState = stateFactory.newSignInSelectFactorState(
             username = info.username,
             availableFactors = availableFactors,
             onSelect = { authFactor ->
-                val passwordField = (currentState as? BaseStateImpl)?.form?.fields?.get(Password)
-                val password = passwordField?.state?.content
-                val newInfo = info.copy(password = password)
-                confirmSignIn(newInfo, authFactor.challengeResponse)
+                val password = if (authFactor is AuthFactor.Password) {
+                    val passwordField = (currentState as? BaseStateImpl)?.form?.fields?.get(Password)
+                    passwordField?.state?.content
+                } else {
+                    null
+                }
+
+                // If a user has already previously selected an auth factor then we need to restart the sign in
+                // flow in order to select a factor again.
+                val flowRestartRequired = currentUserInfo.selectedAuthFactor != null
+
+                currentUserInfo = currentUserInfo.copy(password = password, selectedAuthFactor = authFactor)
+
+                if (flowRestartRequired) {
+                    // Call signIn to restart the flow but select the same factor
+                    startSignIn(currentUserInfo, preferredFirstFactorOverride = authFactor)
+                } else {
+                    // Use confirmSignIn to select an auth factor for the first time
+                    confirmSignIn(currentUserInfo, authFactor.challengeResponse)
+                }
             }
         )
         moveTo(newState)
@@ -430,7 +453,7 @@ internal class AuthenticatorViewModel(
 
     private fun handleTotpSetupRequired(info: UserInfo, totpSetupDetails: TOTPSetupDetails?) {
         if (totpSetupDetails == null) {
-            val exception = AuthException("Missing TOTPSetupDetails", "Please open a bug with Amplify")
+            val exception = AuthException("Missing TOTPSetupDetails", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
             handleGeneralFailure(exception)
             return
         }
@@ -447,7 +470,9 @@ internal class AuthenticatorViewModel(
 
     private suspend fun handleMfaSetupSelectionRequired(info: UserInfo, allowedMfaTypes: Set<MFAType>?) {
         if (allowedMfaTypes.isNullOrEmpty()) {
-            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
+            handleGeneralFailure(
+                AuthException("Missing allowedMfaTypes", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
+            )
             return
         }
 
@@ -469,7 +494,9 @@ internal class AuthenticatorViewModel(
 
     private suspend fun handleMfaSelectionRequired(info: UserInfo, allowedMfaTypes: Set<MFAType>?) {
         if (allowedMfaTypes.isNullOrEmpty()) {
-            handleGeneralFailure(AuthException("Missing allowedMfaTypes", "Please open a bug with Amplify"))
+            handleGeneralFailure(
+                AuthException("Missing allowedMfaTypes", AmplifyException.REPORT_BUG_TO_AWS_SUGGESTION)
+            )
             return
         }
 

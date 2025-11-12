@@ -414,7 +414,7 @@ internal class AuthenticatorViewModel(
             return
         }
 
-        // Use has not selected an auth factor yet.
+        // User has not selected an auth factor yet.
         // We need to keep track of a mutating selection here as `onSelect` may be called multiple times as user
         // retries after encountering an error (e.g. incorrect password, passkey error, etc).
         var currentUserInfo = info.copy(selectedAuthFactor = null)

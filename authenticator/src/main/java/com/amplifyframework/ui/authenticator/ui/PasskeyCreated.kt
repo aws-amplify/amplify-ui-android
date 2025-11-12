@@ -81,5 +81,5 @@ fun PasskeyCreated(
 
 @Composable
 private fun Passkey(credential: AuthWebAuthnCredential) {
-    Text(credential.friendlyName ?: "Unknown Passkey") // todo String resource
+    Text(credential.friendlyName ?: stringResource(R.string.amplify_ui_authenticator_unknown_passkey))
 }

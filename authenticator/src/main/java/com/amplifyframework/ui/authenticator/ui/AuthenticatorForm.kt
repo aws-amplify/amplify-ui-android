@@ -20,15 +20,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.forms.MutableFormState
 
 /**
@@ -37,10 +33,7 @@ import com.amplifyframework.ui.authenticator.forms.MutableFormState
  * @param modifier The Modifier for the composable.
  */
 @Composable
-internal fun AuthenticatorForm(
-    state: MutableFormState,
-    modifier: Modifier = Modifier
-) {
+internal fun AuthenticatorForm(state: MutableFormState, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,34 +48,5 @@ internal fun AuthenticatorForm(
             )
         }
         Spacer(modifier = Modifier.size(16.dp))
-    }
-}
-
-/**
- * The button displayed in Authenticator.
- * @param onClick The click handler for the button
- * @param loading True to show the [loadingIndicator] content, false to show the button label.
- * @param modifier The [Modifier] for the composable.
- * @param label The label for the button
- * @param loadingIndicator The content to show when loading.
- */
-@Composable
-internal fun AuthenticatorButton(
-    onClick: () -> Unit,
-    loading: Boolean,
-    modifier: Modifier = Modifier,
-    label: String = stringResource(R.string.amplify_ui_authenticator_button_submit),
-    loadingIndicator: @Composable () -> Unit = { LoadingIndicator() }
-) {
-    Button(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
-        enabled = !loading
-    ) {
-        if (loading) {
-            loadingIndicator()
-        } else {
-            Text(label)
-        }
     }
 }

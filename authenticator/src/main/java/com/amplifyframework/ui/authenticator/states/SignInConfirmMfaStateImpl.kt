@@ -25,7 +25,8 @@ internal class SignInConfirmMfaStateImpl(
     override val deliveryDetails: AuthCodeDeliveryDetails?,
     private val onSubmit: suspend (confirmationCode: String) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
-) : BaseStateImpl(), SignInConfirmMfaState {
+) : BaseStateImpl(),
+    SignInConfirmMfaState {
 
     init {
         form.addFields {

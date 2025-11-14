@@ -23,6 +23,8 @@ import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
+import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.MutableFormState
@@ -36,6 +38,17 @@ interface AuthenticatorStepState {
      * The [AuthenticatorStep] that this state holder represents.
      */
     val step: AuthenticatorStep
+}
+
+/**
+ * A state holder for the UI that has multiple possible actions that may be in progress.
+ */
+@Stable
+interface AuthenticatorActionState<T> {
+    /**
+     * The action in progress, or null if state is idle
+     */
+    val action: T?
 }
 
 /**
@@ -81,6 +94,73 @@ interface SignInState : AuthenticatorStepState {
      * The input form state holder for this step.
      */
     val form: MutableFormState
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Initiate a sign in with the information entered into the [form].
+     */
+    suspend fun signIn()
+}
+
+/**
+ * The user has entered their username and must select the authentication factor they'd like to use to sign in
+ */
+@Stable
+interface SignInSelectAuthFactorState :
+    AuthenticatorStepState,
+    AuthenticatorActionState<SignInSelectAuthFactorState.Action> {
+
+    sealed interface Action {
+        /**
+         * User has selected an auth factor
+         */
+        data class SelectAuthFactor(val factor: AuthFactor) : Action
+    }
+
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * The username entered in the SignIn step
+     */
+    val username: String
+
+    /**
+     * The available types to select how to sign in.
+     */
+    val availableAuthFactors: Set<AuthFactor>
+
+    /**
+     * Move the user to a different [AuthenticatorInitialStep].
+     */
+    fun moveTo(step: AuthenticatorInitialStep)
+
+    /**
+     * Initiate a sign in with one of the available sign in types
+     */
+    suspend fun select(authFactor: AuthFactor)
+}
+
+/**
+ * A user has entered their username and must enter their password to continue signing in
+ */
+@Stable
+interface SignInConfirmPasswordState : AuthenticatorStepState {
+    /**
+     * The input form state holder for this step.
+     */
+    val form: MutableFormState
+
+    /**
+     * The username entered in the SignIn step
+     */
+    val username: String
 
     /**
      * Move the user to a different [AuthenticatorInitialStep].
@@ -459,4 +539,60 @@ interface VerifyUserConfirmState : AuthenticatorStepState {
      * Skip verification and move to the Signed In state.
      */
     fun skip()
+}
+
+/**
+ * The user is being shown a prompt to create a passkey, encouraging them to use this as a way to sign in quickly
+ * via biometrics
+ */
+@Stable
+interface PromptToCreatePasskeyState :
+    AuthenticatorStepState,
+    AuthenticatorActionState<PromptToCreatePasskeyState.Action> {
+    sealed interface Action {
+        /**
+         * User is creating a passkey
+         */
+        class CreatePasskey : Action
+
+        /**
+         * User has selected the Skip button
+         */
+        class Skip : Action
+    }
+
+    /**
+     * Create a passkey
+     */
+    suspend fun createPasskey()
+
+    /**
+     * Skip passkey creation and continue to the next step
+     */
+    suspend fun skip()
+}
+
+/**
+ * The user is being shown a confirmation screen after creating a passkey
+ */
+@Stable
+interface PasskeyCreatedState :
+    AuthenticatorStepState,
+    AuthenticatorActionState<PasskeyCreatedState.Action> {
+    sealed interface Action {
+        /**
+         * User has selected the Done button
+         */
+        class ContinueSignIn : Action
+    }
+
+    /**
+     * A list of existing passkeys for this user, including the one they've just created
+     */
+    val passkeys: List<AuthWebAuthnCredential>
+
+    /**
+     * Continue to the next step
+     */
+    suspend fun continueSignIn()
 }

@@ -31,18 +31,28 @@ import com.amplifyframework.ui.authenticator.forms.buildForm
 internal class SignUpStateImpl(
     private val signInMethod: SignInMethod,
     private val signUpAttributes: List<AuthUserAttributeKey>,
+    requirePasswordField: Boolean,
     private val passwordCriteria: PasswordCriteria,
     private val signUpForm: FormData,
-    private val onSubmit: suspend (username: String, password: String, attributes: List<AuthUserAttribute>) -> Unit,
+    private val onSubmit: suspend (username: String, password: String?, attributes: List<AuthUserAttribute>) -> Unit,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
-) : BaseStateImpl(), SignUpState {
+) : BaseStateImpl(),
+    SignUpState {
 
     init {
         val formData = buildForm {
             // First add all fields required by configuration in the standard order
             fieldForSignInMethod(signInMethod)
-            password(validator = FieldValidators.password(passwordCriteria))
-            confirmPassword()
+            if (requirePasswordField) {
+                password(validator = FieldValidators.password(passwordCriteria))
+
+                // We don't add confirm password if the customer supplied a form with password and without confirmPassword
+                if (signUpForm.containsField(FieldKey.ConfirmPassword) ||
+                    !signUpForm.containsField(FieldKey.Password)
+                ) {
+                    confirmPassword()
+                }
+            }
             signUpAttributes.forEach { attribute ->
                 when (attribute) {
                     AuthUserAttributeKey.birthdate() -> birthdate(required = true)
@@ -77,8 +87,10 @@ internal class SignUpStateImpl(
 
     override suspend fun signUp() = doSubmit {
         val username = form.getTrimmed(signInMethod.toFieldKey())!!
-        val password = form.getTrimmed(FieldKey.Password)!!
+        val password = form.getTrimmed(FieldKey.Password).takeIf { !it.isNullOrBlank() }
         val attributes = form.getUserAttributes()
         onSubmit(username, password, attributes)
     }
+
+    private fun FormData.containsField(key: FieldKey) = fields.any { it.key == key }
 }

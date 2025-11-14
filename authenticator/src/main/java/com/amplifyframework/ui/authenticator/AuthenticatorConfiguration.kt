@@ -15,6 +15,7 @@
 
 package com.amplifyframework.ui.authenticator
 
+import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
 import com.amplifyframework.ui.authenticator.options.TotpOptions
@@ -22,5 +23,6 @@ import com.amplifyframework.ui.authenticator.options.TotpOptions
 internal data class AuthenticatorConfiguration(
     val initialStep: AuthenticatorInitialStep,
     val signUpForm: SignUpFormBuilder.() -> Unit,
-    val totpOptions: TotpOptions?
+    val totpOptions: TotpOptions?,
+    val authenticationFlow: AuthenticationFlow
 )

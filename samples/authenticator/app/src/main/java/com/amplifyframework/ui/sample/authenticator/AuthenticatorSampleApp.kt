@@ -20,11 +20,14 @@ import android.util.Log
 import com.amplifyframework.AmplifyException
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.core.Amplify
+import com.amplifyframework.logging.AndroidLoggingPlugin
+import com.amplifyframework.logging.LogLevel
 
 class AuthenticatorSampleApp : Application() {
     override fun onCreate() {
         super.onCreate()
         try {
+            Amplify.addPlugin(AndroidLoggingPlugin(LogLevel.VERBOSE))
             Amplify.addPlugin(AWSCognitoAuthPlugin())
             Amplify.configure(applicationContext)
         } catch (e: AmplifyException) {

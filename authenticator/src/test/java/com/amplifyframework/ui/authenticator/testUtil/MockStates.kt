@@ -18,31 +18,46 @@ package com.amplifyframework.ui.authenticator.testUtil
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
+import com.amplifyframework.ui.authenticator.PasskeyCreatedState
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
+import com.amplifyframework.ui.authenticator.data.AuthFactor
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
 import com.amplifyframework.ui.authenticator.mockAuthCodeDeliveryDetails
+import com.amplifyframework.ui.authenticator.states.PasskeyCreatedStateImpl
 import com.amplifyframework.ui.authenticator.states.PasswordResetConfirmStateImpl
 import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
+import com.amplifyframework.ui.authenticator.states.PromptToCreatePasskeyStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmMfaStateImpl
+import com.amplifyframework.ui.authenticator.states.SignInConfirmPasswordStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmTotpCodeStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithEmailSetupStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSelectionStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithMfaSetupSelectionStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInContinueWithTotpSetupStateImpl
+import com.amplifyframework.ui.authenticator.states.SignInSelectAuthFactorStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInStateImpl
 import com.amplifyframework.ui.authenticator.states.SignUpStateImpl
 
-internal fun mockSignInState() = SignInStateImpl(
-    signInMethod = SignInMethod.Username,
-    onSubmit = { _, _ -> },
-    onMoveTo = { }
-)
+internal fun mockSignInState(signInMethod: SignInMethod = SignInMethod.Username, showPasswordField: Boolean = true) =
+    SignInStateImpl(
+        signInMethod = signInMethod,
+        showPasswordField = showPasswordField,
+        onSubmit = { _, _ -> },
+        onMoveTo = { }
+    )
 
-internal fun mockSignUpState() = SignUpStateImpl(
-    signInMethod = SignInMethod.Username,
-    signUpAttributes = listOf(AuthUserAttributeKey.email()),
+internal fun mockSignUpState(
+    signInMethod: SignInMethod = SignInMethod.Username,
+    signUpAttributes: List<AuthUserAttributeKey> = listOf(AuthUserAttributeKey.email()),
+    requirePasswordField: Boolean = true
+) = SignUpStateImpl(
+    signInMethod = signInMethod,
+    signUpAttributes = signUpAttributes,
+    requirePasswordField = requirePasswordField,
     passwordCriteria = PasswordCriteria(8, false, false, false, false),
     signUpForm = FormData(emptyList()),
     onSubmit = { _, _, _ -> },
@@ -105,13 +120,12 @@ internal fun mockSignInContinueWithTotpSetupState(
     onMoveTo = onMoveTo
 )
 
-internal fun mockSignInConfirmMfaState(
-    deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()
-) = SignInConfirmMfaStateImpl(
-    deliveryDetails = deliveryDetails,
-    onSubmit = { },
-    onMoveTo = { }
-)
+internal fun mockSignInConfirmMfaState(deliveryDetails: AuthCodeDeliveryDetails = mockAuthCodeDeliveryDetails()) =
+    SignInConfirmMfaStateImpl(
+        deliveryDetails = deliveryDetails,
+        onSubmit = { },
+        onMoveTo = { }
+    )
 
 internal fun mockSignInContinueWithMfaSetupSelectionState(
     allowedMfaTypes: Set<MFAType> = setOf(MFAType.TOTP, MFAType.SMS, MFAType.EMAIL)
@@ -119,4 +133,49 @@ internal fun mockSignInContinueWithMfaSetupSelectionState(
     allowedMfaTypes = allowedMfaTypes,
     onSubmit = { },
     onMoveTo = { }
+)
+
+internal fun mockPasskeyCreatedState(
+    passkeys: List<AuthWebAuthnCredential> = emptyList(),
+    onDone: suspend () -> Unit = {},
+    action: PasskeyCreatedState.Action? = null
+) = PasskeyCreatedStateImpl(
+    passkeys = passkeys,
+    onDone = onDone
+).apply { this.action = action }
+
+internal fun mockPasskeyCreationPromptState(
+    onSubmit: suspend () -> Unit = {},
+    onSkip: suspend () -> Unit = {},
+    action: PromptToCreatePasskeyState.Action? = null
+) = PromptToCreatePasskeyStateImpl(
+    onSubmit = onSubmit,
+    onSkip = onSkip
+).apply { this.action = action }
+
+internal fun mockSignInConfirmPasswordState(
+    username: String = "testuser",
+    signInMethod: SignInMethod = SignInMethod.Username,
+    onSubmit: suspend (String) -> Unit = { },
+    onMoveTo: (AuthenticatorInitialStep) -> Unit = { }
+) = SignInConfirmPasswordStateImpl(
+    username = username,
+    signInMethod = signInMethod,
+    onSubmit = onSubmit,
+    onMoveTo = onMoveTo
+)
+
+internal fun mockSignInSelectAuthFactorState(
+    username: String = "testuser",
+    signInMethod: SignInMethod = SignInMethod.Username,
+    availableAuthFactors: Set<AuthFactor> =
+        setOf(AuthFactor.Password(), AuthFactor.SmsOtp, AuthFactor.EmailOtp, AuthFactor.WebAuthn),
+    onSelect: suspend (AuthFactor) -> Unit = { },
+    onMoveTo: (AuthenticatorInitialStep) -> Unit = { }
+) = SignInSelectAuthFactorStateImpl(
+    username = username,
+    signInMethod = signInMethod,
+    availableAuthFactors = availableAuthFactors,
+    onSubmit = onSelect,
+    onMoveTo = onMoveTo
 )

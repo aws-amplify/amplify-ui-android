@@ -21,29 +21,43 @@ import com.amplifyframework.auth.AuthUserAttribute
 import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthSignOutResult
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
+import com.amplifyframework.ui.authenticator.AuthenticatorConfiguration
 import com.amplifyframework.ui.authenticator.auth.AmplifyAuthConfiguration
+import com.amplifyframework.ui.authenticator.data.AuthFactor
+import com.amplifyframework.ui.authenticator.data.signInRequiresPassword
+import com.amplifyframework.ui.authenticator.data.signUpRequiresPassword
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
 
 internal class StepStateFactory(
+    private val configuration: AuthenticatorConfiguration,
     private val authConfiguration: AmplifyAuthConfiguration,
     private val signUpForm: FormData,
     private val onMoveTo: (step: AuthenticatorInitialStep) -> Unit
 ) {
 
-    fun newSignedInState(
-        user: AuthUser,
-        onSignOut: suspend () -> AuthSignOutResult
-    ) = SignedInStateImpl(
+    fun newSignedInState(user: AuthUser, onSignOut: suspend () -> AuthSignOutResult) = SignedInStateImpl(
         user = user,
         onSignOut = onSignOut
     )
 
-    fun newSignInState(
-        onSubmit: suspend (username: String, password: String) -> Unit
-    ) = SignInStateImpl(
+    fun newSignInState(onSubmit: suspend (username: String, password: String?) -> Unit) = SignInStateImpl(
         signInMethod = authConfiguration.signInMethod,
+        showPasswordField = configuration.authenticationFlow.signInRequiresPassword,
         onSubmit = onSubmit,
+        onMoveTo = onMoveTo
+    )
+
+    fun newSignInSelectFactorState(
+        username: String,
+        availableFactors: Set<AuthFactor>,
+        onSelect: suspend (AuthFactor) -> Unit
+    ) = SignInSelectAuthFactorStateImpl(
+        username = username,
+        signInMethod = authConfiguration.signInMethod,
+        availableAuthFactors = availableFactors,
+        onSubmit = onSelect,
         onMoveTo = onMoveTo
     )
 
@@ -67,20 +81,26 @@ internal class StepStateFactory(
         onMoveTo = onMoveTo
     )
 
-    fun newSignInConfirmNewPasswordState(
-        onSubmit: suspend (password: String) -> Unit
-    ) = SignInConfirmNewPasswordStateImpl(
-        passwordCriteria = authConfiguration.passwordCriteria,
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    fun newSignInConfirmNewPasswordState(onSubmit: suspend (password: String) -> Unit) =
+        SignInConfirmNewPasswordStateImpl(
+            passwordCriteria = authConfiguration.passwordCriteria,
+            onSubmit = onSubmit,
+            onMoveTo = onMoveTo
+        )
 
-    fun newSignInConfirmTotpCodeState(
-        onSubmit: suspend (confirmationCode: String) -> Unit
-    ) = SignInConfirmTotpCodeStateImpl(
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    fun newSignInConfirmPasswordState(username: String, onSubmit: suspend (password: String) -> Unit) =
+        SignInConfirmPasswordStateImpl(
+            username = username,
+            signInMethod = authConfiguration.signInMethod,
+            onSubmit = onSubmit,
+            onMoveTo = onMoveTo
+        )
+
+    fun newSignInConfirmTotpCodeState(onSubmit: suspend (confirmationCode: String) -> Unit) =
+        SignInConfirmTotpCodeStateImpl(
+            onSubmit = onSubmit,
+            onMoveTo = onMoveTo
+        )
 
     fun newSignInContinueWithMfaSetupSelectionState(
         allowedMfaTypes: Set<MFAType>,
@@ -91,12 +111,11 @@ internal class StepStateFactory(
         onMoveTo = onMoveTo
     )
 
-    fun newSignInContinueWithEmailSetupState(
-        onSubmit: suspend (email: String) -> Unit
-    ) = SignInContinueWithEmailSetupStateImpl(
-        onSubmit = onSubmit,
-        onMoveTo = onMoveTo
-    )
+    fun newSignInContinueWithEmailSetupState(onSubmit: suspend (email: String) -> Unit) =
+        SignInContinueWithEmailSetupStateImpl(
+            onSubmit = onSubmit,
+            onMoveTo = onMoveTo
+        )
 
     fun newSignInContinueWithMfaSelectionState(
         allowedMfaTypes: Set<MFAType>,
@@ -119,10 +138,11 @@ internal class StepStateFactory(
     )
 
     fun newSignUpState(
-        onSubmit: suspend (username: String, password: String, attributes: List<AuthUserAttribute>) -> Unit
+        onSubmit: suspend (username: String, password: String?, attributes: List<AuthUserAttribute>) -> Unit
     ) = SignUpStateImpl(
         signInMethod = authConfiguration.signInMethod,
         signUpAttributes = authConfiguration.signUpAttributes,
+        requirePasswordField = configuration.authenticationFlow.signUpRequiresPassword,
         passwordCriteria = authConfiguration.passwordCriteria,
         signUpForm = signUpForm,
         onSubmit = onSubmit,
@@ -140,9 +160,7 @@ internal class StepStateFactory(
         onMoveTo = onMoveTo
     )
 
-    fun newResetPasswordState(
-        onSubmit: suspend (username: String) -> Unit
-    ) = PasswordResetStateImpl(
+    fun newResetPasswordState(onSubmit: suspend (username: String) -> Unit) = PasswordResetStateImpl(
         signInMethod = authConfiguration.signInMethod,
         onSubmit = onSubmit,
         onMoveTo = onMoveTo
@@ -179,4 +197,16 @@ internal class StepStateFactory(
         onResendCode = onResendCode,
         onSkip = onSkip
     )
+
+    fun newPasskeyPromptState(onSubmit: suspend () -> Unit, onSkip: suspend () -> Unit) =
+        PromptToCreatePasskeyStateImpl(
+            onSubmit = onSubmit,
+            onSkip = onSkip
+        )
+
+    fun newPasskeyCreatedState(passkeys: List<AuthWebAuthnCredential>, onDone: suspend () -> Unit) =
+        PasskeyCreatedStateImpl(
+            passkeys = passkeys,
+            onDone = onDone
+        )
 }

@@ -118,7 +118,7 @@ interface SignInSelectAuthFactorState :
         /**
          * User has selected an auth factor
          */
-        data class SelectFactor(val factor: AuthFactor) : Action
+        data class SelectAuthFactor(val factor: AuthFactor) : Action
     }
 
     /**

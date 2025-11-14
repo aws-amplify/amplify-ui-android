@@ -97,7 +97,7 @@ private fun AuthFactorButton(
     val scope = rememberCoroutineScope()
     AuthenticatorButton(
         onClick = { scope.launch { state.select(authFactor) } },
-        loading = action is Action.SelectFactor && action.factor == authFactor,
+        loading = action is Action.SelectAuthFactor && action.factor == authFactor,
         enabled = action == null,
         label = stringResource(authFactor.signInResourceId),
         modifier = modifier.testTag(authFactor.testTag)

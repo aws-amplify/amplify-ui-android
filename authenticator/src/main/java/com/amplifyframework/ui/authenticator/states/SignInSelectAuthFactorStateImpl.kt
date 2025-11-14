@@ -32,7 +32,7 @@ internal class SignInSelectAuthFactorStateImpl(
 
     override fun moveTo(step: AuthenticatorInitialStep) = onMoveTo(step)
 
-    override suspend fun select(authFactor: AuthFactor) = withAction(Action.SelectFactor(authFactor)) {
+    override suspend fun select(authFactor: AuthFactor) = withAction(Action.SelectAuthFactor(authFactor)) {
         // Clear errors
         form.fields.values.forEach { it.state.error = null }
 

@@ -15,7 +15,9 @@
 
 package com.amplifyframework.ui.sample.authenticator
 
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +45,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.authenticator.AuthenticatorState
 import com.amplifyframework.ui.authenticator.SignedInState
 import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
@@ -64,7 +68,12 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
 
             val authenticatorState = rememberAuthenticatorState(
-                authenticationFlow = AuthenticationFlow.UserChoice()
+                authenticationFlow = AuthenticationFlow.UserChoice(),
+                signUpForm = {
+                    username()
+                    email(required = true)
+                    password(required = false)
+                }
             )
 
             ApplyTheme(theme = currentTheme, darkMode = darkMode) {
@@ -129,10 +138,30 @@ fun SampleAppContent(drawerState: DrawerState, authenticatorState: Authenticator
 @Composable
 fun SignedInContent(state: SignedInState) {
     val scope = rememberCoroutineScope()
+    val activity = LocalContext.current as Activity
     Column {
         Text("You've signed in as ${state.user.username}!")
         Button(onClick = { scope.launch { state.signOut() } }) {
             Text("Sign Out")
         }
+
+        Button(onClick = {
+            Amplify.Auth.associateWebAuthnCredential(activity, { }, ::logError)
+        }) {
+            Text("Register Passkey")
+        }
+        Button(onClick = {
+            Amplify.Auth.listWebAuthnCredentials({
+                if (it.credentials.isNotEmpty()) {
+                    Amplify.Auth.deleteWebAuthnCredential(it.credentials.first().credentialId, { }, ::logError)
+                }
+            }, ::logError)
+        }) {
+            Text("Delete Passkey")
+        }
     }
+}
+
+fun logError(e: Exception) {
+    Log.e("Sample", "Failed", e)
 }

@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.authenticator.AuthenticatorState
 import com.amplifyframework.ui.authenticator.SignedInState
+import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
 import com.amplifyframework.ui.authenticator.rememberAuthenticatorState
 import com.amplifyframework.ui.authenticator.ui.Authenticator
 import com.amplifyframework.ui.sample.authenticator.data.ThemeDatastore
@@ -62,7 +63,9 @@ class MainActivity : ComponentActivity() {
             val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
 
-            val authenticatorState = rememberAuthenticatorState()
+            val authenticatorState = rememberAuthenticatorState(
+                authenticationFlow = AuthenticationFlow.UserChoice()
+            )
 
             ApplyTheme(theme = currentTheme, darkMode = darkMode) {
                 ModalNavigationDrawer(

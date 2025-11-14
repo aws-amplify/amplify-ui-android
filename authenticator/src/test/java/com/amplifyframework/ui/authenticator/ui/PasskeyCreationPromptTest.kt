@@ -1,6 +1,6 @@
 package com.amplifyframework.ui.authenticator.ui
 
-import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState.Action
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState.Action
 import com.amplifyframework.ui.authenticator.testUtil.AuthenticatorUiTest
 import com.amplifyframework.ui.authenticator.testUtil.mockPasskeyCreationPromptState
 import com.amplifyframework.ui.authenticator.ui.robots.passkeyCreationPrompt
@@ -14,7 +14,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     @Test
     fun `title is Sign in faster with Passkey`() {
         setContent {
-            PasskeyPrompt(state = mockPasskeyCreationPromptState())
+            PromptToCreatePasskey(state = mockPasskeyCreationPromptState())
         }
         passkeyCreationPrompt {
             hasTitle("Sign in faster with Passkey")
@@ -24,7 +24,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     @Test
     fun `has create passkey button`() {
         setContent {
-            PasskeyPrompt(state = mockPasskeyCreationPromptState())
+            PromptToCreatePasskey(state = mockPasskeyCreationPromptState())
         }
         passkeyCreationPrompt {
             hasCreatePasskeyButton("Create a Passkey")
@@ -34,7 +34,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     @Test
     fun `has skip passkey button`() {
         setContent {
-            PasskeyPrompt(state = mockPasskeyCreationPromptState())
+            PromptToCreatePasskey(state = mockPasskeyCreationPromptState())
         }
         passkeyCreationPrompt {
             hasSkipPasskeyButton("Continue without a Passkey")
@@ -45,7 +45,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     fun `clicking create passkey calls createPasskey`() {
         val onSubmit = mockk<suspend () -> Unit>(relaxed = true)
         setContent {
-            PasskeyPrompt(state = mockPasskeyCreationPromptState(onSubmit = onSubmit))
+            PromptToCreatePasskey(state = mockPasskeyCreationPromptState(onSubmit = onSubmit))
         }
         passkeyCreationPrompt {
             clickCreatePasskeyButton()
@@ -57,7 +57,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     fun `clicking skip calls skip`() {
         val onSkip = mockk<suspend () -> Unit>(relaxed = true)
         setContent {
-            PasskeyPrompt(state = mockPasskeyCreationPromptState(onSkip = onSkip))
+            PromptToCreatePasskey(state = mockPasskeyCreationPromptState(onSkip = onSkip))
         }
         passkeyCreationPrompt {
             clickSkipPasskeyButton()
@@ -69,7 +69,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     @ScreenshotTest
     fun `default state`() {
         setContent {
-            PasskeyPrompt(state = mockPasskeyCreationPromptState())
+            PromptToCreatePasskey(state = mockPasskeyCreationPromptState())
         }
     }
 
@@ -77,7 +77,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     @ScreenshotTest
     fun `creating passkey`() {
         setContent {
-            PasskeyPrompt(
+            PromptToCreatePasskey(
                 state = mockPasskeyCreationPromptState(action = Action.CreatePasskey())
             )
         }
@@ -87,7 +87,7 @@ class PasskeyCreationPromptTest : AuthenticatorUiTest() {
     @ScreenshotTest
     fun `skipping passkey creation`() {
         setContent {
-            PasskeyPrompt(
+            PromptToCreatePasskey(
                 state = mockPasskeyCreationPromptState(action = Action.Skip())
             )
         }

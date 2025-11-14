@@ -16,7 +16,7 @@ internal class PasskeyCreatedStateImpl(
 
     override var action: PasskeyCreatedState.Action? by mutableStateOf(null)
 
-    override suspend fun done() = withAction(PasskeyCreatedState.Action.Done()) {
+    override suspend fun continueSignIn() = withAction(PasskeyCreatedState.Action.ContinueSignIn()) {
         onDone()
     }
 }

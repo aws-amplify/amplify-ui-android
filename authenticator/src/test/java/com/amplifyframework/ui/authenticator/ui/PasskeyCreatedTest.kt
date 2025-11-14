@@ -89,7 +89,9 @@ class PasskeyCreatedTest : AuthenticatorUiTest() {
             every { friendlyName } returns "Test Passkey"
         }
         setContent {
-            PasskeyCreated(state = mockPasskeyCreatedState(passkeys = listOf(passkey), action = Action.Done()))
+            PasskeyCreated(
+                state = mockPasskeyCreatedState(passkeys = listOf(passkey), action = Action.ContinueSignIn())
+            )
         }
     }
 }

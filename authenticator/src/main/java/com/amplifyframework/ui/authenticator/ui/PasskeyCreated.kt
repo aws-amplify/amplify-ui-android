@@ -70,8 +70,8 @@ fun PasskeyCreated(
 
         AuthenticatorButton(
             modifier = Modifier.testTag(TestTags.ContinueButton),
-            onClick = { scope.launch { state.done() } },
-            loading = state.action is Action.Done,
+            onClick = { scope.launch { state.continueSignIn() } },
+            loading = state.action is Action.ContinueSignIn,
             label = stringResource(R.string.amplify_ui_authenticator_button_continue)
         )
 

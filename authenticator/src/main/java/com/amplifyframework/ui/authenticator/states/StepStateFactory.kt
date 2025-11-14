@@ -199,7 +199,7 @@ internal class StepStateFactory(
     )
 
     fun newPasskeyPromptState(onSubmit: suspend () -> Unit, onSkip: suspend () -> Unit) =
-        PasskeyCreationPromptStateImpl(
+        PromptToCreatePasskeyStateImpl(
             onSubmit = onSubmit,
             onSkip = onSkip
         )

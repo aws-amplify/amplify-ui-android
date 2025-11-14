@@ -20,7 +20,7 @@ import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.auth.MFAType
 import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.ui.authenticator.PasskeyCreatedState
-import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState
 import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.auth.SignInMethod
 import com.amplifyframework.ui.authenticator.data.AuthFactor
@@ -28,9 +28,9 @@ import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.forms.FormData
 import com.amplifyframework.ui.authenticator.mockAuthCodeDeliveryDetails
 import com.amplifyframework.ui.authenticator.states.PasskeyCreatedStateImpl
-import com.amplifyframework.ui.authenticator.states.PasskeyCreationPromptStateImpl
 import com.amplifyframework.ui.authenticator.states.PasswordResetConfirmStateImpl
 import com.amplifyframework.ui.authenticator.states.PasswordResetStateImpl
+import com.amplifyframework.ui.authenticator.states.PromptToCreatePasskeyStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmMfaStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmPasswordStateImpl
 import com.amplifyframework.ui.authenticator.states.SignInConfirmTotpCodeStateImpl
@@ -147,8 +147,8 @@ internal fun mockPasskeyCreatedState(
 internal fun mockPasskeyCreationPromptState(
     onSubmit: suspend () -> Unit = {},
     onSkip: suspend () -> Unit = {},
-    action: PasskeyCreationPromptState.Action? = null
-) = PasskeyCreationPromptStateImpl(
+    action: PromptToCreatePasskeyState.Action? = null
+) = PromptToCreatePasskeyStateImpl(
     onSubmit = onSubmit,
     onSkip = onSkip
 ).apply { this.action = action }

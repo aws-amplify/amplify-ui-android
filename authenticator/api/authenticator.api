@@ -46,32 +46,14 @@ public final class com/amplifyframework/ui/authenticator/LoadingState : com/ampl
 }
 
 public abstract interface class com/amplifyframework/ui/authenticator/PasskeyCreatedState : com/amplifyframework/ui/authenticator/AuthenticatorActionState, com/amplifyframework/ui/authenticator/AuthenticatorStepState {
-	public abstract fun done (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun continueSignIn (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getPasskeys ()Ljava/util/List;
 }
 
 public abstract interface class com/amplifyframework/ui/authenticator/PasskeyCreatedState$Action {
 }
 
-public final class com/amplifyframework/ui/authenticator/PasskeyCreatedState$Action$Done : com/amplifyframework/ui/authenticator/PasskeyCreatedState$Action {
-	public static final field $stable I
-	public fun <init> ()V
-}
-
-public abstract interface class com/amplifyframework/ui/authenticator/PasskeyCreationPromptState : com/amplifyframework/ui/authenticator/AuthenticatorActionState, com/amplifyframework/ui/authenticator/AuthenticatorStepState {
-	public abstract fun createPasskey (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public abstract fun skip (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-}
-
-public abstract interface class com/amplifyframework/ui/authenticator/PasskeyCreationPromptState$Action {
-}
-
-public final class com/amplifyframework/ui/authenticator/PasskeyCreationPromptState$Action$CreatePasskey : com/amplifyframework/ui/authenticator/PasskeyCreationPromptState$Action {
-	public static final field $stable I
-	public fun <init> ()V
-}
-
-public final class com/amplifyframework/ui/authenticator/PasskeyCreationPromptState$Action$Skip : com/amplifyframework/ui/authenticator/PasskeyCreationPromptState$Action {
+public final class com/amplifyframework/ui/authenticator/PasskeyCreatedState$Action$ContinueSignIn : com/amplifyframework/ui/authenticator/PasskeyCreatedState$Action {
 	public static final field $stable I
 	public fun <init> ()V
 }
@@ -87,6 +69,24 @@ public abstract interface class com/amplifyframework/ui/authenticator/PasswordRe
 	public abstract fun getForm ()Lcom/amplifyframework/ui/authenticator/forms/MutableFormState;
 	public abstract fun moveTo (Lcom/amplifyframework/ui/authenticator/enums/AuthenticatorInitialStep;)V
 	public abstract fun submitPasswordReset (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/amplifyframework/ui/authenticator/PromptToCreatePasskeyState : com/amplifyframework/ui/authenticator/AuthenticatorActionState, com/amplifyframework/ui/authenticator/AuthenticatorStepState {
+	public abstract fun createPasskey (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun skip (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class com/amplifyframework/ui/authenticator/PromptToCreatePasskeyState$Action {
+}
+
+public final class com/amplifyframework/ui/authenticator/PromptToCreatePasskeyState$Action$CreatePasskey : com/amplifyframework/ui/authenticator/PromptToCreatePasskeyState$Action {
+	public static final field $stable I
+	public fun <init> ()V
+}
+
+public final class com/amplifyframework/ui/authenticator/PromptToCreatePasskeyState$Action$Skip : com/amplifyframework/ui/authenticator/PromptToCreatePasskeyState$Action {
+	public static final field $stable I
+	public fun <init> ()V
 }
 
 public abstract interface class com/amplifyframework/ui/authenticator/SignInConfirmCustomState : com/amplifyframework/ui/authenticator/AuthenticatorStepState {
@@ -869,15 +869,15 @@ public final class com/amplifyframework/ui/authenticator/options/TotpOptions {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/amplifyframework/ui/authenticator/states/PasskeyCreationPromptStateImpl : com/amplifyframework/ui/authenticator/PasskeyCreationPromptState, com/amplifyframework/ui/authenticator/states/MutableActionState {
+public final class com/amplifyframework/ui/authenticator/states/PromptToCreatePasskeyStateImpl : com/amplifyframework/ui/authenticator/PromptToCreatePasskeyState, com/amplifyframework/ui/authenticator/states/MutableActionState {
 	public static final field $stable I
 	public fun <init> (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 	public fun createPasskey (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun getAction ()Lcom/amplifyframework/ui/authenticator/PasskeyCreationPromptState$Action;
+	public fun getAction ()Lcom/amplifyframework/ui/authenticator/PromptToCreatePasskeyState$Action;
 	public synthetic fun getAction ()Ljava/lang/Object;
 	public fun getStep ()Lcom/amplifyframework/ui/authenticator/enums/AuthenticatorStep$PasskeyCreationPrompt;
 	public synthetic fun getStep ()Lcom/amplifyframework/ui/authenticator/enums/AuthenticatorStep;
-	public fun setAction (Lcom/amplifyframework/ui/authenticator/PasskeyCreationPromptState$Action;)V
+	public fun setAction (Lcom/amplifyframework/ui/authenticator/PromptToCreatePasskeyState$Action;)V
 	public synthetic fun setAction (Ljava/lang/Object;)V
 	public fun skip (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
@@ -887,7 +887,7 @@ public final class com/amplifyframework/ui/authenticator/ui/AuthenticatorErrorKt
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/AuthenticatorKt {
-	public static final fun Authenticator (Landroidx/compose/ui/Modifier;Lcom/amplifyframework/ui/authenticator/AuthenticatorState;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;IIII)V
+	public static final fun Authenticator (Landroidx/compose/ui/Modifier;Lcom/amplifyframework/ui/authenticator/AuthenticatorState;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;IIII)V
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/AuthenticatorLoadingKt {
@@ -903,25 +903,29 @@ public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$AuthenticatorKt;
 	public fun <init> ()V
-	public final fun getLambda$-1364811249$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-1534614155$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-1534995609$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-1589760345$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-173861027$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-1772037977$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-1828710841$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-35945593$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda$-655729473$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$-70309625$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$127509735$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$1684084125$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$1696024992$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda$1943575719$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$2094400221$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$614972265$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$634797031$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$711026261$authenticator_release ()Lkotlin/jvm/functions/Function2;
-	public final fun getLambda$792593797$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1098997081$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1185569707$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$-1321237603$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1500805657$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1564461377$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-489643147$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-829100313$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-901777241$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1086843975$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1121453405$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1279389511$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1463924539$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1517396039$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1704729959$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$178565481$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$1944093671$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2056608783$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$2077124263$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$425485189$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$484030880$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$524324231$authenticator_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$810365703$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$883421405$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$DateInputFieldKt {
@@ -936,13 +940,6 @@ public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons
 	public fun <init> ()V
 	public final fun getLambda$-1577436357$authenticator_release ()Lkotlin/jvm/functions/Function3;
 	public final fun getLambda$1794672713$authenticator_release ()Lkotlin/jvm/functions/Function3;
-}
-
-public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasskeyCreationPromptKt {
-	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasskeyCreationPromptKt;
-	public fun <init> ()V
-	public final fun getLambda$-871924708$authenticator_release ()Lkotlin/jvm/functions/Function3;
-	public final fun getLambda$529487310$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PasswordResetConfirmKt {
@@ -968,6 +965,13 @@ public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons
 	public final fun getLambda$1117974220$authenticator_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$639673736$authenticator_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$977961286$authenticator_release ()Lkotlin/jvm/functions/Function2;
+}
+
+public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$PromptToCreatePasskeyKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/authenticator/ui/ComposableSingletons$PromptToCreatePasskeyKt;
+	public fun <init> ()V
+	public final fun getLambda$280783377$authenticator_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$445145695$authenticator_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/ComposableSingletons$SignInConfirmCustomKt {
@@ -1095,10 +1099,6 @@ public final class com/amplifyframework/ui/authenticator/ui/PasskeyCreatedKt {
 	public static final fun PasskeyCreated (Lcom/amplifyframework/ui/authenticator/PasskeyCreatedState;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
-public final class com/amplifyframework/ui/authenticator/ui/PasskeyCreationPromptKt {
-	public static final fun PasskeyPrompt (Lcom/amplifyframework/ui/authenticator/PasskeyCreationPromptState;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
-}
-
 public final class com/amplifyframework/ui/authenticator/ui/PasswordResetConfirmKt {
 	public static final fun PasswordResetConfirm (Lcom/amplifyframework/ui/authenticator/PasswordResetConfirmState;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun PasswordResetConfirmFooter (Lcom/amplifyframework/ui/authenticator/PasswordResetConfirmState;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
@@ -1107,6 +1107,10 @@ public final class com/amplifyframework/ui/authenticator/ui/PasswordResetConfirm
 public final class com/amplifyframework/ui/authenticator/ui/PasswordResetKt {
 	public static final fun PasswordReset (Lcom/amplifyframework/ui/authenticator/PasswordResetState;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 	public static final fun PasswordResetFooter (Lcom/amplifyframework/ui/authenticator/PasswordResetState;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class com/amplifyframework/ui/authenticator/ui/PromptToCreatePasskeyKt {
+	public static final fun PromptToCreatePasskey (Lcom/amplifyframework/ui/authenticator/PromptToCreatePasskeyState;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class com/amplifyframework/ui/authenticator/ui/SignInConfirmCustomKt {

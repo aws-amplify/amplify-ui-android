@@ -14,19 +14,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState
-import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState.Action
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState.Action
 import com.amplifyframework.ui.authenticator.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun PasskeyPrompt(
-    state: PasskeyCreationPromptState,
+fun PromptToCreatePasskey(
+    state: PromptToCreatePasskeyState,
     modifier: Modifier = Modifier,
-    headerContent: @Composable (PasskeyCreationPromptState) -> Unit = {
+    headerContent: @Composable (PromptToCreatePasskeyState) -> Unit = {
         AuthenticatorTitle(stringResource(R.string.amplify_ui_authenticator_title_prompt_for_passkey))
     },
-    footerContent: @Composable (PasskeyCreationPromptState) -> Unit = {}
+    footerContent: @Composable (PromptToCreatePasskeyState) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val action = state.action

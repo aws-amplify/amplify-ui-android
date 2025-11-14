@@ -546,9 +546,9 @@ interface VerifyUserConfirmState : AuthenticatorStepState {
  * via biometrics
  */
 @Stable
-interface PasskeyCreationPromptState :
+interface PromptToCreatePasskeyState :
     AuthenticatorStepState,
-    AuthenticatorActionState<PasskeyCreationPromptState.Action> {
+    AuthenticatorActionState<PromptToCreatePasskeyState.Action> {
     sealed interface Action {
         /**
          * User is creating a passkey
@@ -583,7 +583,7 @@ interface PasskeyCreatedState :
         /**
          * User has selected the Done button
          */
-        class Done : Action
+        class ContinueSignIn : Action
     }
 
     /**
@@ -594,5 +594,5 @@ interface PasskeyCreatedState :
     /**
      * Continue to the next step
      */
-    suspend fun done()
+    suspend fun continueSignIn()
 }

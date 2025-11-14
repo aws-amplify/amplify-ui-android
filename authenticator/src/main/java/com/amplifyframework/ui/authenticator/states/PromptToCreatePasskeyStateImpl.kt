@@ -3,14 +3,14 @@ package com.amplifyframework.ui.authenticator.states
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState
-import com.amplifyframework.ui.authenticator.PasskeyCreationPromptState.Action
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState.Action
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class PasskeyCreationPromptStateImpl(private val onSubmit: suspend () -> Unit, private val onSkip: suspend () -> Unit) :
-    PasskeyCreationPromptState,
+class PromptToCreatePasskeyStateImpl(private val onSubmit: suspend () -> Unit, private val onSkip: suspend () -> Unit) :
+    PromptToCreatePasskeyState,
     MutableActionState<Action> {
     private val mutex = Mutex()
 

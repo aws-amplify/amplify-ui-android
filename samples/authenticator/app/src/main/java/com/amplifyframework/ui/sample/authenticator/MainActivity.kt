@@ -70,9 +70,9 @@ class MainActivity : ComponentActivity() {
             val authenticatorState = rememberAuthenticatorState(
                 authenticationFlow = AuthenticationFlow.UserChoice(),
                 signUpForm = {
-                    username()
                     email(required = true)
                     password(required = false)
+                    phoneNumber(required = false)
                 }
             )
 

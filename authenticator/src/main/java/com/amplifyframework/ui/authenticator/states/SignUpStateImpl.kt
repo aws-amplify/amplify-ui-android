@@ -87,7 +87,7 @@ internal class SignUpStateImpl(
 
     override suspend fun signUp() = doSubmit {
         val username = form.getTrimmed(signInMethod.toFieldKey())!!
-        val password = form.getTrimmed(FieldKey.Password)
+        val password = form.getTrimmed(FieldKey.Password).takeIf { !it.isNullOrBlank() }
         val attributes = form.getUserAttributes()
         onSubmit(username, password, attributes)
     }

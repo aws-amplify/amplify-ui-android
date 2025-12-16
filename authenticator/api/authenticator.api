@@ -162,12 +162,12 @@ public abstract interface class com/amplifyframework/ui/authenticator/SignInSele
 public abstract interface class com/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action {
 }
 
-public final class com/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectFactor : com/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action {
+public final class com/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectAuthFactor : com/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action {
 	public static final field $stable I
 	public fun <init> (Lcom/amplifyframework/ui/authenticator/data/AuthFactor;)V
 	public final fun component1 ()Lcom/amplifyframework/ui/authenticator/data/AuthFactor;
-	public final fun copy (Lcom/amplifyframework/ui/authenticator/data/AuthFactor;)Lcom/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectFactor;
-	public static synthetic fun copy$default (Lcom/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectFactor;Lcom/amplifyframework/ui/authenticator/data/AuthFactor;ILjava/lang/Object;)Lcom/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectFactor;
+	public final fun copy (Lcom/amplifyframework/ui/authenticator/data/AuthFactor;)Lcom/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectAuthFactor;
+	public static synthetic fun copy$default (Lcom/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectAuthFactor;Lcom/amplifyframework/ui/authenticator/data/AuthFactor;ILjava/lang/Object;)Lcom/amplifyframework/ui/authenticator/SignInSelectAuthFactorState$Action$SelectAuthFactor;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getFactor ()Lcom/amplifyframework/ui/authenticator/data/AuthFactor;
 	public fun hashCode ()I

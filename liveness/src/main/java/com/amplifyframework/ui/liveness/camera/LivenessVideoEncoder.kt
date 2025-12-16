@@ -37,7 +37,9 @@ internal class LivenessVideoEncoder private constructor(
     private val frameRate: Int,
     private val keyframeInterval: Int,
     private val outputFile: File,
-    private val onMuxedSegment: OnMuxedSegment
+    private val onMuxedSegment: OnMuxedSegment,
+    private val onEncoderError: (MediaCodec.CodecException) -> Unit,
+    private val onMuxerError: (Exception) -> Unit
 ) {
 
     companion object {
@@ -45,6 +47,7 @@ internal class LivenessVideoEncoder private constructor(
         const val TAG = "LivenessVideoEncoder"
         const val LOGGING_ENABLED = false
         const val MIME_TYPE = "video/x-vnd.on2.vp8"
+        const val MAX_MUXER_CREATION_ATTEMPTS = 3
 
         fun create(
             context: Context,
@@ -53,7 +56,9 @@ internal class LivenessVideoEncoder private constructor(
             bitrate: Int,
             framerate: Int,
             keyframeInterval: Int,
-            onMuxedSegment: OnMuxedSegment
+            onMuxedSegment: OnMuxedSegment,
+            onEncoderError: (MediaCodec.CodecException) -> Unit,
+            onMuxerError: (Exception) -> Unit
         ): LivenessVideoEncoder? {
             return try {
                 LivenessVideoEncoder(
@@ -63,7 +68,9 @@ internal class LivenessVideoEncoder private constructor(
                     framerate,
                     keyframeInterval,
                     createTempOutputFile(context),
-                    onMuxedSegment
+                    onMuxedSegment,
+                    onEncoderError,
+                    onMuxerError
                 )
             } catch (e: Exception) {
                 null
@@ -118,6 +125,14 @@ internal class LivenessVideoEncoder private constructor(
                 }
 
                 override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
+                    if (!e.isTransient) {
+                        logger.error("MediaCodec encoder error", e)
+                        // Propagate error up
+                        onEncoderError(e)
+                    } else {
+                        // Ignore transient errors
+                        logger.warn("Transient MediaCodec encoder error", e)
+                    }
                 }
             },
             encoderHandler
@@ -127,6 +142,7 @@ internal class LivenessVideoEncoder private constructor(
 
     private var encoding = false
     private var livenessMuxer: LivenessMuxer? = null
+    private var muxerCreationAttempts = 0
     private val logger = Amplify.Logging.forNamespace("Liveness")
 
     init {
@@ -140,8 +156,8 @@ internal class LivenessVideoEncoder private constructor(
     var framesSinceSyncRequest = 0
 
     @WorkerThread
-
     fun handleFrame(outputBufferId: Int, info: MediaCodec.BufferInfo) {
+
         try {
             encoder.getOutputBuffer(outputBufferId)?.let { byteBuffer ->
                 if (encoding) {
@@ -156,6 +172,7 @@ internal class LivenessVideoEncoder private constructor(
 
                     if (info.isKeyFrame()) {
                         if (livenessMuxer == null) {
+                            muxerCreationAttempts++
                             try {
                                 val muxer = LivenessMuxer(
                                     outputFile,
@@ -165,8 +182,13 @@ internal class LivenessVideoEncoder private constructor(
                                 livenessMuxer = muxer
                             } catch (e: Exception) {
                                 // This is likely an unrecoverable error, such as file creation failing.
-                                // However, if it fails, we will allow another attempt at the next keyframe.
-                                logger.error("Failed to create liveness muxer", e)
+                                // However, if it fails, we will allow multiple attempt at the next keyframe.
+                                logger.error("Failed to create liveness muxer (attempt $muxerCreationAttempts)", e)
+                                if (muxerCreationAttempts >= MAX_MUXER_CREATION_ATTEMPTS) {
+                                    // Propagate error up
+                                    onMuxerError(e)
+                                    return
+                                }
                             }
                         }
                         framesSinceSyncRequest = 0 // reset keyframe request on keyframe receipt

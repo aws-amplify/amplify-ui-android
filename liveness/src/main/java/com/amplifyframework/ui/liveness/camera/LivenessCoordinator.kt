@@ -131,6 +131,24 @@ internal class LivenessCoordinator(
         keyframeInterval = TARGET_ENCODE_KEYFRAME_INTERVAL,
         onMuxedSegment = { bytes, time ->
             livenessState.livenessSessionInfo?.sendVideoEvent(VideoEvent(bytes, Date(time)))
+        },
+        onEncoderError = { error ->
+            processSessionError(
+                FaceLivenessDetectionException(
+                    "Video encoding failed: ${error.message}",
+                    "The device may not support video encoding. Please try again or use a different device."
+                ),
+                true
+            )
+        },
+        onMuxerError = { error ->
+            processSessionError(
+                FaceLivenessDetectionException(
+                    "Video recording failed: ${error.message}",
+                    "Unable to save video data. Check device storage and permissions."
+                ),
+                true
+            )
         }
     ) ?: throw IllegalStateException("Failed to start the encoder.")
 

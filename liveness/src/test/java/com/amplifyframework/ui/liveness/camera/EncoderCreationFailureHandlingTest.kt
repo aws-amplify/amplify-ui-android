@@ -18,12 +18,9 @@ package com.amplifyframework.ui.liveness.camera
 import android.media.MediaCodec
 import android.media.MediaFormat
 import android.media.MediaMuxer
-import android.os.Handler
-import android.os.HandlerThread
 import android.view.Surface
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -40,7 +37,7 @@ import java.nio.file.Files
     ShadowMediaMuxer::class,
     ShadowSurface::class
 ])
-class EncoderErrorHandlingTest {
+class EncoderCreationFailureHandlingTest {
 
     private fun setupMocks(shouldThrow: Boolean = true): Triple<File, MediaCodec, (Exception) -> Unit> {
         val tempDir = Files.createTempDirectory("livenessVideoEncoder").toFile()

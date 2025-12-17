@@ -1,0 +1,65 @@
+/*
+ * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *  http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+package com.amplifyframework.ui.liveness.camera
+
+import android.media.MediaCodec
+import android.media.MediaMuxer
+import com.amplifyframework.logging.Logger
+import io.mockk.*
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowMediaCodec
+import org.robolectric.shadows.ShadowMediaMuxer
+import org.robolectric.shadows.ShadowSurface
+
+class EncoderRuntimeFailureHandlingTest {
+
+    private fun createCallback(): Triple<EncoderCallback, (MediaCodec.CodecException) -> Unit, Logger> {
+        val mockHandleFrame = mockk<(Int, MediaCodec.BufferInfo) -> Unit>()
+        val mockOnError = mockk<(MediaCodec.CodecException) -> Unit>(relaxed = true)
+        val mockLogger = mockk<Logger>(relaxed = true)
+        val callback = EncoderCallback(mockHandleFrame, mockOnError, mockLogger)
+        return Triple(callback, mockOnError, mockLogger)
+    }
+
+    @Test
+    fun `callback handles transient errors without calling onEncoderError`() {
+        val (callback, mockOnError, mockLogger) = createCallback()
+        
+        val transientError = mockk<MediaCodec.CodecException>(relaxed = true) {
+            every { isTransient } returns true
+        }
+        callback.onError(mockk(), transientError)
+        
+        verify(exactly = 0) { mockOnError(any()) }
+        verify { mockLogger.warn(any(), transientError) }
+    }
+
+    @Test
+    fun `callback handles non-transient errors by calling onEncoderError`() {
+        val (callback, mockOnError, mockLogger) = createCallback()
+
+        val fatalError = mockk<MediaCodec.CodecException>(relaxed = true) {
+            every { isTransient } returns false
+        }
+        callback.onError(mockk(), fatalError)
+
+        verify(exactly = 1) { mockOnError(fatalError) }
+        verify { mockLogger.error(any(), fatalError) }
+    }
+}

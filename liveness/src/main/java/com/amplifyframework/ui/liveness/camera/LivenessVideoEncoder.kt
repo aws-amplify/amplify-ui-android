@@ -26,6 +26,7 @@ import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.amplifyframework.core.Amplify
+import com.amplifyframework.logging.Logger
 import com.amplifyframework.ui.liveness.util.isKeyFrame
 import java.io.File
 import kotlin.coroutines.resume
@@ -106,45 +107,17 @@ internal class LivenessVideoEncoder private constructor(
     }
 
     private val encoderHandler = Handler(HandlerThread(TAG).apply { start() }.looper)
+    private val logger = Amplify.Logging.forNamespace("Liveness")
 
     private val encoder = MediaCodec.createEncoderByType(MIME_TYPE).apply {
         configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        setCallback(
-            object : MediaCodec.Callback() {
-                override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {
-                }
-
-                override fun onOutputBufferAvailable(
-                    codec: MediaCodec,
-                    index: Int,
-                    info: MediaCodec.BufferInfo
-                ) {
-                    handleFrame(index, info)
-                }
-
-                override fun onOutputFormatChanged(codec: MediaCodec, format: MediaFormat) {
-                }
-
-                override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
-                    if (!e.isTransient) {
-                        logger.error("MediaCodec encoder error", e)
-                        // Propagate error up
-                        onEncoderError(e)
-                    } else {
-                        // Ignore transient errors
-                        logger.warn("Transient MediaCodec encoder error", e)
-                    }
-                }
-            },
-            encoderHandler
-        )
+        setCallback(EncoderCallback(::handleFrame, onEncoderError, logger), encoderHandler)
     }
     val inputSurface = encoder.createInputSurface()
 
     private var encoding = false
     private var livenessMuxer: LivenessMuxer? = null
     var muxerCreationAttempts = 0
-    private val logger = Amplify.Logging.forNamespace("Liveness")
 
     init {
         encoder.start()
@@ -273,6 +246,30 @@ internal class LivenessVideoEncoder private constructor(
             encoder.release()
 
             continuation.resume(Unit)
+        }
+    }
+}
+
+internal class EncoderCallback(
+    private val handleFrame: (Int, MediaCodec.BufferInfo) -> Unit,
+    private val onEncoderError: (MediaCodec.CodecException) -> Unit,
+    private val logger: Logger
+) : MediaCodec.Callback() {
+    
+    override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {}
+
+    override fun onOutputBufferAvailable(codec: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {
+        handleFrame(index, info)
+    }
+
+    override fun onOutputFormatChanged(codec: MediaCodec, format: MediaFormat) {}
+
+    override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
+        if (!e.isTransient) {
+            logger.error("MediaCodec encoder error", e)
+            onEncoderError(e)
+        } else {
+            logger.warn("Transient MediaCodec encoder error", e)
         }
     }
 }

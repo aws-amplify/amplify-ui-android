@@ -123,7 +123,7 @@ internal class LivenessCoordinator(
     }
 
     private val encoder = LivenessVideoEncoder.create(
-        context = context,
+        cacheDir = context.cacheDir,
         width = TARGET_WIDTH,
         height = TARGET_HEIGHT,
         bitrate = TARGET_ENCODE_BITRATE,

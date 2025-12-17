@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.util.isKeyFrame
@@ -50,7 +51,7 @@ internal class LivenessVideoEncoder private constructor(
         const val MAX_MUXER_CREATION_ATTEMPTS = 3
 
         fun create(
-            context: Context,
+            cacheDir: File,
             width: Int,
             height: Int,
             bitrate: Int,
@@ -67,7 +68,7 @@ internal class LivenessVideoEncoder private constructor(
                     bitrate,
                     framerate,
                     keyframeInterval,
-                    createTempOutputFile(context),
+                    createTempOutputFile(cacheDir),
                     onMuxedSegment,
                     onEncoderError,
                     onMuxerError
@@ -77,9 +78,9 @@ internal class LivenessVideoEncoder private constructor(
             }
         }
 
-        private fun createTempOutputFile(context: Context) = File(
+        private fun createTempOutputFile(cacheDir: File) = File(
             File(
-                context.cacheDir,
+               cacheDir,
                 "amplify_liveness_temp"
             ).apply {
                 if (exists()) {
@@ -142,7 +143,7 @@ internal class LivenessVideoEncoder private constructor(
 
     private var encoding = false
     private var livenessMuxer: LivenessMuxer? = null
-    private var muxerCreationAttempts = 0
+    var muxerCreationAttempts = 0
     private val logger = Amplify.Logging.forNamespace("Liveness")
 
     init {
@@ -172,24 +173,7 @@ internal class LivenessVideoEncoder private constructor(
 
                     if (info.isKeyFrame()) {
                         if (livenessMuxer == null) {
-                            muxerCreationAttempts++
-                            try {
-                                val muxer = LivenessMuxer(
-                                    outputFile,
-                                    encoder.outputFormat,
-                                    onMuxedSegment
-                                )
-                                livenessMuxer = muxer
-                            } catch (e: Exception) {
-                                // This is likely an unrecoverable error, such as file creation failing.
-                                // However, if it fails, we will allow multiple attempt at the next keyframe.
-                                logger.error("Failed to create liveness muxer (attempt $muxerCreationAttempts)", e)
-                                if (muxerCreationAttempts >= MAX_MUXER_CREATION_ATTEMPTS) {
-                                    // Propagate error up
-                                    onMuxerError(e)
-                                    return
-                                }
-                            }
+                            createMuxer()
                         }
                         framesSinceSyncRequest = 0 // reset keyframe request on keyframe receipt
                     } else {
@@ -215,6 +199,28 @@ internal class LivenessVideoEncoder private constructor(
             encoder.releaseOutputBuffer(outputBufferId, false)
         } catch (e: IllegalStateException) {
             // may have already been released by stop()
+        }
+    }
+
+    @VisibleForTesting(VisibleForTesting.PRIVATE)
+    fun createMuxer() {
+        muxerCreationAttempts++
+        try {
+            val muxer = LivenessMuxer(
+                outputFile,
+                encoder.outputFormat,
+                onMuxedSegment
+            )
+            livenessMuxer = muxer
+        } catch (e: Exception) {
+            // This is likely an unrecoverable error, such as file creation failing.
+            // However, if it fails, we will allow multiple attempt at the next keyframe.
+            logger.error("Failed to create liveness muxer (attempt $muxerCreationAttempts)", e)
+            if (muxerCreationAttempts >= MAX_MUXER_CREATION_ATTEMPTS) {
+                // Propagate error up
+                onMuxerError(e)
+                return
+            }
         }
     }
 

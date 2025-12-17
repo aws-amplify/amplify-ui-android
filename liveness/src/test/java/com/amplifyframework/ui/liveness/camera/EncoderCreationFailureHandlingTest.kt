@@ -17,48 +17,48 @@ package com.amplifyframework.ui.liveness.camera
 
 import android.media.MediaCodec
 import android.media.MediaFormat
-import android.media.MediaMuxer
 import android.view.Surface
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.slot
+import io.mockk.unmockkStatic
+import io.mockk.verify
+import java.io.File
+import java.nio.file.Files
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowMediaCodec
-import org.robolectric.shadows.ShadowMediaMuxer
 import org.robolectric.shadows.ShadowSurface
-import java.io.File
-import java.nio.file.Files
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28], manifest = Config.NONE, shadows = [
-    ShadowMediaCodec::class,
-    ShadowMediaMuxer::class,
-    ShadowSurface::class
-])
+@Config(
+    sdk = [28],
+    manifest = Config.NONE,
+    shadows = [
+        ShadowMediaCodec::class,
+        ShadowSurface::class
+    ]
+)
 class EncoderCreationFailureHandlingTest {
 
-    private fun setupMocks(shouldThrow: Boolean = true): Triple<File, MediaCodec, (Exception) -> Unit> {
+    private fun setupMocks(): Triple<File, MediaCodec, (Exception) -> Unit> {
         val tempDir = Files.createTempDirectory("livenessVideoEncoder").toFile()
-        
+
         mockkStatic(MediaCodec::class)
         mockkStatic(MediaFormat::class)
-        mockkConstructor(MediaMuxer::class)
 
         val mockCodec = mockk<MediaCodec>(relaxed = true)
         val mockSurface = mockk<Surface>(relaxed = true)
+        val mockFormat = mockk<MediaFormat>(relaxed = true)
         val mockOnError = mockk<(Exception) -> Unit>(relaxed = true)
 
         every { MediaCodec.createEncoderByType(any()) } returns mockCodec
         every { mockCodec.createInputSurface() } returns mockSurface
-        every { mockCodec.outputFormat } returns MediaFormat().apply { setInteger(MediaFormat.KEY_HEIGHT, 1) }
-        
-        if (shouldThrow) {
-            every { anyConstructed<MediaMuxer>().addTrack(any()) } throws RuntimeException("addTrack failed")
-        } else {
-            every { anyConstructed<MediaMuxer>().addTrack(any()) } returns 0
-        }
+        every { mockCodec.outputFormat } returns mockFormat
 
         return Triple(tempDir, mockCodec, mockOnError)
     }
@@ -66,19 +66,23 @@ class EncoderCreationFailureHandlingTest {
     private fun cleanup() {
         unmockkStatic(MediaCodec::class)
         unmockkStatic(MediaFormat::class)
-        unmockkConstructor(MediaMuxer::class)
     }
 
     @Test
     fun `muxer creation failure calls error callback on third attempt`() {
-        val (tempDir, _, mockOnError) = setupMocks(shouldThrow = true)
+        val (tempDir, _, mockOnError) = setupMocks()
         val errorSlot = slot<Exception>()
+
+        val failingMuxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { _, _, _ ->
+            throw RuntimeException("Muxer creation failed")
+        }
 
         try {
             val encoder = LivenessVideoEncoder.create(
                 cacheDir = tempDir, width = 640, height = 480, bitrate = 1,
                 keyframeInterval = 1, framerate = 1,
-                onMuxedSegment = { _, _ -> }, onEncoderError = { }, onMuxerError = mockOnError
+                onMuxedSegment = { _, _ -> }, onEncoderError = { }, onMuxerError = mockOnError,
+                muxerFactory = failingMuxerFactory
             )!!
 
             repeat(2) { encoder.createMuxer() }
@@ -96,18 +100,23 @@ class EncoderCreationFailureHandlingTest {
 
     @Test
     fun `muxer creation success does not call error callback`() {
-        val (tempDir, _, mockOnError) = setupMocks(shouldThrow = false)
+        val (tempDir, _, mockOnError) = setupMocks()
+
+        val successMuxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { _, _, _ ->
+            mockk<LivenessMuxer>(relaxed = true)
+        }
 
         try {
             val encoder = LivenessVideoEncoder.create(
                 cacheDir = tempDir, width = 640, height = 480, bitrate = 1,
                 keyframeInterval = 1, framerate = 1,
-                onMuxedSegment = { _, _ -> }, onEncoderError = { }, onMuxerError = mockOnError
+                onMuxedSegment = { _, _ -> }, onEncoderError = { }, onMuxerError = mockOnError,
+                muxerFactory = successMuxerFactory
             )!!
 
             repeat(3) { encoder.createMuxer() }
             verify(exactly = 0) { mockOnError(any()) }
-            
+
             runBlocking { encoder.stop(); encoder.destroy() }
         } finally {
             tempDir.deleteRecursively()

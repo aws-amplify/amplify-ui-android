@@ -16,16 +16,11 @@
 package com.amplifyframework.ui.liveness.camera
 
 import android.media.MediaCodec
-import android.media.MediaMuxer
 import com.amplifyframework.logging.Logger
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowMediaCodec
-import org.robolectric.shadows.ShadowMediaMuxer
-import org.robolectric.shadows.ShadowSurface
 
 class EncoderRuntimeFailureHandlingTest {
 
@@ -40,12 +35,12 @@ class EncoderRuntimeFailureHandlingTest {
     @Test
     fun `callback handles transient errors without calling onEncoderError`() {
         val (callback, mockOnError, mockLogger) = createCallback()
-        
+
         val transientError = mockk<MediaCodec.CodecException>(relaxed = true) {
             every { isTransient } returns true
         }
         callback.onError(mockk(), transientError)
-        
+
         verify(exactly = 0) { mockOnError(any()) }
         verify { mockLogger.warn(any(), transientError) }
     }

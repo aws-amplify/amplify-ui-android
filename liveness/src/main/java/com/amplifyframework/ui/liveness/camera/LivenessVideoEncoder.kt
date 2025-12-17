@@ -15,7 +15,6 @@
 
 package com.amplifyframework.ui.liveness.camera
 
-import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
@@ -41,7 +40,10 @@ internal class LivenessVideoEncoder private constructor(
     private val outputFile: File,
     private val onMuxedSegment: OnMuxedSegment,
     private val onEncoderError: (MediaCodec.CodecException) -> Unit,
-    private val onMuxerError: (Exception) -> Unit
+    private val onMuxerError: (Exception) -> Unit,
+    private val muxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { file, format, callback ->
+        LivenessMuxer(file, format, callback)
+    }
 ) {
 
     companion object {
@@ -60,7 +62,10 @@ internal class LivenessVideoEncoder private constructor(
             keyframeInterval: Int,
             onMuxedSegment: OnMuxedSegment,
             onEncoderError: (MediaCodec.CodecException) -> Unit,
-            onMuxerError: (Exception) -> Unit
+            onMuxerError: (Exception) -> Unit,
+            muxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { file, format, callback ->
+                LivenessMuxer(file, format, callback)
+            }
         ): LivenessVideoEncoder? {
             return try {
                 LivenessVideoEncoder(
@@ -72,7 +77,8 @@ internal class LivenessVideoEncoder private constructor(
                     createTempOutputFile(cacheDir),
                     onMuxedSegment,
                     onEncoderError,
-                    onMuxerError
+                    onMuxerError,
+                    muxerFactory
                 )
             } catch (e: Exception) {
                 null
@@ -81,7 +87,7 @@ internal class LivenessVideoEncoder private constructor(
 
         private fun createTempOutputFile(cacheDir: File) = File(
             File(
-               cacheDir,
+                cacheDir,
                 "amplify_liveness_temp"
             ).apply {
                 if (exists()) {
@@ -179,7 +185,7 @@ internal class LivenessVideoEncoder private constructor(
     fun createMuxer() {
         muxerCreationAttempts++
         try {
-            val muxer = LivenessMuxer(
+            val muxer = muxerFactory(
                 outputFile,
                 encoder.outputFormat,
                 onMuxedSegment
@@ -255,7 +261,7 @@ internal class EncoderCallback(
     private val onEncoderError: (MediaCodec.CodecException) -> Unit,
     private val logger: Logger
 ) : MediaCodec.Callback() {
-    
+
     override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {}
 
     override fun onOutputBufferAvailable(codec: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {

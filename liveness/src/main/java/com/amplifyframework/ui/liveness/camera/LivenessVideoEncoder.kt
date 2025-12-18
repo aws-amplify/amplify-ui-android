@@ -181,7 +181,7 @@ internal class LivenessVideoEncoder private constructor(
         }
     }
 
-    @VisibleForTesting(VisibleForTesting.PRIVATE)
+    @VisibleForTesting()
     fun createMuxer() {
         muxerCreationAttempts++
         try {

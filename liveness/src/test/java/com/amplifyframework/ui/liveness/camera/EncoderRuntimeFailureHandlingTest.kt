@@ -20,22 +20,25 @@ import com.amplifyframework.logging.Logger
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.junit.Before
 import org.junit.Test
 
 class EncoderRuntimeFailureHandlingTest {
 
-    private fun createCallback(): Triple<EncoderCallback, (MediaCodec.CodecException) -> Unit, Logger> {
+    private lateinit var callback: EncoderCallback
+    private lateinit var mockOnError: (MediaCodec.CodecException) -> Unit
+    private lateinit var mockLogger: Logger
+
+    @Before
+    fun createCallback() {
         val mockHandleFrame = mockk<(Int, MediaCodec.BufferInfo) -> Unit>()
-        val mockOnError = mockk<(MediaCodec.CodecException) -> Unit>(relaxed = true)
-        val mockLogger = mockk<Logger>(relaxed = true)
-        val callback = EncoderCallback(mockHandleFrame, mockOnError, mockLogger)
-        return Triple(callback, mockOnError, mockLogger)
+        mockOnError = mockk<(MediaCodec.CodecException) -> Unit>(relaxed = true)
+        mockLogger = mockk<Logger>(relaxed = true)
+        callback = EncoderCallback(mockHandleFrame, mockOnError, mockLogger)
     }
 
     @Test
     fun `callback handles transient errors without calling onEncoderError`() {
-        val (callback, mockOnError, mockLogger) = createCallback()
-
         val transientError = mockk<MediaCodec.CodecException>(relaxed = true) {
             every { isTransient } returns true
         }
@@ -47,8 +50,6 @@ class EncoderRuntimeFailureHandlingTest {
 
     @Test
     fun `callback handles non-transient errors by calling onEncoderError`() {
-        val (callback, mockOnError, mockLogger) = createCallback()
-
         val fatalError = mockk<MediaCodec.CodecException>(relaxed = true) {
             every { isTransient } returns false
         }

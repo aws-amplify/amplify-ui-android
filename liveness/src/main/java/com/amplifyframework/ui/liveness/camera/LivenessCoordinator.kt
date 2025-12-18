@@ -134,20 +134,16 @@ internal class LivenessCoordinator(
         },
         onEncoderError = { error ->
             processSessionError(
-                FaceLivenessDetectionException(
-                    "Video encoding failed: ${error.message}",
-                    "The device may not support video encoding. Please try again or use a different device.",
-                    error
+                FaceLivenessDetectionException.VideoEncodingException(
+                    throwable = error
                 ),
                 true
             )
         },
         onMuxerError = { error ->
             processSessionError(
-                FaceLivenessDetectionException(
-                    "Video recording failed: ${error.message}",
-                    "Unable to save video data. Check device storage and permissions.",
-                    error
+                FaceLivenessDetectionException.VideoMuxingException(
+                    throwable = error
                 ),
                 true
             )

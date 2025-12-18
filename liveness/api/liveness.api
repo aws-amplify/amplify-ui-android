@@ -58,6 +58,20 @@ public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionE
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$VideoEncodingException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$VideoMuxingException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
 public final class com/amplifyframework/ui/liveness/state/AttemptCounter {
 	public static final field $stable I
 	public static final field ATTEMPT_COUNT_RESET_INTERVAL_MS J

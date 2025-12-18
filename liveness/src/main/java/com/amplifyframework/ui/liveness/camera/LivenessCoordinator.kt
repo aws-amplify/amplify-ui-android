@@ -18,7 +18,6 @@ package com.amplifyframework.ui.liveness.camera
 import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.camera2.CaptureRequest
-import android.media.MediaFormat
 import android.util.Range
 import android.util.Size
 import androidx.camera.camera2.interop.Camera2Interop
@@ -62,7 +61,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import java.io.File
 
 internal typealias OnMuxedSegment = (bytes: ByteArray, timestamp: Long) -> Unit
 internal typealias OnChallengeComplete = () -> Unit

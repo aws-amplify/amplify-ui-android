@@ -58,6 +58,19 @@ open class FaceLivenessDetectionException(
         throwable: Throwable? = null
     ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 
+    class VideoEncodingException(
+        message: String = "Video encoding failed.",
+        recoverySuggestion: String = "The device may not support video encoding. " +
+            "Please try again or use a different device.",
+        throwable: Throwable? = null
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+
+    class VideoMuxingException(
+        message: String = "Video muxer creation failed.",
+        recoverySuggestion: String = "Retry the face liveness check.",
+        throwable: Throwable? = null
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+
     /**
      * This is not an error we have determined to publicly expose.
      * The error will come to the customer in onError, but only instance checked as FaceLivenessDetectionException.

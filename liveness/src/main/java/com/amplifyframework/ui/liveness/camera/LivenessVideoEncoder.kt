@@ -15,7 +15,6 @@
 
 package com.amplifyframework.ui.liveness.camera
 
-import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
@@ -23,8 +22,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.amplifyframework.core.Amplify
+import com.amplifyframework.logging.Logger
 import com.amplifyframework.ui.liveness.util.isKeyFrame
 import java.io.File
 import kotlin.coroutines.resume
@@ -37,7 +38,12 @@ internal class LivenessVideoEncoder private constructor(
     private val frameRate: Int,
     private val keyframeInterval: Int,
     private val outputFile: File,
-    private val onMuxedSegment: OnMuxedSegment
+    private val onMuxedSegment: OnMuxedSegment,
+    private val onEncoderError: (MediaCodec.CodecException) -> Unit,
+    private val onMuxerError: (Exception) -> Unit,
+    private val muxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { file, format, callback ->
+        LivenessMuxer(file, format, callback)
+    }
 ) {
 
     companion object {
@@ -45,15 +51,21 @@ internal class LivenessVideoEncoder private constructor(
         const val TAG = "LivenessVideoEncoder"
         const val LOGGING_ENABLED = false
         const val MIME_TYPE = "video/x-vnd.on2.vp8"
+        const val MAX_MUXER_CREATION_ATTEMPTS = 3
 
         fun create(
-            context: Context,
+            cacheDir: File,
             width: Int,
             height: Int,
             bitrate: Int,
             framerate: Int,
             keyframeInterval: Int,
-            onMuxedSegment: OnMuxedSegment
+            onMuxedSegment: OnMuxedSegment,
+            onEncoderError: (MediaCodec.CodecException) -> Unit,
+            onMuxerError: (Exception) -> Unit,
+            muxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { file, format, callback ->
+                LivenessMuxer(file, format, callback)
+            }
         ): LivenessVideoEncoder? {
             return try {
                 LivenessVideoEncoder(
@@ -62,17 +74,20 @@ internal class LivenessVideoEncoder private constructor(
                     bitrate,
                     framerate,
                     keyframeInterval,
-                    createTempOutputFile(context),
-                    onMuxedSegment
+                    createTempOutputFile(cacheDir),
+                    onMuxedSegment,
+                    onEncoderError,
+                    onMuxerError,
+                    muxerFactory
                 )
             } catch (e: Exception) {
                 null
             }
         }
 
-        private fun createTempOutputFile(context: Context) = File(
+        private fun createTempOutputFile(cacheDir: File) = File(
             File(
-                context.cacheDir,
+                cacheDir,
                 "amplify_liveness_temp"
             ).apply {
                 if (exists()) {
@@ -98,36 +113,17 @@ internal class LivenessVideoEncoder private constructor(
     }
 
     private val encoderHandler = Handler(HandlerThread(TAG).apply { start() }.looper)
+    private val logger = Amplify.Logging.forNamespace("Liveness")
 
     private val encoder = MediaCodec.createEncoderByType(MIME_TYPE).apply {
         configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        setCallback(
-            object : MediaCodec.Callback() {
-                override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {
-                }
-
-                override fun onOutputBufferAvailable(
-                    codec: MediaCodec,
-                    index: Int,
-                    info: MediaCodec.BufferInfo
-                ) {
-                    handleFrame(index, info)
-                }
-
-                override fun onOutputFormatChanged(codec: MediaCodec, format: MediaFormat) {
-                }
-
-                override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
-                }
-            },
-            encoderHandler
-        )
+        setCallback(EncoderCallback(::handleFrame, onEncoderError, logger), encoderHandler)
     }
     val inputSurface = encoder.createInputSurface()
 
     private var encoding = false
     private var livenessMuxer: LivenessMuxer? = null
-    private val logger = Amplify.Logging.forNamespace("Liveness")
+    var muxerCreationAttempts = 0
 
     init {
         encoder.start()
@@ -140,8 +136,8 @@ internal class LivenessVideoEncoder private constructor(
     var framesSinceSyncRequest = 0
 
     @WorkerThread
-
     fun handleFrame(outputBufferId: Int, info: MediaCodec.BufferInfo) {
+
         try {
             encoder.getOutputBuffer(outputBufferId)?.let { byteBuffer ->
                 if (encoding) {
@@ -156,18 +152,7 @@ internal class LivenessVideoEncoder private constructor(
 
                     if (info.isKeyFrame()) {
                         if (livenessMuxer == null) {
-                            try {
-                                val muxer = LivenessMuxer(
-                                    outputFile,
-                                    encoder.outputFormat,
-                                    onMuxedSegment
-                                )
-                                livenessMuxer = muxer
-                            } catch (e: Exception) {
-                                // This is likely an unrecoverable error, such as file creation failing.
-                                // However, if it fails, we will allow another attempt at the next keyframe.
-                                logger.error("Failed to create liveness muxer", e)
-                            }
+                            createMuxer()
                         }
                         framesSinceSyncRequest = 0 // reset keyframe request on keyframe receipt
                     } else {
@@ -193,6 +178,28 @@ internal class LivenessVideoEncoder private constructor(
             encoder.releaseOutputBuffer(outputBufferId, false)
         } catch (e: IllegalStateException) {
             // may have already been released by stop()
+        }
+    }
+
+    @VisibleForTesting()
+    fun createMuxer() {
+        muxerCreationAttempts++
+        try {
+            val muxer = muxerFactory(
+                outputFile,
+                encoder.outputFormat,
+                onMuxedSegment
+            )
+            livenessMuxer = muxer
+        } catch (e: Exception) {
+            // This is likely an unrecoverable error, such as file creation failing.
+            // However, if it fails, we will allow multiple attempt at the next keyframe.
+            logger.error("Failed to create liveness muxer (attempt $muxerCreationAttempts)", e)
+            if (muxerCreationAttempts >= MAX_MUXER_CREATION_ATTEMPTS) {
+                // Propagate error up
+                onMuxerError(e)
+                return
+            }
         }
     }
 
@@ -245,6 +252,30 @@ internal class LivenessVideoEncoder private constructor(
             encoder.release()
 
             continuation.resume(Unit)
+        }
+    }
+}
+
+internal class EncoderCallback(
+    private val handleFrame: (Int, MediaCodec.BufferInfo) -> Unit,
+    private val onEncoderError: (MediaCodec.CodecException) -> Unit,
+    private val logger: Logger
+) : MediaCodec.Callback() {
+
+    override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {}
+
+    override fun onOutputBufferAvailable(codec: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {
+        handleFrame(index, info)
+    }
+
+    override fun onOutputFormatChanged(codec: MediaCodec, format: MediaFormat) {}
+
+    override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
+        if (!e.isTransient) {
+            logger.error("MediaCodec encoder error", e)
+            onEncoderError(e)
+        } else {
+            logger.warn("Transient MediaCodec encoder error", e)
         }
     }
 }

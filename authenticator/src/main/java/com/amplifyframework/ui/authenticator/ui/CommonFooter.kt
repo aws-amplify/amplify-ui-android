@@ -14,7 +14,8 @@ import com.amplifyframework.ui.authenticator.R
 @Composable
 internal fun BackToSignInFooter(
     onClickBackToSignIn: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    label: String = stringResource(R.string.amplify_ui_authenticator_button_back_to_signin)
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -24,7 +25,7 @@ internal fun BackToSignInFooter(
             modifier = Modifier.testTag(TestTags.BackToSignInButton),
             onClick = onClickBackToSignIn
         ) {
-            Text(stringResource(R.string.amplify_ui_authenticator_button_back_to_signin))
+            Text(label)
         }
     }
 }

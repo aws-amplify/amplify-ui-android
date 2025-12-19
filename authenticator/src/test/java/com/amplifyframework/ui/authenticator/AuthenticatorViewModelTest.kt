@@ -32,6 +32,7 @@ import com.amplifyframework.auth.result.step.AuthSignInStep
 import com.amplifyframework.auth.result.step.AuthSignUpStep
 import com.amplifyframework.hub.HubEvent
 import com.amplifyframework.ui.authenticator.auth.VerificationMechanism
+import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.util.AmplifyResult
 import com.amplifyframework.ui.authenticator.util.AmplifyResult.Error
@@ -85,8 +86,8 @@ class AuthenticatorViewModelTest {
 
     @Test
     fun `start only executes once`() = runTest {
-        viewModel.start(mockAuthenticatorConfiguration())
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
+        viewModel.start()
         advanceUntilIdle()
 
         // fetchAuthSession only called by the first start
@@ -99,7 +100,7 @@ class AuthenticatorViewModelTest {
     fun `missing configuration results in an error`() = runTest {
         coEvery { authProvider.getConfiguration() } returns AuthConfigurationResult.Missing
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         advanceUntilIdle()
 
         coVerify(exactly = 0) { authProvider.fetchAuthSession() }
@@ -110,7 +111,7 @@ class AuthenticatorViewModelTest {
     fun `invalid configuration results in an error`() = runTest {
         coEvery { authProvider.getConfiguration() } returns AuthConfigurationResult.Invalid("Invalid")
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         advanceUntilIdle()
 
         coVerify(exactly = 0) { authProvider.fetchAuthSession() }
@@ -121,7 +122,7 @@ class AuthenticatorViewModelTest {
     fun `fetchAuthSession error during start results in an error`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns AmplifyResult.Error(mockAuthException())
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         advanceUntilIdle()
 
         coVerify(exactly = 1) { authProvider.fetchAuthSession() }
@@ -133,7 +134,7 @@ class AuthenticatorViewModelTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
         coEvery { authProvider.getCurrentUser() } returns AmplifyResult.Error(mockAuthException())
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         advanceUntilIdle()
 
         coVerify(exactly = 1) {
@@ -148,7 +149,7 @@ class AuthenticatorViewModelTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
         coEvery { authProvider.getCurrentUser() } returns AmplifyResult.Error(SessionExpiredException())
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         advanceUntilIdle()
 
         coVerify(exactly = 1) {
@@ -163,7 +164,7 @@ class AuthenticatorViewModelTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = true))
         coEvery { authProvider.getCurrentUser() } returns Success(mockAuthUser())
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         advanceUntilIdle()
 
         coVerify(exactly = 1) {
@@ -177,7 +178,7 @@ class AuthenticatorViewModelTest {
     fun `initial step is SignIn`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
         advanceUntilIdle()
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
@@ -189,14 +190,14 @@ class AuthenticatorViewModelTest {
     @Test
     fun `TOTPSetup next step shows error if totpSetupDetails is null`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(
                 signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP,
                 totpSetupDetails = null
             )
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.Error
@@ -205,14 +206,14 @@ class AuthenticatorViewModelTest {
     @Test
     fun `TOTPSetup next step shows SignInContinueWithTotpSetup screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(
                 signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_TOTP_SETUP,
                 totpSetupDetails = mockk(relaxed = true)
             )
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignInContinueWithTotpSetup
@@ -221,11 +222,11 @@ class AuthenticatorViewModelTest {
     @Test
     fun `TOTP Code next step shows the SignInConfirmTotpCode screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_TOTP_CODE)
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmTotpCode
@@ -234,11 +235,11 @@ class AuthenticatorViewModelTest {
     @Test
     fun `SMS MFA Code next step shows the SignInConfirmMfa screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_SMS_MFA_CODE)
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmMfa
@@ -247,11 +248,11 @@ class AuthenticatorViewModelTest {
     @Test
     fun `Custom Challenge next step shows the SignInConfirmCustomAuth screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_CUSTOM_CHALLENGE)
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmCustomAuth
@@ -260,11 +261,11 @@ class AuthenticatorViewModelTest {
     @Test
     fun `New Password next step shows the SignInConfirmNewPassword screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_IN_WITH_NEW_PASSWORD)
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignInConfirmNewPassword
@@ -273,12 +274,12 @@ class AuthenticatorViewModelTest {
     @Test
     fun `Confirm SignUp next step, get error from resendSignUpCode, stays in SignIn screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_UP)
         )
-        coEvery { authProvider.resendSignUpCode(any()) } returns AmplifyResult.Error(mockAuthException())
+        coEvery { authProvider.resendSignUpCode(any()) } returns Error(mockAuthException())
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
@@ -287,12 +288,12 @@ class AuthenticatorViewModelTest {
     @Test
     fun `Confirm SignUp next step shows the SignUpConfirm screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(signInStep = AuthSignInStep.CONFIRM_SIGN_UP)
         )
         coEvery { authProvider.resendSignUpCode(any()) } returns Success(mockk())
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignUpConfirm
@@ -301,14 +302,14 @@ class AuthenticatorViewModelTest {
     @Test
     fun `MFA selection next step shows error if allowedMFATypes is null`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(
                 signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
                 allowedMFATypes = null
             )
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.Error
@@ -317,14 +318,14 @@ class AuthenticatorViewModelTest {
     @Test
     fun `MFA selection next step shows error if allowedMFATypes is empty`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(
                 signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
                 allowedMFATypes = emptySet()
             )
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.Error
@@ -333,14 +334,14 @@ class AuthenticatorViewModelTest {
     @Test
     fun `MFA Selection next step shows the SignInContinueWithMfaSelection screen`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(
                 signInStep = AuthSignInStep.CONTINUE_SIGN_IN_WITH_MFA_SELECTION,
                 allowedMFATypes = setOf(MFAType.TOTP, MFAType.SMS)
             )
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.SignInContinueWithMfaSelection
@@ -349,7 +350,7 @@ class AuthenticatorViewModelTest {
     @Test
     fun `user attribute verification screen is shown if user has no verified attributes`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(mockSignInResult())
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
             verificationMechanisms = setOf(VerificationMechanism.Email)
         )
@@ -357,7 +358,7 @@ class AuthenticatorViewModelTest {
             mockUserAttributes(email() to "email", emailVerified() to "false")
         )
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         viewModel.signIn("username", "password")
 
         viewModel.currentStep shouldBe AuthenticatorStep.VerifyUser
@@ -366,7 +367,7 @@ class AuthenticatorViewModelTest {
     @Test
     fun `user attribute verification screen is not shown if user has verified attributes`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(mockSignInResult())
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
             verificationMechanisms = setOf(VerificationMechanism.Email)
         )
@@ -374,7 +375,7 @@ class AuthenticatorViewModelTest {
             mockUserAttributes(email() to "email", emailVerified() to "true") // email is already verified
         )
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         viewModel.signIn("username", "password")
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
@@ -383,7 +384,7 @@ class AuthenticatorViewModelTest {
     @Test
     fun `user attribute verification screen is not shown if there are no verification mechanisms`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(mockSignInResult())
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
             verificationMechanisms = emptySet() // no verification mechanisms
         )
@@ -391,7 +392,7 @@ class AuthenticatorViewModelTest {
             mockUserAttributes(email() to "email", emailVerified() to "false")
         )
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         viewModel.signIn("username", "password")
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
@@ -400,14 +401,14 @@ class AuthenticatorViewModelTest {
     @Test
     fun `user attribute verification screen is not shown if cannot fetch user attributes`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(mockSignInResult())
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
             verificationMechanisms = setOf(VerificationMechanism.Email)
         )
         // cannot fetch user attributes
-        coEvery { authProvider.fetchUserAttributes() } returns AmplifyResult.Error(mockk(relaxed = true))
+        coEvery { authProvider.fetchUserAttributes() } returns Error(mockk(relaxed = true))
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         viewModel.signIn("username", "password")
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
@@ -416,13 +417,13 @@ class AuthenticatorViewModelTest {
     @Test
     fun `user attribute verification screen is not shown if user does not have the required attributes`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(mockSignInResult())
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
             verificationMechanisms = setOf(VerificationMechanism.Email)
         )
         coEvery { authProvider.fetchUserAttributes() } returns Success(mockUserAttributes()) // no email attribute
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         viewModel.signIn("username", "password")
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
@@ -431,7 +432,7 @@ class AuthenticatorViewModelTest {
     @Test
     fun `signing in with no internet results in network error message`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns
+        coEvery { authProvider.signIn(any(), any(), any()) } returns
             Error(
                 mockk<UnknownException> {
                     every { cause } returns
@@ -441,7 +442,7 @@ class AuthenticatorViewModelTest {
                 }
             )
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
 
         viewModel.shouldEmitMessage<NetworkErrorMessage> {
             viewModel.signIn("username", "password")
@@ -455,7 +456,7 @@ class AuthenticatorViewModelTest {
     fun `moves to SignedInState when receiving SignedIn event`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         runCurrent()
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
@@ -466,12 +467,12 @@ class AuthenticatorViewModelTest {
     @Test
     fun `does not advance to signed in if sign in is in progress when SignedIn event is received`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } coAnswers {
+        coEvery { authProvider.signIn(any(), any(), any()) } coAnswers {
             delay(1000) // delay so that the sign in does not complete until the clock is advanced
             Success(mockSignInResult())
         }
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         runCurrent()
 
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
@@ -489,7 +490,7 @@ class AuthenticatorViewModelTest {
     @Test
     fun `does not advance to SignedIn when SignedIn event is received in a post-sign-in state`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(mockSignInResult())
         coEvery { authProvider.getConfiguration() } returns mockAmplifyAuthConfiguration(
             verificationMechanisms = setOf(VerificationMechanism.Email)
         )
@@ -497,7 +498,7 @@ class AuthenticatorViewModelTest {
             mockUserAttributes(email() to "email", emailVerified() to "false")
         )
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         viewModel.signIn("username", "password")
 
         viewModel.currentStep shouldBe AuthenticatorStep.VerifyUser
@@ -514,7 +515,7 @@ class AuthenticatorViewModelTest {
         coEvery { authProvider.signUp("username", "password", any()) } returns Success(result)
         coEvery { authProvider.autoSignIn() } returns Success(mockSignInResult())
 
-        viewModel.start(mockAuthenticatorConfiguration())
+        viewModel.start()
         viewModel.signUp("username", "password", emptyList())
         advanceUntilIdle()
 
@@ -527,13 +528,13 @@ class AuthenticatorViewModelTest {
     @Test
     fun `Sign in with temporary password requires password reset`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
-        coEvery { authProvider.signIn(any(), any()) } returns Success(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Success(
             mockSignInResult(
                 signInStep = AuthSignInStep.RESET_PASSWORD
             )
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.SignIn))
+        viewModel.start()
 
         viewModel.signIn("username", "password")
         viewModel.currentStep shouldBe AuthenticatorStep.PasswordReset
@@ -548,7 +549,7 @@ class AuthenticatorViewModelTest {
                 AuthNextResetPasswordStep(AuthResetPasswordStep.DONE, emptyMap(), null)
             )
         )
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+        viewModel.start(AuthenticatorStep.PasswordReset)
 
         viewModel.resetPassword("username")
         viewModel.currentStep shouldBe AuthenticatorStep.SignIn
@@ -564,14 +565,14 @@ class AuthenticatorViewModelTest {
                 }
             }
         )
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+        viewModel.start(AuthenticatorStep.PasswordReset)
 
         viewModel.resetPassword("username")
         viewModel.currentStep shouldBe AuthenticatorStep.PasswordReset
     }
 
     @Test
-    fun `Password reset confirmation succeeds, sign in succeeds, state should be signed in`() = runTest {
+    fun `Password reset confirmation succeeds, state should be sign in`() = runTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.resetPassword(any()) } returns Success(
             AuthResetPasswordResult(
@@ -581,13 +582,12 @@ class AuthenticatorViewModelTest {
         )
 
         coEvery { authProvider.confirmResetPassword(any(), any(), any()) } returns Success(Unit)
-        coEvery { authProvider.signIn(any(), any()) } returns Success(mockSignInResult())
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+        viewModel.start(AuthenticatorStep.PasswordReset)
 
         viewModel.resetPassword("username")
         viewModel.confirmResetPassword("username", "password", "code")
-        viewModel.currentStep shouldBe AuthenticatorStep.SignedIn
+        viewModel.currentStep shouldBe AuthenticatorStep.SignIn
     }
 
     @Test
@@ -608,7 +608,7 @@ class AuthenticatorViewModelTest {
             }
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+        viewModel.start(AuthenticatorStep.PasswordReset)
 
         viewModel.resetPassword("username")
         viewModel.confirmResetPassword("username", "password", "code")
@@ -626,7 +626,7 @@ class AuthenticatorViewModelTest {
         )
 
         coEvery { authProvider.confirmResetPassword(any(), any(), any()) } returns Success(Unit)
-        coEvery { authProvider.signIn(any(), any()) } returns Error(
+        coEvery { authProvider.signIn(any(), any(), any()) } returns Error(
             mockk<UnknownException> {
                 every { cause } returns mockk<HttpException> {
                     every { cause } returns mockk<UnknownHostException>()
@@ -634,7 +634,7 @@ class AuthenticatorViewModelTest {
             }
         )
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+        viewModel.start(AuthenticatorStep.PasswordReset)
 
         viewModel.resetPassword("username")
         viewModel.confirmResetPassword("username", "password", "code")
@@ -646,15 +646,21 @@ class AuthenticatorViewModelTest {
         coEvery { authProvider.fetchAuthSession() } returns Success(mockAuthSession(isSignedIn = false))
         coEvery { authProvider.resetPassword(any()) } returns Error(LimitExceededException(null))
 
-        viewModel.start(mockAuthenticatorConfiguration(initialStep = AuthenticatorStep.PasswordReset))
+        viewModel.start(AuthenticatorStep.PasswordReset)
 
         viewModel.shouldEmitMessage<LimitExceededMessage> {
             viewModel.resetPassword("username")
         }
     }
+
 //endregion
 //region helpers
     private val AuthenticatorViewModel.currentStep: AuthenticatorStep
         get() = stepState.value.step
+
+    private fun AuthenticatorViewModel.start(step: AuthenticatorInitialStep = AuthenticatorStep.SignIn) = start(
+        configuration = mockAuthenticatorConfiguration(initialStep = step),
+        activity = null
+    )
 //endregion
 }

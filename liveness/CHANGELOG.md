@@ -1,3 +1,10 @@
+## [Release 1.8.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.8.2)
+
+### Bug Fixes
+- **liveness:** Improve liveness encoder and muxer creation error handling to propagate errors up early ([#289](https://github.com/aws-amplify/amplify-ui-android/issues/289))
+
+[See all changes between 1.8.1 and 1.8.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.8.1...release_liveness_v1.8.2)
+
 ## [Release 1.8.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.8.1)
 
 ### Bug Fixes

@@ -1,3 +1,10 @@
+## [Release 1.8.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.8.0)
+
+### Features
+- **authenticator:** Add passwordless sign in flows ([#287](https://github.com/aws-amplify/amplify-ui-android/issues/287))
+
+[See all changes between 1.7.0 and 1.8.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.7.0...release_authenticator_v1.8.0)
+
 ## [Release 1.7.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.7.0)
 
 ### Features

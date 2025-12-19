@@ -18,6 +18,10 @@
     <string name="amplify_ui_authenticator_button_submit">Submit</string>
     <string name="amplify_ui_authenticator_button_continue">Continue</string>
     <string name="amplify_ui_authenticator_button_signin">Sign In</string>
+    <string name="amplify_ui_authenticator_button_signin_password">Sign In with Password</string>
+    <string name="amplify_ui_authenticator_button_signin_sms">Sign In with SMS</string>
+    <string name="amplify_ui_authenticator_button_signin_email">Sign In with Email</string>
+    <string name="amplify_ui_authenticator_button_signin_passkey">Sign In with Passkey</string>
     <string name="amplify_ui_authenticator_button_change_password">Change Password</string>
     <string name="amplify_ui_authenticator_button_signup">Create Account</string>
     <string name="amplify_ui_authenticator_button_forgot_password">Forgot Password?</string>
@@ -26,4 +30,7 @@
     <string name="amplify_ui_authenticator_button_resend_code">Send Code</string>
     <string name="amplify_ui_authenticator_button_skip">Skip</string>
     <string name="amplify_ui_authenticator_button_copy_key">Copy Key</string>
+    <string name="amplify_ui_authenticator_button_start_over">Start Over</string>
+    <string name="amplify_ui_authenticator_button_create_passkey">Create a Passkey</string>
+    <string name="amplify_ui_authenticator_button_skip_passkey">Continue without a Passkey</string>
 </resources>

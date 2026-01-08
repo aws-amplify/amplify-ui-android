@@ -4,14 +4,17 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import com.amplifyframework.ui.liveness.media.VideoCodec
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.ui.FaceLivenessDetector
 import com.amplifyframework.ui.liveness.ui.LivenessColorScheme
+import com.amplifyframework.ui.liveness.ui.VideoOptions
 import com.amplifyframework.ui.sample.liveness.MainViewModel
 
 @Composable
 fun LivenessScreen(
     viewModel: MainViewModel,
+    videoCodec: VideoCodec,
     onChallengeComplete: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -24,6 +27,7 @@ fun LivenessScreen(
             sessionId = sessionId,
             region = "us-east-1",
             disableStartView = false,
+            videoOptions = VideoOptions(codec = videoCodec),
             onComplete = {
                 viewModel.fetchSessionResult(sessionId)
                 onChallengeComplete()

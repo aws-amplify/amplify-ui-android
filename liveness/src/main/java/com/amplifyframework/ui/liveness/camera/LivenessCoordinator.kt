@@ -43,12 +43,14 @@ import com.amplifyframework.predictions.models.Challenge
 import com.amplifyframework.predictions.models.FaceLivenessSessionInformation
 import com.amplifyframework.predictions.models.VideoEvent
 import com.amplifyframework.ui.liveness.BuildConfig
+import com.amplifyframework.ui.liveness.media.LivenessVideoEncoder
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.state.AttemptCounter
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.ui.Camera
 import com.amplifyframework.ui.liveness.ui.ChallengeOptions
+import com.amplifyframework.ui.liveness.ui.VideoOptions
 import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import java.util.Date
 import java.util.concurrent.Executors
@@ -80,6 +82,7 @@ internal class LivenessCoordinator(
     private val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     private val disableStartView: Boolean,
     private val challengeOptions: ChallengeOptions,
+    videoOptions: VideoOptions,
     private val onChallengeComplete: OnChallengeComplete,
     val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -123,11 +126,12 @@ internal class LivenessCoordinator(
     }
 
     private val encoder = LivenessVideoEncoder.create(
+        videoCodec = videoOptions.codec,
         cacheDir = context.cacheDir,
         width = TARGET_WIDTH,
         height = TARGET_HEIGHT,
         bitrate = TARGET_ENCODE_BITRATE,
-        framerate = TARGET_FPS_MAX,
+        frameRate = TARGET_FPS_MAX,
         keyframeInterval = TARGET_ENCODE_KEYFRAME_INTERVAL,
         onMuxedSegment = { bytes, time ->
             livenessState.livenessSessionInfo?.sendVideoEvent(VideoEvent(bytes, Date(time)))

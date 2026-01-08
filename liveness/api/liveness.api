@@ -7,6 +7,33 @@ public final class com/amplifyframework/ui/liveness/BuildConfig {
 	public fun <init> ()V
 }
 
+public abstract interface class com/amplifyframework/ui/liveness/media/VideoCodec {
+}
+
+public final class com/amplifyframework/ui/liveness/media/VideoCodec$H264 : com/amplifyframework/ui/liveness/media/VideoCodec {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/media/VideoCodec$H264;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/amplifyframework/ui/liveness/media/VideoCodec$VP8 : com/amplifyframework/ui/liveness/media/VideoCodec {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/media/VideoCodec$VP8;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/amplifyframework/ui/liveness/media/VideoCodec$VP9 : com/amplifyframework/ui/liveness/media/VideoCodec {
+	public static final field $stable I
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/media/VideoCodec$VP9;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
 	public static final field $stable I
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
@@ -134,7 +161,7 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Canc
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt;
 	public fun <init> ()V
-	public final fun getLambda$1074976397$liveness_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1421398948$liveness_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt {
@@ -167,7 +194,7 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Reco
 
 public final class com/amplifyframework/ui/liveness/ui/FaceLivenessDetectorKt {
 	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Landroidx/compose/runtime/Composer;II)V
-	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Lcom/amplifyframework/ui/liveness/ui/ChallengeOptions;Landroidx/compose/runtime/Composer;II)V
+	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Lcom/amplifyframework/ui/liveness/ui/ChallengeOptions;Lcom/amplifyframework/ui/liveness/ui/VideoOptions;Landroidx/compose/runtime/Composer;II)V
 }
 
 public abstract class com/amplifyframework/ui/liveness/ui/LivenessChallenge {
@@ -210,5 +237,19 @@ public final class com/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defau
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/LivenessColorScheme$Defaults;
 	public final fun getDarkColorScheme ()Landroidx/compose/material3/ColorScheme;
 	public final fun getLightColorScheme ()Landroidx/compose/material3/ColorScheme;
+}
+
+public final class com/amplifyframework/ui/liveness/ui/VideoOptions {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Lcom/amplifyframework/ui/liveness/media/VideoCodec;)V
+	public synthetic fun <init> (Lcom/amplifyframework/ui/liveness/media/VideoCodec;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/amplifyframework/ui/liveness/media/VideoCodec;
+	public final fun copy (Lcom/amplifyframework/ui/liveness/media/VideoCodec;)Lcom/amplifyframework/ui/liveness/ui/VideoOptions;
+	public static synthetic fun copy$default (Lcom/amplifyframework/ui/liveness/ui/VideoOptions;Lcom/amplifyframework/ui/liveness/media/VideoCodec;ILjava/lang/Object;)Lcom/amplifyframework/ui/liveness/ui/VideoOptions;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCodec ()Lcom/amplifyframework/ui/liveness/media/VideoCodec;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 

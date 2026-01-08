@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.amplifyframework.ui.liveness.camera
+package com.amplifyframework.ui.liveness.media
 
 import android.media.MediaCodec
 import android.media.MediaFormat

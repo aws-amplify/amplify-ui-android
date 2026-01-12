@@ -22,9 +22,11 @@ import androidx.annotation.WorkerThread
 import androidx.media3.common.util.MediaFormatUtil
 import androidx.media3.muxer.BufferInfo
 import androidx.media3.muxer.FragmentedMp4Muxer
+import androidx.media3.muxer.Muxer
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.camera.OnMuxedSegment
 import java.io.File
+import java.io.FileOutputStream
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 
@@ -158,11 +160,12 @@ internal class WebMMuxer : LivenessMuxer {
     }
 }
 
-internal class Mp4Muxer : LivenessMuxer {
+internal class Mp4Muxer(private val createMediaMuxer: (outputStream: FileOutputStream) -> Muxer = ::createMediaMuxer) :
+    LivenessMuxer {
 
     private val logger = Amplify.Logging.forNamespace("Liveness")
 
-    private var muxer: FragmentedMp4Muxer? = null
+    private var muxer: Muxer? = null
     private var videoTrackToken: Int? = null
     private var firstKeyframeReceived = false
     private var currentVideoStartTime = 0L // set at the start of each chunk
@@ -177,18 +180,10 @@ internal class Mp4Muxer : LivenessMuxer {
         muxerRandomAccessFile = RandomAccessFile(outputFile, "r")
         sendMuxedSegment = onMuxedSegment
 
-        muxer = FragmentedMp4Muxer.Builder(outputFile.outputStream().channel)
-            /*
-            Segments aren't too heavy in size. Would rather have more segments than delays in sending data.
-            Seeing no data available on some notifyChunk() flushes when duration matches keyframe interval
-            I believe segments are only created after keyframes so setting this number low may have minimal impact.
-            Liveness library currently has 1 second keyframes, so 500ms if half
-             */
-            .setFragmentDurationMs(500)
-            .build().apply {
-                videoTrackToken = addTrack(MediaFormatUtil.createFormatFromMediaFormat(mediaFormat))
-                currentVideoStartTime = System.currentTimeMillis()
-            }
+        muxer = createMediaMuxer(outputFile.outputStream()).apply {
+            videoTrackToken = addTrack(MediaFormatUtil.createFormatFromMediaFormat(mediaFormat))
+            currentVideoStartTime = System.currentTimeMillis()
+        }
     }
 
     /*
@@ -209,13 +204,10 @@ internal class Mp4Muxer : LivenessMuxer {
         if (bufferInfo.isKeyFrame()) {
             if (!firstKeyframeReceived) {
                 firstKeyframeReceived = true
-            } else {
+            } else if (notifyChunk()) {
                 // The mp4 muxer creates a segment for the previous chunk on each keyframe receipt
-                if (notifyChunk()) {
-                    currentVideoStartTime = System.currentTimeMillis()
-                }
+                currentVideoStartTime = System.currentTimeMillis()
             }
-            return
         }
     }
 
@@ -244,35 +236,30 @@ internal class Mp4Muxer : LivenessMuxer {
     private fun notifyChunk(): Boolean {
         return try {
             muxerRandomAccessFile?.let { raf ->
-                try {
-                    val sizeToRead = raf.length() - currentBytePosition
+                val sizeToRead = raf.length() - currentBytePosition
 
-                    // don't attempt to send chunk if no update available,
-                    // or if the first chunk hasn't accumulated enough data
-                    if (sizeToRead <= 0 || (currentBytePosition == 0L && sizeToRead < 100)) {
-                        return false
-                    }
+                // don't attempt to send chunk if no update available,
+                // or if the first chunk hasn't accumulated enough data
+                if (sizeToRead <= 0 || (currentBytePosition == 0L && sizeToRead < 100)) {
+                    return false
+                }
 
-                    val chunkByteArray = ByteArray(sizeToRead.toInt())
-                    raf.seek(currentBytePosition)
-                    raf.read(chunkByteArray)
-                    currentBytePosition += sizeToRead
+                val chunkByteArray = ByteArray(sizeToRead.toInt())
+                raf.seek(currentBytePosition)
+                raf.read(chunkByteArray)
+                currentBytePosition += sizeToRead
 
-                    val sendMuxedSegment = sendMuxedSegment
-                    if (sendMuxedSegment != null) {
-                        sendMuxedSegment(chunkByteArray, currentVideoStartTime)
-                        true
-                    } else {
-                        logger.error("sendMuxedSegmentHandler unexpectedly null")
-                        return false
-                    }
-                } catch (_: Exception) {
-                    // failed to access muxer file
-                    false
+                val sendMuxedSegment = sendMuxedSegment
+                if (sendMuxedSegment != null) {
+                    sendMuxedSegment(chunkByteArray, currentVideoStartTime)
+                    true
+                } else {
+                    logger.error("sendMuxedSegmentHandler unexpectedly null")
+                    return false
                 }
             } ?: false
-        } catch (_: Exception) {
-            // process possibly stopped
+        } catch (e: Exception) {
+            logger.warn("Unable to send muxed segment", e)
             false
         }
     }
@@ -284,4 +271,17 @@ internal class Mp4Muxer : LivenessMuxer {
         size,
         flags
     )
+
+    companion object {
+        private fun createMediaMuxer(outputStream: FileOutputStream): Muxer =
+            FragmentedMp4Muxer.Builder(outputStream.channel)
+                /*
+                Segments aren't too heavy in size. Would rather have more segments than delays in sending data.
+                Seeing no data available on some notifyChunk() flushes when duration matches keyframe interval
+                I believe segments are only created after keyframes so setting this number low may have minimal impact.
+                Liveness library currently has 1 second keyframes, so 500ms if half
+                 */
+                .setFragmentDurationMs(500)
+                .build()
+    }
 }

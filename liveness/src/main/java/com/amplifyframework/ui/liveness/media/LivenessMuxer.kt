@@ -39,11 +39,9 @@ internal interface LivenessMuxer {
     fun stop()
 
     companion object {
-        // VP8 must use a WebM container, and H264 uses MP4.
-        // VP9 can be muxed into either container, but we choose MP4 because it may have better hardware support
         fun create(format: VideoCodec): LivenessMuxer = when (format) {
-            VideoCodec.H264, VideoCodec.VP9 -> Mp4Muxer()
-            VideoCodec.VP8 -> WebMMuxer()
+            VideoCodec.H264 -> Mp4Muxer()
+            VideoCodec.VP8, VideoCodec.VP9 -> WebMMuxer()
         }
     }
 }

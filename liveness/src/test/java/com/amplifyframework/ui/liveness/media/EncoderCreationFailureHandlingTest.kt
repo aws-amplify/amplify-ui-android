@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.amplifyframework.ui.liveness.camera
+package com.amplifyframework.ui.liveness.media
 
 import android.media.MediaCodec
 import android.media.MediaFormat
@@ -78,16 +78,21 @@ class EncoderCreationFailureHandlingTest {
     fun `muxer creation failure calls error callback on third attempt`() {
         val errorSlot = slot<Exception>()
 
-        val failingMuxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { _, _, _ ->
+        val failingMuxerFactory: (VideoCodec) -> LivenessMuxer = {
             throw RuntimeException("Muxer creation failed")
         }
 
-        val encoder = LivenessVideoEncoder.create(
-            cacheDir = tempDir, width = 640, height = 480, bitrate = 1,
-            keyframeInterval = 1, framerate = 1,
+        val encoder = LivenessVideoEncoder(
+            videoCodec = VideoCodec.VP8,
+            outputFile = tempDir,
+            width = 640,
+            height = 480,
+            bitrate = 1,
+            keyframeInterval = 1,
+            frameRate = 1,
             onMuxedSegment = { _, _ -> }, onEncoderError = { }, onMuxerError = mockOnError,
             muxerFactory = failingMuxerFactory
-        )!!
+        )
 
         repeat(2) { encoder.createMuxer() }
         verify(exactly = 0) { mockOnError(any()) }
@@ -101,16 +106,23 @@ class EncoderCreationFailureHandlingTest {
 
     @Test
     fun `muxer creation success does not call error callback`() {
-        val successMuxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { _, _, _ ->
+        val successMuxerFactory: (VideoCodec) -> LivenessMuxer = {
             mockk<LivenessMuxer>(relaxed = true)
         }
 
-        val encoder = LivenessVideoEncoder.create(
-            cacheDir = tempDir, width = 640, height = 480, bitrate = 1,
-            keyframeInterval = 1, framerate = 1,
-            onMuxedSegment = { _, _ -> }, onEncoderError = { }, onMuxerError = mockOnError,
+        val encoder = LivenessVideoEncoder(
+            videoCodec = VideoCodec.VP8,
+            outputFile = tempDir,
+            width = 640,
+            height = 480,
+            bitrate = 1,
+            keyframeInterval = 1,
+            frameRate = 1,
+            onMuxedSegment = { _, _ -> },
+            onEncoderError = { },
+            onMuxerError = mockOnError,
             muxerFactory = successMuxerFactory
-        )!!
+        )
 
         repeat(3) { encoder.createMuxer() }
         verify(exactly = 0) { mockOnError(any()) }

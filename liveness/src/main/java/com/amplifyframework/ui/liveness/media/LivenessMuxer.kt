@@ -18,8 +18,10 @@ package com.amplifyframework.ui.liveness.media
 import android.media.MediaCodec
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import androidx.annotation.OptIn
 import androidx.annotation.WorkerThread
 import androidx.media3.common.util.MediaFormatUtil
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.muxer.BufferInfo
 import androidx.media3.muxer.FragmentedMp4Muxer
 import androidx.media3.muxer.Muxer
@@ -160,6 +162,7 @@ internal class WebMMuxer : LivenessMuxer {
     }
 }
 
+@OptIn(UnstableApi::class)
 internal class Mp4Muxer(private val createMediaMuxer: (outputStream: FileOutputStream) -> Muxer = ::createMediaMuxer) :
     LivenessMuxer {
 

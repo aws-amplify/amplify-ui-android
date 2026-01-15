@@ -41,16 +41,20 @@ import com.amplifyframework.ui.authenticator.AuthenticatorState
 import com.amplifyframework.ui.authenticator.AuthenticatorStepState
 import com.amplifyframework.ui.authenticator.ErrorState
 import com.amplifyframework.ui.authenticator.LoadingState
+import com.amplifyframework.ui.authenticator.PasskeyCreatedState
 import com.amplifyframework.ui.authenticator.PasswordResetConfirmState
 import com.amplifyframework.ui.authenticator.PasswordResetState
+import com.amplifyframework.ui.authenticator.PromptToCreatePasskeyState
 import com.amplifyframework.ui.authenticator.SignInConfirmCustomState
 import com.amplifyframework.ui.authenticator.SignInConfirmMfaState
 import com.amplifyframework.ui.authenticator.SignInConfirmNewPasswordState
+import com.amplifyframework.ui.authenticator.SignInConfirmPasswordState
 import com.amplifyframework.ui.authenticator.SignInConfirmTotpCodeState
 import com.amplifyframework.ui.authenticator.SignInContinueWithEmailSetupState
 import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSelectionState
 import com.amplifyframework.ui.authenticator.SignInContinueWithMfaSetupSelectionState
 import com.amplifyframework.ui.authenticator.SignInContinueWithTotpSetupState
+import com.amplifyframework.ui.authenticator.SignInSelectAuthFactorState
 import com.amplifyframework.ui.authenticator.SignInState
 import com.amplifyframework.ui.authenticator.SignUpConfirmState
 import com.amplifyframework.ui.authenticator.SignUpState
@@ -119,6 +123,10 @@ fun Authenticator(
     passwordResetConfirmContent: @Composable (state: PasswordResetConfirmState) -> Unit = { PasswordResetConfirm(it) },
     verifyUserContent: @Composable (state: VerifyUserState) -> Unit = { VerifyUser(it) },
     verifyUserConfirmContent: @Composable (state: VerifyUserConfirmState) -> Unit = { VerifyUserConfirm(it) },
+    signInSelectAuthFactorContent: @Composable (SignInSelectAuthFactorState) -> Unit = { SignInSelectAuthFactor(it) },
+    signInConfirmPasswordContent: @Composable (SignInConfirmPasswordState) -> Unit = { SignInConfirmPassword(it) },
+    promptToCreatePasskeyContent: @Composable (PromptToCreatePasskeyState) -> Unit = { PromptToCreatePasskey(it) },
+    passkeyCreatedContent: @Composable (PasskeyCreatedState) -> Unit = { PasskeyCreated(it) },
     errorContent: @Composable (state: ErrorState) -> Unit = { AuthenticatorError(it) },
     headerContent: @Composable () -> Unit = {},
     footerContent: @Composable () -> Unit = {},
@@ -147,6 +155,7 @@ fun Authenticator(
                         when (targetState) {
                             is LoadingState -> loadingContent()
                             is SignInState -> signInContent(targetState)
+                            is SignInSelectAuthFactorState -> signInSelectAuthFactorContent(targetState)
                             is SignInConfirmMfaState -> signInConfirmMfaContent(targetState)
                             is SignInConfirmCustomState -> signInConfirmCustomContent(targetState)
                             is SignInConfirmNewPasswordState -> signInConfirmNewPasswordContent(
@@ -154,6 +163,7 @@ fun Authenticator(
                             )
 
                             is SignInConfirmTotpCodeState -> signInConfirmTotpCodeContent(targetState)
+                            is SignInConfirmPasswordState -> signInConfirmPasswordContent(targetState)
                             is SignInContinueWithTotpSetupState -> signInContinueWithTotpSetupContent(targetState)
                             is SignInContinueWithEmailSetupState -> signInContinueWithEmailSetupContent(targetState)
                             is SignInContinueWithMfaSetupSelectionState ->
@@ -167,7 +177,9 @@ fun Authenticator(
                             is SignUpConfirmState -> signUpConfirmContent(targetState)
                             is VerifyUserState -> verifyUserContent(targetState)
                             is VerifyUserConfirmState -> verifyUserConfirmContent(targetState)
-                            else -> Unit
+                            is PromptToCreatePasskeyState -> promptToCreatePasskeyContent(targetState)
+                            is PasskeyCreatedState -> passkeyCreatedContent(targetState)
+                            else -> error("Unimplemented state")
                         }
                         footerContent()
                     }

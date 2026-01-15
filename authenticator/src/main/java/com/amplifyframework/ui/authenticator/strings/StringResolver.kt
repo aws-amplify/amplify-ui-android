@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.amplifyframework.auth.AuthException
@@ -38,7 +39,7 @@ internal open class StringResolver {
     @Composable
     @ReadOnlyComposable
     open fun label(config: FieldConfig): String {
-        var label = title(config)
+        var label = fieldName(config)
         if (!config.required) {
             label = stringResource(R.string.amplify_ui_authenticator_field_optional, label)
         }
@@ -47,7 +48,11 @@ internal open class StringResolver {
 
     @Composable
     @ReadOnlyComposable
-    private fun title(config: FieldConfig): String = config.label ?: when (config.key) {
+    private fun fieldName(config: FieldConfig): String = config.label ?: fieldName(config.key)
+
+    @Composable
+    @ReadOnlyComposable
+    fun fieldName(key: FieldKey): String = when (key) {
         FieldKey.ConfirmPassword -> stringResource(R.string.amplify_ui_authenticator_field_label_password_confirm)
         FieldKey.ConfirmationCode -> stringResource(R.string.amplify_ui_authenticator_field_label_confirmation_code)
         FieldKey.Password -> stringResource(R.string.amplify_ui_authenticator_field_label_password)
@@ -88,39 +93,38 @@ internal open class StringResolver {
         is FieldError.InvalidPassword -> {
             var errorText = stringResource(R.string.amplify_ui_authenticator_field_password_requirements)
             error.errors.forEach {
-                errorText += "\n" +
-                    when (it) {
-                        is PasswordError.InvalidPasswordLength ->
-                            pluralStringResource(
-                                id = R.plurals.amplify_ui_authenticator_field_password_too_short,
-                                count = it.minimumLength,
-                                it.minimumLength
-                            )
-                        PasswordError.InvalidPasswordMissingSpecial ->
-                            stringResource(R.string.amplify_ui_authenticator_field_password_missing_special)
-                        PasswordError.InvalidPasswordMissingNumber ->
-                            stringResource(R.string.amplify_ui_authenticator_field_password_missing_number)
-                        PasswordError.InvalidPasswordMissingUpper ->
-                            stringResource(R.string.amplify_ui_authenticator_field_password_missing_upper)
-                        PasswordError.InvalidPasswordMissingLower ->
-                            stringResource(R.string.amplify_ui_authenticator_field_password_missing_lower)
-                        else -> ""
-                    }
+                errorText += "\n" + when (it) {
+                    is PasswordError.InvalidPasswordLength ->
+                        pluralStringResource(
+                            id = R.plurals.amplify_ui_authenticator_field_password_too_short,
+                            count = it.minimumLength,
+                            it.minimumLength
+                        )
+                    PasswordError.InvalidPasswordMissingSpecial ->
+                        stringResource(R.string.amplify_ui_authenticator_field_password_missing_special)
+                    PasswordError.InvalidPasswordMissingNumber ->
+                        stringResource(R.string.amplify_ui_authenticator_field_password_missing_number)
+                    PasswordError.InvalidPasswordMissingUpper ->
+                        stringResource(R.string.amplify_ui_authenticator_field_password_missing_upper)
+                    PasswordError.InvalidPasswordMissingLower ->
+                        stringResource(R.string.amplify_ui_authenticator_field_password_missing_lower)
+                    else -> ""
+                }
             }
             errorText
         }
         FieldError.PasswordsDoNotMatch ->
             stringResource(R.string.amplify_ui_authenticator_field_warn_unmatched_password)
         FieldError.MissingRequired -> {
-            val label = title(config)
+            val label = fieldName(config)
             stringResource(R.string.amplify_ui_authenticator_field_warn_empty, label)
         }
         FieldError.InvalidFormat -> {
-            val label = title(config)
+            val label = fieldName(config)
             stringResource(R.string.amplify_ui_authenticator_field_warn_invalid_format, label)
         }
         FieldError.FieldValueExists -> {
-            val label = title(config)
+            val label = fieldName(config)
             stringResource(R.string.amplify_ui_authenticator_field_warn_existing, label)
         }
         FieldError.ConfirmationCodeIncorrect -> {
@@ -128,7 +132,7 @@ internal open class StringResolver {
         }
         is FieldError.Custom -> error.message
         FieldError.NotFound -> {
-            val label = title(config)
+            val label = fieldName(config)
             stringResource(R.string.amplify_ui_authenticator_field_warn_not_found, label)
         }
         else -> ""
@@ -143,7 +147,7 @@ internal open class StringResolver {
             // Check if the customer application has defined a specific string for this Exception type. If not, return
             // the generic error message.
             val resourceName = error.toResourceName()
-            val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
+            val resourceId = LocalResources.current.getIdentifier(resourceName, "string", context.packageName)
             val message = if (resourceId != 0) stringResource(resourceId) else null
             message ?: stringResource(R.string.amplify_ui_authenticator_error_unknown)
         }
@@ -153,6 +157,10 @@ internal open class StringResolver {
         @Composable
         @ReadOnlyComposable
         fun label(config: FieldConfig) = LocalStringResolver.current.label(config = config)
+
+        @Composable
+        @ReadOnlyComposable
+        fun fieldName(key: FieldKey) = LocalStringResolver.current.fieldName(key = key)
 
         @Composable
         @ReadOnlyComposable

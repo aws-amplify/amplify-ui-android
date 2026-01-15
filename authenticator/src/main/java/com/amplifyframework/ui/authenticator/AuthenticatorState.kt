@@ -22,12 +22,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.amplifyframework.ui.authenticator.data.AuthenticationFlow
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorInitialStep
 import com.amplifyframework.ui.authenticator.enums.AuthenticatorStep
 import com.amplifyframework.ui.authenticator.forms.SignUpFormBuilder
 import com.amplifyframework.ui.authenticator.options.TotpOptions
 import com.amplifyframework.ui.authenticator.util.AuthenticatorMessage
+import com.amplifyframework.ui.authenticator.util.findActivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -46,18 +49,22 @@ import kotlinx.coroutines.flow.onEach
 fun rememberAuthenticatorState(
     initialStep: AuthenticatorInitialStep = AuthenticatorStep.SignIn,
     signUpForm: SignUpFormBuilder.() -> Unit = {},
-    totpOptions: TotpOptions? = null
+    totpOptions: TotpOptions? = null,
+    authenticationFlow: AuthenticationFlow = AuthenticationFlow.Password
 ): AuthenticatorState {
     val viewModel = viewModel<AuthenticatorViewModel>()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     return remember {
         val configuration = AuthenticatorConfiguration(
             initialStep = initialStep,
             signUpForm = signUpForm,
-            totpOptions = totpOptions
+            totpOptions = totpOptions,
+            authenticationFlow = authenticationFlow
         )
 
-        viewModel.start(configuration)
+        viewModel.start(configuration, context.findActivity())
         AuthenticatorStateImpl(viewModel).also { state ->
             viewModel.stepState.onEach { state.stepState = it }.launchIn(scope)
         }
@@ -102,9 +109,7 @@ interface AuthenticatorState {
     val messages: Flow<AuthenticatorMessage>
 }
 
-internal class AuthenticatorStateImpl constructor(
-    private val viewModel: AuthenticatorViewModel
-) : AuthenticatorState {
+internal class AuthenticatorStateImpl constructor(private val viewModel: AuthenticatorViewModel) : AuthenticatorState {
     override var stepState by mutableStateOf<AuthenticatorStepState>(LoadingState)
 
     override val messages: Flow<AuthenticatorMessage>

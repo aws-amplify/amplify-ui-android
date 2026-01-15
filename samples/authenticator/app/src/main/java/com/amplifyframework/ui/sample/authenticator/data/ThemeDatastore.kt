@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.map
 
 class ThemeDatastore(context: Context) {
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "theme")
-
-    private val datastore = context.dataStore
+    private val datastore = initDatastore(context)
 
     private val darkModeKey = booleanPreferencesKey("darkMode")
     private val themeKey = stringPreferencesKey("theme")
@@ -40,4 +38,16 @@ class ThemeDatastore(context: Context) {
         SupportedTheme.valueOf(name)
     }
 
+    companion object {
+        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "theme")
+
+        private lateinit var dataStore: DataStore<Preferences>
+
+        private fun initDatastore(context: Context): DataStore<Preferences> {
+            if (!::dataStore.isInitialized) {
+                dataStore = context.dataStore
+            }
+            return dataStore
+        }
+    }
 }

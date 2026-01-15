@@ -15,10 +15,10 @@
 
 package com.amplifyframework.ui.authenticator.util
 
+import android.app.Activity
 import com.amplifyframework.auth.AWSCognitoAuthMetadataType
 import com.amplifyframework.auth.AuthChannelEventName
 import com.amplifyframework.auth.AuthCodeDeliveryDetails
-import com.amplifyframework.auth.AuthException
 import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.AuthUser
 import com.amplifyframework.auth.AuthUserAttribute
@@ -27,11 +27,14 @@ import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin
 import com.amplifyframework.auth.cognito.PasswordProtectionSettings
 import com.amplifyframework.auth.cognito.UsernameAttribute
 import com.amplifyframework.auth.cognito.VerificationMechanism as AmplifyVerificationMechanism
+import com.amplifyframework.auth.options.AuthConfirmSignInOptions
+import com.amplifyframework.auth.options.AuthSignInOptions
 import com.amplifyframework.auth.options.AuthSignUpOptions
 import com.amplifyframework.auth.result.AuthResetPasswordResult
 import com.amplifyframework.auth.result.AuthSignInResult
 import com.amplifyframework.auth.result.AuthSignOutResult
 import com.amplifyframework.auth.result.AuthSignUpResult
+import com.amplifyframework.auth.result.AuthWebAuthnCredential
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.hub.HubChannel
 import com.amplifyframework.hub.HubEvent
@@ -52,11 +55,14 @@ import kotlinx.coroutines.flow.callbackFlow
  * An abstraction of the Amplify.Auth API that allows us to use coroutines with no exceptions
  */
 internal interface AuthProvider {
-    suspend fun signIn(username: String, password: String): AmplifyResult<AuthSignInResult>
+    suspend fun signIn(username: String, password: String?, options: AuthSignInOptions): AmplifyResult<AuthSignInResult>
 
-    suspend fun confirmSignIn(challengeResponse: String): AmplifyResult<AuthSignInResult>
+    suspend fun confirmSignIn(
+        challengeResponse: String,
+        options: AuthConfirmSignInOptions
+    ): AmplifyResult<AuthSignInResult>
 
-    suspend fun signUp(username: String, password: String, options: AuthSignUpOptions): AmplifyResult<AuthSignUpResult>
+    suspend fun signUp(username: String, password: String?, options: AuthSignUpOptions): AmplifyResult<AuthSignUpResult>
 
     suspend fun confirmSignUp(username: String, code: String): AmplifyResult<AuthSignUpResult>
 
@@ -75,6 +81,10 @@ internal interface AuthProvider {
     suspend fun signOut(): AuthSignOutResult
 
     suspend fun fetchAuthSession(): AmplifyResult<AuthSession>
+
+    suspend fun createPasskey(activity: Activity): AmplifyResult<Unit>
+
+    suspend fun getPasskeys(): AmplifyResult<List<AuthWebAuthnCredential>>
 
     suspend fun fetchUserAttributes(): AmplifyResult<List<AuthUserAttribute>>
 
@@ -106,24 +116,28 @@ internal class RealAuthProvider : AuthProvider {
         cognitoPlugin?.addToUserAgent(AWSCognitoAuthMetadataType.Authenticator, BuildConfig.VERSION_NAME)
     }
 
-    override suspend fun signIn(username: String, password: String) = suspendCoroutine { continuation ->
-        Amplify.Auth.signIn(
-            username,
-            password,
-            { continuation.resume(AmplifyResult.Success(it)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun signIn(username: String, password: String?, options: AuthSignInOptions) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.signIn(
+                username,
+                password,
+                options,
+                { continuation.resume(AmplifyResult.Success(it)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
-    override suspend fun confirmSignIn(challengeResponse: String) = suspendCoroutine { continuation ->
-        Amplify.Auth.confirmSignIn(
-            challengeResponse,
-            { continuation.resume(AmplifyResult.Success(it)) },
-            { continuation.resume(AmplifyResult.Error(it)) }
-        )
-    }
+    override suspend fun confirmSignIn(challengeResponse: String, options: AuthConfirmSignInOptions) =
+        suspendCoroutine { continuation ->
+            Amplify.Auth.confirmSignIn(
+                challengeResponse,
+                options,
+                { continuation.resume(AmplifyResult.Success(it)) },
+                { continuation.resume(AmplifyResult.Error(it)) }
+            )
+        }
 
-    override suspend fun signUp(username: String, password: String, options: AuthSignUpOptions) =
+    override suspend fun signUp(username: String, password: String?, options: AuthSignUpOptions) =
         suspendCoroutine { continuation ->
             Amplify.Auth.signUp(
                 username,
@@ -184,6 +198,21 @@ internal class RealAuthProvider : AuthProvider {
     override suspend fun fetchAuthSession() = suspendCoroutine { continuation ->
         Amplify.Auth.fetchAuthSession(
             { continuation.resume(AmplifyResult.Success(it)) },
+            { continuation.resume(AmplifyResult.Error(it)) }
+        )
+    }
+
+    override suspend fun createPasskey(activity: Activity) = suspendCoroutine { continuation ->
+        Amplify.Auth.associateWebAuthnCredential(
+            activity,
+            { continuation.resume(AmplifyResult.Success(Unit)) },
+            { continuation.resume(AmplifyResult.Error(it)) }
+        )
+    }
+
+    override suspend fun getPasskeys(): AmplifyResult<List<AuthWebAuthnCredential>> = suspendCoroutine { continuation ->
+        Amplify.Auth.listWebAuthnCredentials(
+            { continuation.resume(AmplifyResult.Success(it.credentials)) },
             { continuation.resume(AmplifyResult.Error(it)) }
         )
     }
@@ -276,9 +305,4 @@ internal class RealAuthProvider : AuthProvider {
         requiresUpper = requiresUpper,
         requiresLower = requiresLower
     )
-}
-
-internal sealed interface AmplifyResult<out T : Any> {
-    data class Success<out T : Any>(val data: T) : AmplifyResult<T>
-    data class Error(val error: AuthException) : AmplifyResult<Nothing>
 }

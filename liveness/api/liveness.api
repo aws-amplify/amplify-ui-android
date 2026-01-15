@@ -58,6 +58,20 @@ public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionE
 	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
 
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$VideoEncodingException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException$VideoMuxingException : com/amplifyframework/ui/liveness/model/FaceLivenessDetectionException {
+	public static final field $stable I
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
 public final class com/amplifyframework/ui/liveness/state/AttemptCounter {
 	public static final field $stable I
 	public static final field ATTEMPT_COUNT_RESET_INTERVAL_MS J
@@ -136,9 +150,9 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Inst
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$PhotosensitivityViewKt;
 	public fun <init> ()V
-	public final fun getLambda$1098672121$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$324742654$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$348729199$liveness_release ()Lkotlin/jvm/functions/Function2;
+	public final fun getLambda$414441816$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$56343374$liveness_release ()Lkotlin/jvm/functions/Function2;
 	public final fun getLambda$917919958$liveness_release ()Lkotlin/jvm/functions/Function3;
 }

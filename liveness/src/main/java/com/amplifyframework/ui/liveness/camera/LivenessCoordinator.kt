@@ -123,7 +123,7 @@ internal class LivenessCoordinator(
     }
 
     private val encoder = LivenessVideoEncoder.create(
-        context = context,
+        cacheDir = context.cacheDir,
         width = TARGET_WIDTH,
         height = TARGET_HEIGHT,
         bitrate = TARGET_ENCODE_BITRATE,
@@ -131,6 +131,22 @@ internal class LivenessCoordinator(
         keyframeInterval = TARGET_ENCODE_KEYFRAME_INTERVAL,
         onMuxedSegment = { bytes, time ->
             livenessState.livenessSessionInfo?.sendVideoEvent(VideoEvent(bytes, Date(time)))
+        },
+        onEncoderError = { error ->
+            processSessionError(
+                FaceLivenessDetectionException.VideoEncodingException(
+                    throwable = error
+                ),
+                true
+            )
+        },
+        onMuxerError = { error ->
+            processSessionError(
+                FaceLivenessDetectionException.VideoMuxingException(
+                    throwable = error
+                ),
+                true
+            )
         }
     ) ?: throw IllegalStateException("Failed to start the encoder.")
 

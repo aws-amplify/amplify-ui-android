@@ -1,3 +1,25 @@
+## [Release 1.8.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.8.2)
+
+### Bug Fixes
+- **liveness:** Improve liveness encoder and muxer creation error handling to propagate errors up early ([#289](https://github.com/aws-amplify/amplify-ui-android/issues/289))
+
+[See all changes between 1.8.1 and 1.8.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.8.1...release_liveness_v1.8.2)
+
+## [Release 1.8.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.8.1)
+
+### Bug Fixes
+- **liveness:** Prevent crash on detachPreviewSurface is context is null ([#255](https://github.com/aws-amplify/amplify-ui-android/issues/255))
+- **liveness:** Update LiteRT to fix < Android 8 support for Liveness ([#283](https://github.com/aws-amplify/amplify-ui-android/issues/283))
+
+[See all changes between 1.8.0 and 1.8.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.8.0...release_liveness_v1.8.1)
+
+## [Release 1.8.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.8.0)
+
+### Features
+- **all:** Update compose bom and reintroduce material icons lib ([#278](https://github.com/aws-amplify/amplify-ui-android/issues/278))
+
+[See all changes between 1.7.1 and 1.8.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.7.1...release_liveness_v1.8.0)
+
 ## [Release 1.7.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.7.1)
 
 ### Bug Fixes

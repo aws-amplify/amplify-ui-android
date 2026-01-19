@@ -28,6 +28,7 @@ import com.amplifyframework.ui.sample.liveness.ui.LivenessScreen
 import com.amplifyframework.ui.sample.liveness.ui.ResultScreen
 import com.amplifyframework.ui.sample.liveness.ui.theme.MyApplicationTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.amplifyframework.ui.liveness.media.VideoCodec
 
 class MainActivity : ComponentActivity() {
 
@@ -45,6 +46,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    var videoCodec: VideoCodec = VideoCodec.VP8
+
     @Composable
     private fun Navigation(viewModel: MainViewModel = viewModel()) {
         val navController: NavHostController = rememberNavController()
@@ -52,13 +55,17 @@ class MainActivity : ComponentActivity() {
             composable("home") {
                 HomeScreen(
                     viewModel,
-                    onStartChallenge = { navController.navigate("challenge") }
+                    onStartChallenge = { _, format ->
+                        videoCodec = format
+                        navController.navigate("challenge")
+                    }
                 )
             }
 
             composable(route = "challenge") {
                 LivenessScreen(
                     viewModel,
+                    videoCodec = videoCodec,
                     onChallengeComplete = {
                         navController.navigate("results") {
                             popUpTo("challenge") {

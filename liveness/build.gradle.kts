@@ -56,11 +56,15 @@ dependencies {
 
     implementation(libs.androidx.futures)
     implementation(libs.androidx.lifecycle)
+    implementation(libs.androidx.media3.muxer)
 
     implementation(libs.kotlin.serialization.json)
 
     implementation(libs.litert)
     implementation(libs.litert.support)
+
+    // Needed to workaround warning for missing annotations from a transitive dependency of media3
+    implementation(libs.errorpone)
 
     coreLibraryDesugaring(libs.android.desugar)
 

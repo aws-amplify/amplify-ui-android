@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.amplifyframework.ui.liveness.camera
+package com.amplifyframework.ui.liveness.media
 
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
@@ -26,12 +26,14 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.amplifyframework.core.Amplify
 import com.amplifyframework.logging.Logger
+import com.amplifyframework.ui.liveness.camera.OnMuxedSegment
 import com.amplifyframework.ui.liveness.util.isKeyFrame
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal class LivenessVideoEncoder private constructor(
+internal class LivenessVideoEncoder @VisibleForTesting constructor(
+    private val videoCodec: VideoCodec,
     width: Int,
     height: Int,
     bitrate: Int,
@@ -41,48 +43,41 @@ internal class LivenessVideoEncoder private constructor(
     private val onMuxedSegment: OnMuxedSegment,
     private val onEncoderError: (MediaCodec.CodecException) -> Unit,
     private val onMuxerError: (Exception) -> Unit,
-    private val muxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { file, format, callback ->
-        LivenessMuxer(file, format, callback)
-    }
+    private val muxerFactory: (format: VideoCodec) -> LivenessMuxer = LivenessMuxer::create
 ) {
 
     companion object {
 
         const val TAG = "LivenessVideoEncoder"
         const val LOGGING_ENABLED = false
-        const val MIME_TYPE = "video/x-vnd.on2.vp8"
         const val MAX_MUXER_CREATION_ATTEMPTS = 3
 
         fun create(
+            videoCodec: VideoCodec,
             cacheDir: File,
             width: Int,
             height: Int,
             bitrate: Int,
-            framerate: Int,
+            frameRate: Int,
             keyframeInterval: Int,
             onMuxedSegment: OnMuxedSegment,
             onEncoderError: (MediaCodec.CodecException) -> Unit,
-            onMuxerError: (Exception) -> Unit,
-            muxerFactory: (File, MediaFormat, OnMuxedSegment) -> LivenessMuxer = { file, format, callback ->
-                LivenessMuxer(file, format, callback)
-            }
-        ): LivenessVideoEncoder? {
-            return try {
-                LivenessVideoEncoder(
-                    width,
-                    height,
-                    bitrate,
-                    framerate,
-                    keyframeInterval,
-                    createTempOutputFile(cacheDir),
-                    onMuxedSegment,
-                    onEncoderError,
-                    onMuxerError,
-                    muxerFactory
-                )
-            } catch (e: Exception) {
-                null
-            }
+            onMuxerError: (Exception) -> Unit
+        ): LivenessVideoEncoder? = try {
+            LivenessVideoEncoder(
+                videoCodec,
+                width,
+                height,
+                bitrate,
+                frameRate,
+                keyframeInterval,
+                createTempOutputFile(cacheDir),
+                onMuxedSegment,
+                onEncoderError,
+                onMuxerError
+            )
+        } catch (e: Exception) {
+            null
         }
 
         private fun createTempOutputFile(cacheDir: File) = File(
@@ -99,10 +94,10 @@ internal class LivenessVideoEncoder private constructor(
                 }
             },
             "${System.currentTimeMillis()}"
-        )
+        ).apply { createNewFile() }
     }
 
-    private val format = MediaFormat.createVideoFormat(MIME_TYPE, width, height).apply {
+    private val format = MediaFormat.createVideoFormat(videoCodec.mimeType, width, height).apply {
         setInteger(
             MediaFormat.KEY_COLOR_FORMAT,
             MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
@@ -115,7 +110,7 @@ internal class LivenessVideoEncoder private constructor(
     private val encoderHandler = Handler(HandlerThread(TAG).apply { start() }.looper)
     private val logger = Amplify.Logging.forNamespace("Liveness")
 
-    private val encoder = MediaCodec.createEncoderByType(MIME_TYPE).apply {
+    private val encoder = MediaCodec.createEncoderByType(videoCodec.mimeType).apply {
         configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         setCallback(EncoderCallback(::handleFrame, onEncoderError, logger), encoderHandler)
     }
@@ -126,6 +121,7 @@ internal class LivenessVideoEncoder private constructor(
     var muxerCreationAttempts = 0
 
     init {
+        logger.info { "Encoding starting with $videoCodec" }
         encoder.start()
     }
 
@@ -137,7 +133,6 @@ internal class LivenessVideoEncoder private constructor(
 
     @WorkerThread
     fun handleFrame(outputBufferId: Int, info: MediaCodec.BufferInfo) {
-
         try {
             encoder.getOutputBuffer(outputBufferId)?.let { byteBuffer ->
                 if (encoding) {
@@ -185,12 +180,9 @@ internal class LivenessVideoEncoder private constructor(
     fun createMuxer() {
         muxerCreationAttempts++
         try {
-            val muxer = muxerFactory(
-                outputFile,
-                encoder.outputFormat,
-                onMuxedSegment
-            )
+            val muxer = muxerFactory(videoCodec)
             livenessMuxer = muxer
+            muxer.start(outputFile, encoder.outputFormat, onMuxedSegment)
         } catch (e: Exception) {
             // This is likely an unrecoverable error, such as file creation failing.
             // However, if it fails, we will allow multiple attempt at the next keyframe.

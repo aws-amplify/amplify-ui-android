@@ -61,6 +61,7 @@ import com.amplifyframework.predictions.models.FaceLivenessSession
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
+import com.amplifyframework.ui.liveness.media.VideoCodec
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
@@ -100,6 +101,7 @@ fun FaceLivenessDetector(
  * @param credentialsProvider to provide custom CredentialsProvider for authentication. Default uses initialized Amplify.Auth CredentialsProvider
  * @param disableStartView to bypass warmup screen.
  * @param challengeOptions is the list of ChallengeOptions that are to be overridden from the default configuration
+ * @param videoCodec
  * @param onComplete callback notifying a completed challenge
  * @param onError callback containing exception for cause
  */
@@ -112,9 +114,10 @@ fun FaceLivenessDetector(
     onComplete: Action,
     onError: Consumer<FaceLivenessDetectionException>,
     challengeOptions: ChallengeOptions = ChallengeOptions(),
+    videoOptions: VideoOptions = VideoOptions()
 ) {
     val scope = rememberCoroutineScope()
-    val key = DetectorStateKey(sessionId, region, credentialsProvider)
+    val key = DetectorStateKey(sessionId, region, credentialsProvider, videoOptions)
     var isFinished by remember(key) { mutableStateOf(false) }
     val currentOnComplete by rememberUpdatedState(onComplete)
     val currentOnError by rememberUpdatedState(onError)
@@ -154,6 +157,7 @@ fun FaceLivenessDetector(
                 credentialsProvider = credentialsProvider,
                 disableStartView,
                 challengeOptions = challengeOptions,
+                videoOptions = videoOptions,
                 onChallengeComplete = {
                     scope.launch {
                         // if we are already finished, we already provided a result in complete or failed
@@ -187,6 +191,7 @@ internal fun ChallengeView(
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     disableStartView: Boolean,
     challengeOptions: ChallengeOptions,
+    videoOptions: VideoOptions,
     onChallengeComplete: OnChallengeComplete,
     onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -208,6 +213,7 @@ internal fun ChallengeView(
                 credentialsProvider,
                 disableStartView,
                 challengeOptions,
+                videoOptions = videoOptions,
                 onChallengeComplete = { currentOnChallengeComplete() },
                 onChallengeFailed = { currentOnChallengeFailed.accept(it) }
             )
@@ -446,7 +452,8 @@ internal fun ChallengeView(
 internal data class DetectorStateKey(
     val sessionId: String,
     val region: String,
-    val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?
+    val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
+    val videoOptions: VideoOptions
 )
 
 data class ChallengeOptions(
@@ -468,6 +475,10 @@ data class ChallengeOptions(
             faceMovement
         ).all { it.camera == faceMovementAndLight.camera }
 }
+
+data class VideoOptions(
+    val codec: VideoCodec = VideoCodec.VP8
+)
 
 sealed class LivenessChallenge(
     open val camera: Camera = Camera.Front

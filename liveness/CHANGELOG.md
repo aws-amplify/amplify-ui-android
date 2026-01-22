@@ -1,3 +1,10 @@
+## [Release 1.9.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.9.0)
+
+### Features
+- **Liveness:** Add option to use H264 and VP9 codecs. ([#293](https://github.com/aws-amplify/amplify-ui-android/issues/293))
+
+[See all changes between 1.8.2 and 1.9.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.8.2...release_liveness_v1.9.0)
+
 ## [Release 1.8.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.8.2)
 
 ### Bug Fixes

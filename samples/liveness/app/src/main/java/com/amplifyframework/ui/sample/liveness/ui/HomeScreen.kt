@@ -21,9 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,6 +38,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -45,6 +47,8 @@ fun HomeScreen(viewModel: MainViewModel, onStartChallenge: (sessionId: String, v
     val authState = viewModel.authState.collectAsState().value
     val fetchingSession = viewModel.fetchingSession.collectAsState().value
     val activity = LocalContext.current.findActivity()
+
+    val scope = rememberCoroutineScope()
 
     Row(
         modifier = Modifier
@@ -111,7 +115,8 @@ fun HomeScreen(viewModel: MainViewModel, onStartChallenge: (sessionId: String, v
 
                     Button(
                         onClick = {
-                            viewModel.createLivenessSession { sessionId ->
+                            scope.launch {
+                                val sessionId = viewModel.createLivenessSession()
                                 sessionId?.let { onStartChallenge(it, videoCodec) }
                             }
                         }
@@ -136,9 +141,11 @@ fun FormatSelector(
             selected = videoCodec == selectedFormat,
             onClick = null
         )
-        Text(modifier = Modifier.padding(start = 8.dp),
+        Text(
+            modifier = Modifier.padding(start = 8.dp),
             text = videoCodec::class.simpleName!!,
-            color = MaterialTheme.colorScheme.onBackground)
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 

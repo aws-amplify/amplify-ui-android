@@ -8,9 +8,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.amplifyframework.auth.AuthException
+import com.amplifyframework.auth.AuthSession
 import com.amplifyframework.auth.cognito.exceptions.invalidstate.SignedInException
+import com.amplifyframework.auth.exceptions.SessionExpiredException
 import com.amplifyframework.kotlin.core.Amplify
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
+import kotlin.math.sign
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -37,7 +41,6 @@ class MainViewModel : ViewModel() {
             fetchAuthState()
         }
     }
-
 
     private suspend fun fetchAuthState() {
         _authState.value = AuthState.Fetching
@@ -71,24 +74,29 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun createLivenessSession(onComplete: (sessionId: String?) -> Unit) {
+    suspend fun createLivenessSession(): String? {
         _fetchingSession.value = true
-        viewModelScope.launch {
+        return viewModelScope.async {
             try {
                 val sessionId = LivenessSampleBackend.createSession()
                 _sessionId.value = sessionId
-                onComplete(sessionId)
+                sessionId
             } catch (e: Exception) {
                 _fetchingSession.value = false
                 Log.e(MainActivity.TAG, "Failed to create Liveness session ID.", e)
                 _sessionId.value = null
-                onComplete(null)
+
+                if (e.isSessionExpired()) {
+                    signOut()
+                }
+
+                null
             }
-        }
+        }.await()
     }
 
     fun fetchSessionResult(sessionId: String) {
-        if (_resultData.value != null) return //we already have result, likely timeout
+        if (_resultData.value != null) return // we already have result, likely timeout
 
         _fetchingResult.value = true
         viewModelScope.launch {
@@ -106,7 +114,7 @@ class MainViewModel : ViewModel() {
                     sessionId,
                     isLive = result.isLive,
                     confidenceScore = result.confidenceScore,
-                    referenceImage = auditImage,
+                    referenceImage = auditImage
                 )
 
                 _resultData.value = resultData
@@ -137,6 +145,17 @@ class MainViewModel : ViewModel() {
         _fetchingResult.value = false
         _fetchingSession.value = false
     }
+
+    private suspend fun signOut() {
+        Amplify.Auth.signOut()
+        _authState.value = AuthState.SignedOut
+    }
+
+    // Session refresh tokens require the user to sign in again
+    private tailrec fun Throwable.isSessionExpired(): Boolean {
+        val cause = this.cause
+        return this is SessionExpiredException || (cause != null && cause != this && cause.isSessionExpired())
+    }
 }
 
 sealed class AuthState {
@@ -151,5 +170,5 @@ data class ResultData(
     val isLive: Boolean = false,
     val confidenceScore: Float = 0f,
     val referenceImage: Bitmap? = null,
-    val error: FaceLivenessDetectionException? = null,
+    val error: FaceLivenessDetectionException? = null
 )

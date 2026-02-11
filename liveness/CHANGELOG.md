@@ -1,3 +1,10 @@
+## [Release 1.10.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.10.0)
+
+### Features
+- **all:** Update Amplify dependency to 2.33.0 ([#297](https://github.com/aws-amplify/amplify-ui-android/issues/297))
+
+[See all changes between 1.9.0 and 1.10.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.9.0...release_liveness_v1.10.0)
+
 ## [Release 1.9.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.9.0)
 
 ### Features

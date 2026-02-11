@@ -1,3 +1,10 @@
+## [Release 1.9.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.9.0)
+
+### Features
+- **all:** Update Amplify dependency to 2.33.0 ([#297](https://github.com/aws-amplify/amplify-ui-android/issues/297))
+
+[See all changes between 1.8.0 and 1.9.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.8.0...release_authenticator_v1.9.0)
+
 ## [Release 1.8.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.8.0)
 
 ### Features

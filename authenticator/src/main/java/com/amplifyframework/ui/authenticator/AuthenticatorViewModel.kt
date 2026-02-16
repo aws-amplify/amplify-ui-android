@@ -42,6 +42,7 @@ import com.amplifyframework.auth.cognito.exceptions.service.UsernameExistsExcept
 import com.amplifyframework.auth.cognito.options.AWSCognitoAuthConfirmSignInOptions
 import com.amplifyframework.auth.cognito.options.AWSCognitoAuthSignInOptions
 import com.amplifyframework.auth.exceptions.NotAuthorizedException
+import com.amplifyframework.auth.exceptions.InvalidStateException
 import com.amplifyframework.auth.exceptions.SessionExpiredException
 import com.amplifyframework.auth.exceptions.UnknownException
 import com.amplifyframework.auth.options.AuthSignUpOptions
@@ -375,6 +376,17 @@ internal class AuthenticatorViewModel(
         ) {
             moveTo(AuthenticatorStep.SignIn)
             sendMessage(AuthFlowSessionExpiredMessage(error))
+        } else if (configuration.authenticationFlow is AuthenticationFlow.UserChoice &&
+            info.selectedAuthFactor is AuthFactor.Password &&
+            (error is NotAuthorizedException || error is InvalidStateException)
+        ) {
+            logger.info("Restarting signin flow for password factor.")
+            // The SDK cancels the sign-in flow on password failure in SigningInWithSRP state. 
+            // Hence, restart sigin with same auth factor
+            if (error is NotAuthorizedException) {
+                sendMessage(InvalidLoginMessage(error))
+            }
+            startSignIn(info, preferredFirstFactorOverride = info.selectedAuthFactor)
         } else {
             handleSignInFailure(info, error)
         }

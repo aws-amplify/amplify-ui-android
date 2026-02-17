@@ -701,7 +701,7 @@ internal class AuthenticatorViewModel(
         sendMessage(PasswordResetMessage)
         if (username != null && password != null) {
             startSignInJob {
-                val options = getSignInOptions()
+                val options = getSignInOptions(AuthFactor.Password(srp = true))
                 when (val result = authProvider.signIn(username, password, options)) {
                     is AmplifyResult.Error -> moveTo(stateFactory.newSignInState(this::signIn))
                     is AmplifyResult.Success -> {

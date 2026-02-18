@@ -684,14 +684,14 @@ internal class AuthenticatorViewModel(
             logger.debug("Confirming password reset")
             when (val result = authProvider.confirmResetPassword(username, password, code)) {
                 is AmplifyResult.Error -> handleResetPasswordError(result.error)
-                is AmplifyResult.Success -> handlePasswordResetComplete()
+                is AmplifyResult.Success -> handlePasswordResetComplete(username, password)
             }
         }.join()
     }
 
     private suspend fun handleResetPasswordSuccess(username: String, result: AuthResetPasswordResult) {
         when (result.nextStep.resetPasswordStep) {
-            AuthResetPasswordStep.DONE -> handlePasswordResetComplete()
+            AuthResetPasswordStep.DONE -> handlePasswordResetComplete(null, null)
             AuthResetPasswordStep.CONFIRM_RESET_PASSWORD_WITH_CODE -> {
                 logger.debug("Password reset confirmation required")
                 val state = stateFactory.newResetPasswordConfirmState(
@@ -708,10 +708,27 @@ internal class AuthenticatorViewModel(
         }
     }
 
-    private suspend fun handlePasswordResetComplete() {
+    private suspend fun handlePasswordResetComplete(username: String?, password: String?) {
         logger.debug("Password reset complete")
         sendMessage(PasswordResetMessage)
-        moveTo(stateFactory.newSignInState(this::signIn))
+        if (username != null && password != null) {
+            startSignInJob {
+                val options = getSignInOptions(AuthFactor.Password(srp = true))
+                when (val result = authProvider.signIn(username, password, options)) {
+                    is AmplifyResult.Error -> moveTo(stateFactory.newSignInState(this::signIn))
+                    is AmplifyResult.Success -> {
+                        val info = UserInfo(
+                            username = username,
+                            password = password,
+                            signInSource = SignInSource.SignIn
+                        )
+                        handleSignInSuccess(info, result.data)
+                    }
+                }
+            }
+        } else {
+            moveTo(stateFactory.newSignInState(this::signIn))
+        }
     }
 
     private suspend fun handleResetPasswordError(error: AuthException) = handleAuthException(error)

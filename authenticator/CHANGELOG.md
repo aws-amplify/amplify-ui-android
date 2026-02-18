@@ -1,3 +1,10 @@
+## [Release 1.9.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.9.1)
+
+### Bug Fixes
+- **authenticator:** Fix signin not happening after password reset ([#302](https://github.com/aws-amplify/amplify-ui-android/issues/302))
+
+[See all changes between 1.9.0 and 1.9.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.9.0...release_authenticator_v1.9.1)
+
 ## [Release 1.9.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.9.0)
 
 ### Features

@@ -508,6 +508,26 @@ internal class AuthenticatorViewModel(
         )
     }
 
+    private fun handleConfirmPasswordRequired(info: UserInfo) {
+        var currentUserInfo = info
+        val newState = stateFactory.newSignInConfirmPasswordState(username = info.username) { password ->
+            // If a user has already previously entered a password then we need to restart the sign in
+            // flow because the Amplify state machine will be in an invalid state
+            val flowRestartRequired = currentUserInfo.password != null
+
+            currentUserInfo = currentUserInfo.copy(password = password)
+
+            if (flowRestartRequired) {
+                // Call signIn to restart the flow but prefer the password factor
+                startSignIn(currentUserInfo, preferredFirstFactorOverride = info.selectedAuthFactor)
+            } else {
+                // Use confirmSignIn to supply the password for the first time
+                confirmSignIn(currentUserInfo, password)
+            }
+        }
+        moveTo(newState)
+    }
+
     private suspend fun handleSignInSuccess(info: UserInfo, result: AuthSignInResult) {
         when (val nextStep = result.nextStep.signInStep) {
             AuthSignInStep.DONE -> checkForPasskeyPrompt(info)
@@ -556,12 +576,7 @@ internal class AuthenticatorViewModel(
                 if (info.password != null) {
                     confirmSignIn(info, info.password)
                 } else {
-                    moveTo(
-                        stateFactory.newSignInConfirmPasswordState(username = info.username) { password ->
-                            val newInfo = info.copy(password = password)
-                            confirmSignIn(newInfo, password)
-                        }
-                    )
+                    handleConfirmPasswordRequired(info)
                 }
             }
             else -> {

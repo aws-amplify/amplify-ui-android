@@ -1,3 +1,10 @@
+## [Release 1.9.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.9.2)
+
+### Bug Fixes
+- **authenticator:** Restart flow for second password attempt ([#305](https://github.com/aws-amplify/amplify-ui-android/issues/305))
+
+[See all changes between 1.9.1 and 1.9.2](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.9.1...release_authenticator_v1.9.2)
+
 ## [Release 1.9.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.9.1)
 
 ### Bug Fixes

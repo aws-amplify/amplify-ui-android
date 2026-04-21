@@ -15,7 +15,7 @@
 
 package com.amplifyframework.ui.authenticator.util
 
-import android.content.Context
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.text.Spanned
 import android.text.SpannedString
@@ -24,7 +24,7 @@ import android.text.style.UnderlineSpan
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -39,30 +39,24 @@ import androidx.core.text.toHtml
  * Reads an HTML string from resources and turns it into an [AnnotatedString]
  */
 @Composable
-internal fun annotatedStringResource(
-    @StringRes id: Int
-): AnnotatedString {
-    val context = LocalContext.current
+internal fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
+    val resources = LocalResources.current
     return remember(id) {
-        context.getText(id).toAnnotatedString()
+        resources.getFormattedText(id).toAnnotatedString()
     }
 }
 
 @Composable
-internal fun annotatedStringResource(
-    @StringRes id: Int,
-    vararg formatArgs: Any
-): AnnotatedString {
-    val context = LocalContext.current
+internal fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: Any): AnnotatedString {
+    val resources = LocalResources.current
     return remember(id, formatArgs) {
-        context.getText(id, *formatArgs).toAnnotatedString()
+        resources.getFormattedText(id, *formatArgs).toAnnotatedString()
     }
 }
 
-private fun Context.getText(
-    @StringRes id: Int,
-    vararg formatArgs: Any
-): CharSequence {
+// This formatting is compatible with the way the Authenticator resource strings were written originally, before
+// AnnotatedString.fromHtml() was available
+private fun Resources.getFormattedText(@StringRes id: Int, vararg formatArgs: Any): CharSequence {
     val resource = SpannedString(getText(id))
     val html = resource.toHtml()
     val string = String.format(html, *formatArgs)
@@ -72,32 +66,33 @@ private fun Context.getText(
 /**
  * Converts certain style spans to their AnnotatedString equivalent
  */
-private fun CharSequence.toAnnotatedString(): AnnotatedString {
-    return if (this is Spanned) {
-        val spanned = this
-        buildAnnotatedString {
-            append(spanned.toString())
-            getSpans(0, spanned.length, Any::class.java).forEach { span ->
-                val start = getSpanStart(span)
-                val end = getSpanEnd(span)
-                when (span) {
-                    is StyleSpan -> when (span.style) {
-                        Typeface.BOLD -> addStyle(SpanStyle(fontWeight = FontWeight.Bold), start, end)
-                        Typeface.ITALIC -> addStyle(SpanStyle(fontStyle = FontStyle.Italic), start, end)
-                        Typeface.BOLD_ITALIC -> addStyle(
-                            SpanStyle(
-                                fontStyle = FontStyle.Italic,
-                                fontWeight = FontWeight.Bold
-                            ),
-                            start,
-                            end
-                        )
-                    }
-                    is UnderlineSpan -> addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
+private fun CharSequence.toAnnotatedString(): AnnotatedString = if (this is Spanned) {
+    val spanned = this
+    buildAnnotatedString {
+        append(spanned.toString())
+        getSpans(0, spanned.length, Any::class.java).forEach { span ->
+            val start = getSpanStart(span)
+            val end = getSpanEnd(span)
+            when (span) {
+                is StyleSpan -> when (span.style) {
+                    Typeface.BOLD -> addStyle(SpanStyle(fontWeight = FontWeight.Bold), start, end)
+
+                    Typeface.ITALIC -> addStyle(SpanStyle(fontStyle = FontStyle.Italic), start, end)
+
+                    Typeface.BOLD_ITALIC -> addStyle(
+                        SpanStyle(
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        start,
+                        end
+                    )
                 }
+
+                is UnderlineSpan -> addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
             }
         }
-    } else {
-        AnnotatedString(this.toString())
     }
+} else {
+    AnnotatedString(this.toString())
 }

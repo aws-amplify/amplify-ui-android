@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,7 +34,7 @@ fun SignInContinueWithMfaSelection(
     }
 ) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val fieldState = state.form.fields[FieldKey.MfaSelection]?.state!!
 
     Column(
@@ -54,9 +54,9 @@ fun SignInContinueWithMfaSelection(
             onSelect = { fieldState.content = it },
             label = {
                 when (it) {
-                    MFAType.SMS.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_sms)
-                    MFAType.EMAIL.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_email)
-                    else -> context.getString(R.string.amplify_ui_authenticator_mfa_totp)
+                    MFAType.SMS.challengeResponse -> resources.getString(R.string.amplify_ui_authenticator_mfa_sms)
+                    MFAType.EMAIL.challengeResponse -> resources.getString(R.string.amplify_ui_authenticator_mfa_email)
+                    else -> resources.getString(R.string.amplify_ui_authenticator_mfa_totp)
                 }
             },
             modifier = Modifier.padding(bottom = 16.dp)
@@ -72,10 +72,8 @@ fun SignInContinueWithMfaSelection(
 }
 
 @Composable
-fun SignInContinueWithMfaSelectionFooter(
-    state: SignInContinueWithMfaSelectionState,
-    modifier: Modifier = Modifier
-) = BackToSignInFooter(
-    modifier = modifier,
-    onClickBackToSignIn = { state.moveTo(AuthenticatorStep.SignIn) }
-)
+fun SignInContinueWithMfaSelectionFooter(state: SignInContinueWithMfaSelectionState, modifier: Modifier = Modifier) =
+    BackToSignInFooter(
+        modifier = modifier,
+        onClickBackToSignIn = { state.moveTo(AuthenticatorStep.SignIn) }
+    )

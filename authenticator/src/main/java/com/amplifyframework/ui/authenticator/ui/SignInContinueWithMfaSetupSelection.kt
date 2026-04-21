@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,7 @@ fun SignInContinueWithMfaSetupSelection(
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val fieldState = state.form.fields[FieldKey.MfaSelection]?.state!!
 
     Column(
@@ -69,16 +71,16 @@ fun SignInContinueWithMfaSetupSelection(
             onSelect = { fieldState.content = it },
             label = {
                 when (it) {
-                    MFAType.SMS.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_sms)
-                    MFAType.EMAIL.challengeResponse -> context.getString(R.string.amplify_ui_authenticator_mfa_email)
-                    else -> context.getString(R.string.amplify_ui_authenticator_mfa_totp)
+                    MFAType.SMS.challengeResponse -> resources.getString(R.string.amplify_ui_authenticator_mfa_sms)
+                    MFAType.EMAIL.challengeResponse -> resources.getString(R.string.amplify_ui_authenticator_mfa_email)
+                    else -> resources.getString(R.string.amplify_ui_authenticator_mfa_totp)
                 }
             },
             modifier = Modifier.padding(bottom = 16.dp)
         )
         AuthenticatorButton(
             modifier = modifier.testTag(TestTags.SignInConfirmButton),
-            label = context.getString(R.string.amplify_ui_authenticator_button_continue),
+            label = resources.getString(R.string.amplify_ui_authenticator_button_continue),
             onClick = { scope.launch { state.continueSignIn() } },
             loading = !state.form.enabled
         )

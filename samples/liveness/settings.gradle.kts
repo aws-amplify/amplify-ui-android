@@ -23,5 +23,6 @@ dependencyResolutionManagement {
 rootProject.name = "Liveness-Sample"
 include(":app")
 
-// Uncomment this to use local liveness module from Amplify UI Repo
-//includeBuild("../../") {}
+// Use the local liveness module from this repo so edits to liveness/ are picked up.
+// Composite-build substitution swaps com.amplifyframework.ui:liveness for project(":liveness").
+includeBuild("../../") {}

@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.liveness.ui
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -43,11 +44,15 @@ import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 
 @Composable internal fun InstructionMessage(
+    @StringRes initialMessageResId: Int,
     livenessCheckState: LivenessCheckState
 ) {
     val instructionText = livenessCheckState.instructionId?.let { stringResource(it) } ?: return
     if (livenessCheckState.isActionable) {
-        FaceOvalInstructionMessage(message = instructionText)
+        FaceOvalInstructionMessage(
+            initialMessageResId = initialMessageResId,
+            message = instructionText,
+        )
     } else {
         InstructionMessage(message = instructionText, showProgress = true)
     }
@@ -86,12 +91,15 @@ private fun InstructionMessage(
 
 @Composable
 private fun FaceOvalInstructionMessage(
+    @StringRes initialMessageResId: Int,
     message: String
 ) {
 
     val isTooClose = message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
     val isInitialCenterFace =
-        LivenessCheckState.Initial.withStartViewMessage().instructionId?.let { stringResource(it) == message } == true
+        LivenessCheckState.Initial
+            .withStartViewMessage(initialMessageResId)
+            .instructionId?.let { stringResource(it) == message } == true
 
     val backgroundColor = if (isTooClose) {
         MaterialTheme.colorScheme.error
@@ -149,7 +157,10 @@ private fun InstructionMessageProgressPreview() {
 @Composable
 private fun FaceOvalInstructionMessagePreview() {
     LivenessPreviewContainer {
-        FaceOvalInstructionMessage("Move closer")
+        FaceOvalInstructionMessage(
+            initialMessageResId = 0,
+            message = "Move closer",
+        )
     }
 }
 

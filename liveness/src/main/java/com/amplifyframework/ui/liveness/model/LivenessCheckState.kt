@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.liveness.model
 
 import android.graphics.RectF
+import androidx.annotation.StringRes
 import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 
@@ -33,8 +34,8 @@ internal sealed class LivenessCheckState(open val instructionId: Int? = null, op
                 Initial(R.string.amplify_ui_liveness_challenge_instruction_move_face_further)
             fun withConnectingMessage() =
                 Initial(R.string.amplify_ui_liveness_challenge_connecting, false)
-            fun withStartViewMessage() =
-                Initial(R.string.amplify_ui_liveness_get_ready_center_face_label)
+            fun withStartViewMessage(@StringRes message: Int) =
+                Initial(message)
         }
     }
     data class Running(override val instructionId: Int? = null) : LivenessCheckState(instructionId, true) {

@@ -16,6 +16,7 @@
 package com.amplifyframework.ui.liveness.ui
 
 import android.graphics.RectF
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,7 +50,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.amplifyframework.auth.AWSCredentials
@@ -58,7 +58,6 @@ import com.amplifyframework.core.Action
 import com.amplifyframework.core.Consumer
 import com.amplifyframework.predictions.models.FaceLivenessChallengeType
 import com.amplifyframework.predictions.models.FaceLivenessSession
-import com.amplifyframework.ui.liveness.R
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.camera.OnChallengeComplete
 import com.amplifyframework.ui.liveness.media.VideoCodec
@@ -81,6 +80,8 @@ import kotlinx.coroutines.launch
 fun FaceLivenessDetector(
     sessionId: String,
     region: String,
+    @StringRes initialMessageResId: Int,
+    ctaButtonData: CtaButtonData,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>? = null,
     disableStartView: Boolean = false,
     onComplete: Action,
@@ -88,6 +89,8 @@ fun FaceLivenessDetector(
 ) = FaceLivenessDetector(
     sessionId,
     region,
+    initialMessageResId,
+    ctaButtonData,
     credentialsProvider,
     disableStartView,
     onComplete,
@@ -104,17 +107,26 @@ fun FaceLivenessDetector(
  * @param videoCodec
  * @param onComplete callback notifying a completed challenge
  * @param onError callback containing exception for cause
+ * @param previewOnly DEV ONLY. When true, skips the AWS Liveness session call and
+ *  parks the UI on the start view (camera preview + FaceGuide oval) so the
+ *  oval / camera UI can be iterated on without a configured Amplify backend.
+ *  Tapping "Begin check" in this mode will leave the start view but no real
+ *  challenge will run; intended for visual iteration only. Do not enable in
+ *  production.
  */
 @Composable
 fun FaceLivenessDetector(
     sessionId: String,
     region: String,
+    @StringRes initialMessageResId: Int,
+    ctaButtonData: CtaButtonData,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>? = null,
     disableStartView: Boolean = false,
     onComplete: Action,
     onError: Consumer<FaceLivenessDetectionException>,
     challengeOptions: ChallengeOptions = ChallengeOptions(),
-    videoOptions: VideoOptions = VideoOptions()
+    videoOptions: VideoOptions = VideoOptions(),
+    previewOnly: Boolean = false
 ) {
     val scope = rememberCoroutineScope()
     val key = DetectorStateKey(sessionId, region, credentialsProvider, videoOptions)
@@ -153,11 +165,14 @@ fun FaceLivenessDetector(
             ChallengeView(
                 key = key,
                 sessionId = sessionId,
-                region,
+                region = region,
+                initialMessageResId = initialMessageResId,
+                ctaButtonData = ctaButtonData,
                 credentialsProvider = credentialsProvider,
-                disableStartView,
+                disableStartView = disableStartView,
                 challengeOptions = challengeOptions,
                 videoOptions = videoOptions,
+                previewOnly = previewOnly,
                 onChallengeComplete = {
                     scope.launch {
                         // if we are already finished, we already provided a result in complete or failed
@@ -188,10 +203,13 @@ internal fun ChallengeView(
     key: Any,
     sessionId: String,
     region: String,
+    @StringRes initialMessageResId: Int,
+    ctaButtonData: CtaButtonData,
     credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     disableStartView: Boolean,
     challengeOptions: ChallengeOptions,
     videoOptions: VideoOptions,
+    previewOnly: Boolean,
     onChallengeComplete: OnChallengeComplete,
     onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -215,7 +233,8 @@ internal fun ChallengeView(
                 challengeOptions,
                 videoOptions = videoOptions,
                 onChallengeComplete = { currentOnChallengeComplete() },
-                onChallengeFailed = { currentOnChallengeFailed.accept(it) }
+                onChallengeFailed = { currentOnChallengeFailed.accept(it) },
+                previewOnly = previewOnly
             )
         } catch (e: Exception) {
             currentOnChallengeFailed.accept(
@@ -302,7 +321,10 @@ internal fun ChallengeView(
                         }
                     }
 
-                    InstructionMessage(LivenessCheckState.Initial.withStartViewMessage())
+                    InstructionMessage(
+                        initialMessageResId = initialMessageResId,
+                        livenessCheckState = LivenessCheckState.Initial.withStartViewMessage(initialMessageResId),
+                    )
                 }
 
                 Box(
@@ -314,11 +336,15 @@ internal fun ChallengeView(
                 ) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
+                        colors = ctaButtonData.buttonColors,
                         onClick = {
                             livenessState.onStartViewComplete()
                         }
                     ) {
-                        Text(stringResource(R.string.amplify_ui_liveness_get_ready_begin_check))
+                        Text(
+                            text = ctaButtonData.text,
+                            style = ctaButtonData.textStyle,
+                        )
                     }
                 }
 
@@ -404,7 +430,10 @@ internal fun ChallengeView(
                                         livenessState.livenessSessionInfo?.challengeType
                                     )
                                 ) {
-                                    InstructionMessage(livenessState.livenessCheckState)
+                                    InstructionMessage(
+                                        initialMessageResId = initialMessageResId,
+                                        livenessCheckState = livenessState.livenessCheckState,
+                                    )
                                 }
                                 if (livenessState.livenessCheckState.instructionId ==
                                     FaceDetector.FaceOvalPosition.TOO_FAR.instructionStringRes
@@ -439,7 +468,10 @@ internal fun ChallengeView(
                                 verticalArrangement = Arrangement.spacedBy(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                InstructionMessage(livenessState.livenessCheckState)
+                                InstructionMessage(
+                                    initialMessageResId = initialMessageResId,
+                                    livenessCheckState = livenessState.livenessCheckState,
+                                )
                             }
                         }
                     }
@@ -486,6 +518,7 @@ sealed class LivenessChallenge(
     data class FaceMovement(override val camera: Camera = Camera.Front) : LivenessChallenge(
         camera = camera
     )
+
     data object FaceMovementAndLight : LivenessChallenge()
 }
 

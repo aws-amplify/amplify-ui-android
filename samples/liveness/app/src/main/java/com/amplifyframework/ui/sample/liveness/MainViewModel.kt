@@ -33,8 +33,14 @@ class MainViewModel : ViewModel() {
     val resultData = _resultData.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            fetchAuthState()
+        if (STUB_SESSION_FOR_UI_DEV) {
+            // UI-only mode: skip Amplify entirely so HomeScreen renders the codec picker
+            // and "Create session" button without needing a configured backend.
+            _authState.value = AuthState.SignedIn
+        } else {
+            viewModelScope.launch {
+                fetchAuthState()
+            }
         }
     }
 
@@ -72,6 +78,16 @@ class MainViewModel : ViewModel() {
     }
 
     fun createLivenessSession(onComplete: (sessionId: String?) -> Unit) {
+        if (STUB_SESSION_FOR_UI_DEV) {
+            // UI-only mode: skip the backend call and hand back a fake sessionId so
+            // LivenessScreen will mount FaceLivenessDetector and render the camera + oval.
+            // The WebSocket handshake will fail shortly after, but the UI is visible until then.
+            _fetchingSession.value = true
+            _sessionId.value = STUB_SESSION_ID
+            onComplete(STUB_SESSION_ID)
+            return
+        }
+
         _fetchingSession.value = true
         viewModelScope.launch {
             try {
@@ -85,6 +101,17 @@ class MainViewModel : ViewModel() {
                 onComplete(null)
             }
         }
+    }
+
+    companion object {
+        // Flip to false to use the real backend. When true:
+        //  - auth check is skipped (HomeScreen renders the codec picker immediately)
+        //  - createLivenessSession() returns a stub id without calling AWS
+        //  - MainActivity routes the "challenge" destination to DebugCameraOvalScreen
+        //    instead of FaceLivenessDetector, so you get camera+oval without an
+        //    Amplify backend
+        const val STUB_SESSION_FOR_UI_DEV = true
+        private const val STUB_SESSION_ID = "00000000-0000-0000-0000-000000000000"
     }
 
     fun fetchSessionResult(sessionId: String) {

@@ -45,4 +45,5 @@
     <string name="result_tip_title">Tips to pass the video check:</string>
     <string name="result_tip_1">Avoid very bright lighting conditions, such as direct sunlight.</string>
     <string name="result_tip_2">Remove sunglasses, mask, hat, or anything blocking your face.</string>
+    <string name="initial_message">Get ready for your video selfie</string>
 </resources>

@@ -84,7 +84,13 @@ internal class LivenessCoordinator(
     private val challengeOptions: ChallengeOptions,
     videoOptions: VideoOptions,
     private val onChallengeComplete: OnChallengeComplete,
-    val onChallengeFailed: Consumer<FaceLivenessDetectionException>
+    val onChallengeFailed: Consumer<FaceLivenessDetectionException>,
+    /**
+     * Dev-only: when true, skips the AWS Liveness session call so the start view
+     * (camera preview + FaceGuide oval) renders without a configured Amplify
+     * backend. Used for iterating on the FaceGuide / oval UI in place.
+     */
+    private val previewOnly: Boolean = false
 ) {
 
     private val attemptCounter = AttemptCounter()
@@ -169,7 +175,9 @@ internal class LivenessCoordinator(
     private var disconnectEventReceived = false
 
     init {
-        startLivenessSession()
+        if (!previewOnly) {
+            startLivenessSession()
+        }
         if (challengeOptions.hasOneCameraConfigured()) {
             launchCamera(challengeOptions.faceMovementAndLight.camera)
         } else {

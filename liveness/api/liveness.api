@@ -161,7 +161,7 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Canc
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceLivenessDetectorKt;
 	public fun <init> ()V
-	public final fun getLambda$-1421398948$liveness_release ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-817868928$liveness_release ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt {
@@ -194,7 +194,7 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Reco
 
 public final class com/amplifyframework/ui/liveness/ui/FaceLivenessDetectorKt {
 	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Landroidx/compose/runtime/Composer;II)V
-	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Lcom/amplifyframework/ui/liveness/ui/ChallengeOptions;Lcom/amplifyframework/ui/liveness/ui/VideoOptions;Landroidx/compose/runtime/Composer;II)V
+	public static final fun FaceLivenessDetector (Ljava/lang/String;Ljava/lang/String;Lcom/amplifyframework/auth/AWSCredentialsProvider;ZLcom/amplifyframework/core/Action;Lcom/amplifyframework/core/Consumer;Lcom/amplifyframework/ui/liveness/ui/ChallengeOptions;Lcom/amplifyframework/ui/liveness/ui/VideoOptions;ZLandroidx/compose/runtime/Composer;II)V
 }
 
 public abstract class com/amplifyframework/ui/liveness/ui/LivenessChallenge {

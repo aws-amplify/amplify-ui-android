@@ -1,3 +1,13 @@
+## [Release 1.10.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.10.0)
+
+### Features
+- **all:** Update to Compose BOM 2026.03.00 ([#295](https://github.com/aws-amplify/amplify-ui-android/issues/295))
+
+### Bug Fixes
+- **authenticator:** Update Amplify to 2.38.1 ([#321](https://github.com/aws-amplify/amplify-ui-android/issues/321))
+
+[See all changes between 1.9.2 and 1.10.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_authenticator_v1.9.2...release_authenticator_v1.10.0)
+
 ## [Release 1.9.2](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_authenticator_v1.9.2)
 
 ### Bug Fixes

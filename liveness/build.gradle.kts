@@ -44,7 +44,6 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material.icons)
 
-    api(libs.amplify.api)
     api(libs.amplify.predictions)
 
     implementation(libs.bundles.camera)

@@ -24,4 +24,4 @@ rootProject.name = "Liveness-Sample"
 include(":app")
 
 // Uncomment this to use local liveness module from Amplify UI Repo
-//includeBuild("../../") {}
+includeBuild("../../") {}

@@ -8,10 +8,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles += file("consumer-rules.pro")
     }
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -23,7 +19,6 @@ dependencies {
     implementation(libs.androidx.lifecycle)
     implementation(libs.androidx.compose.viewmodel)
     implementation(libs.zxing)
-    coreLibraryDesugaring(libs.android.desugar)
 
     testImplementation(projects.testing)
 }

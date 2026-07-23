@@ -20,8 +20,9 @@ import com.amplifyframework.ui.authenticator.auth.PasswordCriteria
 import com.amplifyframework.ui.authenticator.forms.FieldError.InvalidFormat
 import com.amplifyframework.ui.authenticator.forms.FieldError.PasswordsDoNotMatch
 import com.amplifyframework.ui.authenticator.forms.FieldKey.Password
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.regex.Pattern
 
 /**
@@ -56,7 +57,7 @@ internal object FieldValidators {
     private val numbersRegex = "\\d+".toRegex()
     private val upperRegex = "[A-Z]+".toRegex()
     private val lowerRegex = "[a-z]+".toRegex()
-    private val dateFormat = DateTimeFormatter.ISO_LOCAL_DATE
+    private val isoDatePattern = """\d{4}-\d{2}-\d{2}""".toRegex()
 
     /**
      * The empty [FieldValidator] instance. This never returns an error.
@@ -84,14 +85,25 @@ internal object FieldValidators {
 
     fun date(error: FieldError = InvalidFormat): FieldValidator = {
         if (content.isNotBlank()) {
-            try {
-                dateFormat.parse(content)
-                null
-            } catch (e: DateTimeParseException) {
-                error
-            }
+            if (isValidIsoDate(content)) null else error
         } else {
             null
+        }
+    }
+
+    /**
+     * Validates that [value] is a strict ISO 8601 local date (yyyy-MM-dd). The [isoDatePattern] check
+     * enforces zero-padded fields and rejects trailing content, while the non-lenient [SimpleDateFormat]
+     * parse rejects impossible calendar dates such as 2023-02-29.
+     */
+    private fun isValidIsoDate(value: String): Boolean {
+        if (!isoDatePattern.matches(value)) return false
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply { isLenient = false }
+        return try {
+            format.parse(value)
+            true
+        } catch (e: ParseException) {
+            false
         }
     }
 

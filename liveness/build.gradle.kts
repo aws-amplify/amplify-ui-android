@@ -38,10 +38,6 @@ android {
     androidResources {
         noCompress += "tflite"
     }
-
-    compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
@@ -65,8 +61,6 @@ dependencies {
 
     // Needed to workaround warning for missing annotations from a transitive dependency of media3
     implementation(libs.errorpone)
-
-    coreLibraryDesugaring(libs.android.desugar)
 
     testImplementation(projects.testing)
 }

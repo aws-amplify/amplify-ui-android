@@ -48,10 +48,22 @@ import com.amplifyframework.ui.authenticator.R
 import com.amplifyframework.ui.authenticator.forms.FieldConfig
 import com.amplifyframework.ui.authenticator.forms.MutableFieldState
 import com.amplifyframework.ui.authenticator.strings.StringResolver
-import java.time.Duration
-import java.time.LocalDate
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 private val invalidDateChars = """[^\d-]+""".toRegex()
+
+/**
+ * Convert a UTC epoch millisecond value into an ISO 8601 (yyyy-MM-dd) date string.
+ */
+internal fun epochMillisToIsoDate(epochMillis: Long): String {
+    val format = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+    return format.format(Date(epochMillis))
+}
 
 private object DateVisualTransformation : VisualTransformation {
     fun transform(original: String): String {
@@ -145,7 +157,7 @@ internal fun DateInputField(
                     onClick = {
                         datePickerState.selectedDateMillis?.let {
                             // Convert the UTC milliseconds into an ISO 8601 date string
-                            fieldState.content = LocalDate.ofEpochDay(Duration.ofMillis(it).toDays()).toString()
+                            fieldState.content = epochMillisToIsoDate(it)
                         }
                         dialogVisible = false
                     }

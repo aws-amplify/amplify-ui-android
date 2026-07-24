@@ -1,10 +1,13 @@
-## [Release 1.10.1](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.10.1)
+## [Release 1.11.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.11.0)
+
+### Features
+- **all:** Update to Compose BOM 2026.03.00 ([#295](https://github.com/aws-amplify/amplify-ui-android/issues/295))
 
 ### Bug Fixes
 - **all:** Remove desugaring requirement from UI libraries ([#326](https://github.com/aws-amplify/amplify-ui-android/issues/326))
 - **liveness:** Remove Amplify.API dependency from Liveness ([#327](https://github.com/aws-amplify/amplify-ui-android/issues/327))
 
-[See all changes between 1.10.0 and 1.10.1](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.10.0...release_liveness_v1.10.1)
+[See all changes between 1.10.0 and 1.11.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.10.0...release_liveness_v1.11.0)
 
 ## [Release 1.10.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.10.0)
 

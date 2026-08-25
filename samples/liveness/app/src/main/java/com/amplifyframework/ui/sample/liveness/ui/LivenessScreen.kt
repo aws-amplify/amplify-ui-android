@@ -1,9 +1,11 @@
 package com.amplifyframework.ui.sample.liveness.ui
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import com.amplifyframework.ui.liveness.media.VideoCodec
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.ui.FaceLivenessDetector
@@ -20,6 +22,7 @@ fun LivenessScreen(
 ) {
     BackHandler(onBack = onBack)
 
+    val context = LocalContext.current
     val sessionId = viewModel.sessionId.collectAsState().value ?: return
 
     MaterialTheme(colorScheme = LivenessColorScheme.default()) {
@@ -32,12 +35,22 @@ fun LivenessScreen(
                 viewModel.fetchSessionResult(sessionId)
                 onChallengeComplete()
             },
-            onError = {
-                if (it is FaceLivenessDetectionException.UserCancelledException) {
-                    onBack()
-                } else {
-                    viewModel.reportErrorResult(it)
-                    onChallengeComplete()
+            onError = { error ->
+                when (error) {
+                    is FaceLivenessDetectionException.UserCancelledException -> onBack()
+                    // An interruption is transient, so prompt for a retry instead of reporting a failed check.
+                    is FaceLivenessDetectionException.SessionInterruptedException -> {
+                        Toast.makeText(
+                            context,
+                            "Your check was interrupted. Please try again.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        onBack()
+                    }
+                    else -> {
+                        viewModel.reportErrorResult(error)
+                        onChallengeComplete()
+                    }
                 }
             }
         )

@@ -32,10 +32,6 @@ import com.amplifyframework.auth.AWSCredentials
 import com.amplifyframework.auth.AWSCredentialsProvider
 import com.amplifyframework.core.Consumer
 import com.amplifyframework.predictions.aws.AWSPredictionsPlugin
-import com.amplifyframework.predictions.aws.exceptions.AccessDeniedException
-import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionNotFoundException
-import com.amplifyframework.predictions.aws.exceptions.FaceLivenessSessionTimeoutException
-import com.amplifyframework.predictions.aws.exceptions.FaceLivenessUnsupportedChallengeTypeException
 import com.amplifyframework.predictions.aws.models.ColorChallengeResponse
 import com.amplifyframework.predictions.aws.models.RgbColor
 import com.amplifyframework.predictions.aws.options.AWSFaceLivenessSessionOptions
@@ -46,6 +42,7 @@ import com.amplifyframework.ui.liveness.BuildConfig
 import com.amplifyframework.ui.liveness.media.LivenessVideoEncoder
 import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
+import com.amplifyframework.ui.liveness.model.toFaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.state.AttemptCounter
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.ui.Camera
@@ -255,21 +252,8 @@ internal class LivenessCoordinator(
                 onChallengeComplete()
             },
             { error ->
-                val (faceLivenessException, shouldStopLivenessSession) = when (error) {
-                    is AccessDeniedException ->
-                        FaceLivenessDetectionException.AccessDeniedException(throwable = error) to false
-                    is FaceLivenessSessionNotFoundException ->
-                        FaceLivenessDetectionException.SessionNotFoundException(throwable = error) to false
-                    is FaceLivenessSessionTimeoutException ->
-                        FaceLivenessDetectionException.SessionTimedOutException(throwable = error) to false
-                    is FaceLivenessUnsupportedChallengeTypeException ->
-                        FaceLivenessDetectionException.UnsupportedChallengeTypeException(throwable = error) to true
-                    else -> FaceLivenessDetectionException(
-                        error.message ?: "Unknown error.",
-                        error.recoverySuggestion,
-                        error
-                    ) to false
-                }
+                val (faceLivenessException, shouldStopLivenessSession) =
+                    error.toFaceLivenessDetectionException()
                 processSessionError(faceLivenessException, shouldStopLivenessSession)
             }
         )

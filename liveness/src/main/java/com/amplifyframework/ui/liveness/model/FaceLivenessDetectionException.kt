@@ -38,6 +38,17 @@ open class FaceLivenessDetectionException(
         throwable: Throwable? = null
     ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
 
+    /**
+     * The connection to the face liveness service was lost before the check could complete, for example because the
+     * app was backgrounded long enough for the socket to close, or because the device lost network connectivity. This
+     * is distinct from the user deliberately cancelling the check, and from the check itself failing.
+     */
+    class SessionInterruptedException(
+        message: String = "The face liveness check was interrupted before it could complete.",
+        recoverySuggestion: String = "Retry the face liveness check.",
+        throwable: Throwable? = null
+    ) : FaceLivenessDetectionException(message, recoverySuggestion, throwable)
+
     class SessionTimedOutException(
         message: String = "Session timed out.",
         recoverySuggestion: String = "Retry the face liveness check and prompt the user" +

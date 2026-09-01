@@ -33,6 +33,10 @@ class LicensesConventionPlugin : Plugin<Project> {
                 allowUrl("http://aws.amazon.com/apache2.0")
                 allowUrl("https://developer.android.com/studio/terms.html")
 
+                allowUrl("https://opensource.org/license/mit") {
+                    because("MIT license - alternate URL used by slf4j 2.0.17+")
+                }
+
                 ignoreDependencies("org.junit", "junit-bom") {
                     because("Unit Testing Dependency")
                 }

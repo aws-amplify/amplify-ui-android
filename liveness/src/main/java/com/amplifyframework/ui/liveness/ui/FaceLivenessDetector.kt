@@ -22,13 +22,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,7 +41,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -415,14 +412,9 @@ internal fun ChallengeView(
                                     val progressWidth = with(LocalDensity.current) {
                                         ((scaledOvalRect.right - scaledOvalRect.left) * 0.6f).toDp()
                                     }
-                                    LinearProgressIndicator(
+                                    FaceMatchProgressBar(
                                         progress = livenessState.faceMatchPercentage,
-                                        modifier = Modifier
-                                            .clip(MaterialTheme.shapes.small)
-                                            .width(progressWidth)
-                                            .height(12.dp),
-                                        color = MaterialTheme.colorScheme.primary,
-                                        trackColor = MaterialTheme.colorScheme.surface
+                                        width = progressWidth
                                     )
                                 }
                             }

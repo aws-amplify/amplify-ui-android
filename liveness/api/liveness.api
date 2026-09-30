@@ -171,6 +171,12 @@ public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$Face
 	public final fun getLambda$-1421398948$liveness_release ()Lkotlin/jvm/functions/Function3;
 }
 
+public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceMatchProgressBarKt {
+	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$FaceMatchProgressBarKt;
+	public fun <init> ()V
+	public final fun getLambda$-1051203906$liveness_release ()Lkotlin/jvm/functions/Function2;
+}
+
 public final class com/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt {
 	public static final field INSTANCE Lcom/amplifyframework/ui/liveness/ui/ComposableSingletons$InstructionMessageKt;
 	public fun <init> ()V

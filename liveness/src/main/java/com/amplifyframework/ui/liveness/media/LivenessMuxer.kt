@@ -251,7 +251,7 @@ internal class Mp4Muxer(private val createMediaMuxer: (outputStream: FileOutputS
 
                 val chunkByteArray = ByteArray(sizeToRead.toInt())
                 raf.seek(currentBytePosition)
-                raf.read(chunkByteArray)
+                raf.readFully(chunkByteArray)
                 currentBytePosition += sizeToRead
 
                 val sendMuxedSegment = sendMuxedSegment

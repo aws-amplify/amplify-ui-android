@@ -29,9 +29,15 @@ import java.nio.ByteBuffer
  *
  * This replaces the absolute position with one relative to the enclosing fragment, and adds the
  * fragment's decode time, accumulated from the sample durations already seen. The brand that permits
- * a relative position is declared alongside it. The result is also correct when the chunks are
- * concatenated, because the relative position resolves to the same bytes and the decode time matches
- * the duration of the fragments it follows.
+ * a relative position is declared alongside it. As long as every chunk is rewritten, the result is
+ * also correct when the chunks are concatenated, because the relative position resolves to the same
+ * bytes and the decode time matches the duration of the fragments it follows.
+ *
+ * Only the layout the muxer actually writes is rewritten. Anything else is rejected so that it takes
+ * the fallback rather than being rewritten into something wrong, which means a fragment this does not
+ * recognise stops the rewriting for the rest of the file. Every fragment in a file has the same
+ * layout, so a layout that is rejected is rejected from the first chunk, before any chunk has been
+ * rewritten.
  *
  * Instances are stateful and must be used for a single output file, from one thread.
  */
@@ -49,9 +55,10 @@ internal class Mp4FragmentRewriter {
             rewriteBoxes(chunk)
         } catch (e: Exception) {
             /*
-            A chunk that is left alone is no worse than the chunks already sent, while a chunk whose
-            decode time does not follow on from the last one describes a timeline that never
-            happened. Stop rewriting instead of emitting a mixture of the two.
+            A reader that takes one chunk at a time is no worse off for a chunk left alone than it
+            would be for a chunk whose decode time does not follow on from the last one. A reader that
+            joins the chunks is worse off either way, because the chunks already rewritten have grown
+            and an absolute position no longer reaches the samples it names.
              */
             logger.error("Unable to rewrite movie fragment, sending remaining chunks unchanged", e)
             enabled = false
@@ -60,7 +67,7 @@ internal class Mp4FragmentRewriter {
     }
 
     private fun rewriteBoxes(chunk: ByteArray): ByteArray {
-        val output = ByteArrayOutputStream(chunk.size + BOX_HEADER_SIZE)
+        val output = ByteArrayOutputStream(chunk.size + CHUNK_GROWTH)
         forEachBox(chunk, 0, chunk.size) { box ->
             when (box.type) {
                 TYPE_MOOF -> output.write(rewriteFragment(chunk, box))
@@ -105,29 +112,34 @@ internal class Mp4FragmentRewriter {
             when (box.type) {
                 TYPE_MFHD -> header = chunk.copyOfRange(box.offset, box.endOffset)
                 TYPE_TRAF -> tracks.add(box)
+                else -> error("Fragment holds an unexpected ${box.type} box")
             }
         }
 
         val fragmentHeader = checkNotNull(header) { "Fragment is missing its header" }
-        check(tracks.isNotEmpty()) { "Fragment contains no tracks" }
 
         /*
-        Each track fragment loses the absolute position from its header and gains a decode time, so
-        the sample data moves further from the start of the fragment by the difference.
+        A decode time belongs to one track and is counted in that track's own timescale, so a
+        fragment covering more than one track needs a decode time for each of them.
          */
-        val growth = tracks.size * (TFDT_BOX_SIZE - BASE_DATA_OFFSET_SIZE)
-        val rewritten = tracks.map { rewriteTrack(chunk, it, growth) }
+        check(tracks.size == 1) { "Fragment covers ${tracks.size} tracks" }
 
-        val contentSize = fragmentHeader.size + rewritten.sumOf { it.bytes.size }
+        /*
+        The track fragment loses the absolute position from its header and gains a decode time, so the
+        sample data moves further from the start of the fragment by the difference.
+         */
+        val growth = TFDT_BOX_SIZE - BASE_DATA_OFFSET_SIZE
+        val rewritten = rewriteTrack(chunk, tracks.single(), growth)
+
+        val contentSize = fragmentHeader.size + rewritten.bytes.size
         val bytes = ByteBuffer.allocate(BOX_HEADER_SIZE + contentSize).apply {
             putInt(BOX_HEADER_SIZE + contentSize)
             putType(TYPE_MOOF)
             put(fragmentHeader)
-            rewritten.forEach { put(it.bytes) }
+            put(rewritten.bytes)
         }.array()
 
-        // Every track covers the same span of the fragment, so any of them gives its duration
-        decodeTime += rewritten.maxOf { it.duration }
+        decodeTime += rewritten.duration
 
         return bytes
     }
@@ -139,8 +151,12 @@ internal class Mp4FragmentRewriter {
         forEachBox(chunk, track.contentOffset, track.endOffset) { box ->
             when (box.type) {
                 TYPE_TFHD -> header = box
-                TYPE_TRUN -> run = box
-                TYPE_TFDT -> throw IllegalStateException("Track fragment already states its decode time")
+                TYPE_TRUN -> {
+                    check(run == null) { "Track fragment holds more than one run of samples" }
+                    run = box
+                }
+                TYPE_TFDT -> error("Track fragment already states its decode time")
+                else -> error("Track fragment holds an unexpected ${box.type} box")
             }
         }
 
@@ -150,6 +166,10 @@ internal class Mp4FragmentRewriter {
         val headerFlags = chunk.readInt(trackHeader.contentOffset) and FLAG_MASK
         check(headerFlags == TFHD_FLAG_BASE_DATA_OFFSET) {
             "Track fragment header holds more than an absolute position: $headerFlags"
+        }
+        // Holding nothing but an absolute position is what makes the growth of the rewrite a constant
+        check(trackHeader.size == TFHD_BOX_SIZE + BASE_DATA_OFFSET_SIZE) {
+            "Track fragment header is ${trackHeader.size} bytes"
         }
         val trackId = chunk.readInt(trackHeader.contentOffset + Int.SIZE_BYTES)
         val samples = readSamples(chunk, trackRun)
@@ -185,14 +205,20 @@ internal class Mp4FragmentRewriter {
         val flags = chunk.readInt(run.contentOffset) and FLAG_MASK
         check(flags and TRUN_FLAG_DATA_OFFSET != 0) { "Samples do not record their position" }
         check(flags and TRUN_FLAG_SAMPLE_DURATION != 0) { "Samples do not record their duration" }
+        /*
+        Flags held for the first sample alone sit between the position and the samples, which would
+        move every field that follows them.
+         */
+        check(flags and TRUN_FLAG_FIRST_SAMPLE_FLAGS == 0) { "Samples single out the first of them" }
 
         val count = chunk.readInt(run.contentOffset + Int.SIZE_BYTES)
         val dataOffset = chunk.readInt(run.offset + TRUN_DATA_OFFSET)
 
         val bytesPerSample = TRUN_SAMPLE_FIELDS.count { flags and it != 0 } * Int.SIZE_BYTES
         val firstSample = run.offset + TRUN_DATA_OFFSET + Int.SIZE_BYTES
-        check(count >= 0 && firstSample + count.toLong() * bytesPerSample <= run.endOffset) {
-            "$count samples do not fit in their box"
+        // An exact fit is what shows that the fields counted from the flags are the fields written
+        check(count >= 0 && firstSample + count.toLong() * bytesPerSample == run.endOffset.toLong()) {
+            "$count samples of $bytesPerSample bytes do not fill their box"
         }
 
         var duration = 0L
@@ -274,7 +300,14 @@ internal class Mp4FragmentRewriter {
         // A track run records its version and flags, then the sample count, then the data offset
         const val TRUN_DATA_OFFSET = BOX_HEADER_SIZE + 2 * Int.SIZE_BYTES
         const val TRUN_FLAG_DATA_OFFSET = 0x000001
+        const val TRUN_FLAG_FIRST_SAMPLE_FLAGS = 0x000004
         const val TRUN_FLAG_SAMPLE_DURATION = 0x000100
+
+        /*
+        What a chunk holding one movie fragment grows by: the brand added to its file type box, and the
+        decode time its track fragment gains less the absolute position it loses.
+         */
+        const val CHUNK_GROWTH = BRAND_SIZE + TFDT_BOX_SIZE - BASE_DATA_OFFSET_SIZE
 
         /**
          * The per sample fields of a track run, in the order they are written, so that the number of

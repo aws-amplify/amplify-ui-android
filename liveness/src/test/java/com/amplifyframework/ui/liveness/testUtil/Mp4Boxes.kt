@@ -155,7 +155,20 @@ internal class Mp4Reader(private val chunk: ByteArray) {
         val endOffset get() = offset + size
         val flags get() = readInt(contentOffset) and 0xFFFFFF
         val decodeTime get() = ByteBuffer.wrap(chunk, contentOffset + 4, 8).long
+        val sampleCount get() = readInt(contentOffset + 4)
         val dataOffset get() = readInt(contentOffset + 8)
+
+        /** The duration of every sample of a track run, which is the first field each one records. */
+        val sampleDurations: List<Long>
+            get() {
+                require(flags and BASE_DATA_OFFSET_PRESENT != 0) { "Samples do not record their position" }
+                val fieldsPerSample = PER_SAMPLE_FLAGS.count { flags and it != 0 }
+                val firstSample = contentOffset + 3 * 4
+                return (0 until sampleCount).map {
+                    readInt(firstSample + it * fieldsPerSample * 4).toUInt().toLong()
+                }
+            }
+
         private fun readInt(index: Int) = ByteBuffer.wrap(chunk, index, 4).int
     }
 
@@ -194,5 +207,8 @@ internal class Mp4Reader(private val chunk: ByteArray) {
 
     private companion object {
         val CONTAINERS = setOf("moof", "traf")
+
+        // The per sample fields of a track run, in the order they are written
+        val PER_SAMPLE_FLAGS = listOf(0x000100, 0x000200, 0x000400, 0x000800)
     }
 }

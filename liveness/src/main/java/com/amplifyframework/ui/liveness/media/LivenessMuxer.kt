@@ -250,13 +250,17 @@ internal class Mp4Muxer(private val createMediaMuxer: (outputStream: FileOutputS
                 }
 
                 val chunkByteArray = ByteArray(sizeToRead.toInt())
+                val chunkFileOffset = currentBytePosition
                 raf.seek(currentBytePosition)
                 raf.readFully(chunkByteArray)
                 currentBytePosition += sizeToRead
 
                 val sendMuxedSegment = sendMuxedSegment
                 if (sendMuxedSegment != null) {
-                    sendMuxedSegment(fragmentRewriter.rewrite(chunkByteArray), currentVideoStartTime)
+                    sendMuxedSegment(
+                        fragmentRewriter.rewrite(chunkByteArray, chunkFileOffset),
+                        currentVideoStartTime
+                    )
                     true
                 } else {
                     logger.error("sendMuxedSegmentHandler unexpectedly null")

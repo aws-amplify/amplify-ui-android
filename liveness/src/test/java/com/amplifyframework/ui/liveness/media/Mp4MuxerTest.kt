@@ -20,6 +20,7 @@ import androidx.media3.common.util.MediaFormatUtil
 import com.amplifyframework.ui.liveness.camera.OnMuxedSegment
 import com.amplifyframework.ui.liveness.testUtil.Mp4Reader
 import com.amplifyframework.ui.liveness.testUtil.TestMuxer
+import com.amplifyframework.ui.liveness.testUtil.atFileOffset
 import com.amplifyframework.ui.liveness.testUtil.chunkOf
 import com.amplifyframework.ui.liveness.testUtil.movieFragment
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -130,8 +131,13 @@ class Mp4MuxerTest {
 
         muxer.start(outputFile = file, mediaFormat = mockk(), onMuxedSegment = onMuxedSegment)
 
-        muxer.write(fragment(sampleDurations = listOf(100, 100)), bufferInfo(isKeyFrame = true))
-        muxer.write(fragment(sampleDurations = listOf(100, 100)), bufferInfo(isKeyFrame = true))
+        // The fragments record where they land in the file, which is what the rewrite is checked against
+        val first = chunkOf(movieFragment(sampleDurations = listOf(100, 100)))
+        val second = chunkOf(movieFragment(sampleDurations = listOf(100, 100)))
+        val written = atFileOffset(first + second)
+
+        muxer.write(buffer(written, 0, first.size), bufferInfo(isKeyFrame = true))
+        muxer.write(buffer(written, first.size, written.size), bufferInfo(isKeyFrame = true))
 
         verify { onMuxedSegment.invoke(capture(chunk), any()) }
         val sent = Mp4Reader(chunk.captured)
@@ -157,10 +163,8 @@ class Mp4MuxerTest {
         if (isKeyFrame) flags = MediaCodec.BUFFER_FLAG_KEY_FRAME
     }
 
-    private fun fragment(sampleDurations: List<Int>): ByteBuffer =
-        chunkOf(movieFragment(sampleDurations)).let { bytes ->
-            ByteBuffer.allocate(bytes.size).put(bytes).also { it.flip() }
-        }
+    private fun buffer(bytes: ByteArray, from: Int, to: Int): ByteBuffer =
+        ByteBuffer.allocate(to - from).put(bytes, from, to - from).also { it.flip() }
 
     private companion object {
         const val DEFAULT_BASE_IS_MOOF = 0x020000

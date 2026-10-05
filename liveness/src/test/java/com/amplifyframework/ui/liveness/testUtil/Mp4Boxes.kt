@@ -51,11 +51,12 @@ internal fun fileType(majorBrand: String, vararg compatibleBrands: String): Byte
  */
 internal fun movieFragment(
     sampleDurations: List<Int>,
-    baseDataOffset: Long = 5_000,
+    baseDataOffset: Long = 0,
     sampleSize: Int = 8,
     tracks: Int = 1,
     firstSampleFlags: Boolean = false,
     runsPerTrack: Int = 1,
+    sampleDataOffset: Int? = null,
     extraFragmentBoxes: List<ByteArray> = emptyList(),
     extraTrackBoxes: List<ByteArray> = emptyList()
 ): ByteArray {
@@ -68,7 +69,7 @@ internal fun movieFragment(
         extraFragmentBoxes.sumOf { it.size }
 
     // The samples follow the fragment, after the header of the box that holds them
-    val dataOffset = fragmentSize + BOX_HEADER_SIZE
+    val dataOffset = sampleDataOffset ?: (fragmentSize + BOX_HEADER_SIZE)
 
     val fragmentHeader = box("mfhd", ByteBuffer.allocate(8).putInt(0).putInt(1).array())
     val trackHeader = box(
@@ -106,6 +107,42 @@ private fun List<ByteArray>.join(): ByteArray {
 /** A movie fragment followed by the box holding its sample data. */
 internal fun chunkOf(fragment: ByteArray, sampleBytes: Int = 64): ByteArray =
     fragment + box("mdat", ByteArray(sampleBytes) { it.toByte() })
+
+/**
+ * Records in every movie fragment of a chunk the position it sits at, as the muxer does when it writes
+ * the fragment to a file. Call this once a chunk is fully assembled, since a fragment's position
+ * depends on whatever precedes it.
+ */
+internal fun atFileOffset(chunk: ByteArray, fileOffset: Long = 0): ByteArray {
+    val positioned = chunk.copyOf()
+    var at = 0
+    while (at + BOX_HEADER_SIZE <= positioned.size) {
+        val size = ByteBuffer.wrap(positioned, at, 4).int
+        if (String(positioned, at + 4, 4, Charsets.US_ASCII) == "moof") {
+            forEachTrackHeader(positioned, at, at + size) { header ->
+                ByteBuffer.wrap(positioned).putLong(header + BOX_HEADER_SIZE + 8, fileOffset + at)
+            }
+        }
+        at += size
+    }
+    return positioned
+}
+
+private fun forEachTrackHeader(chunk: ByteArray, start: Int, end: Int, action: (Int) -> Unit) {
+    var at = start + BOX_HEADER_SIZE
+    while (at + BOX_HEADER_SIZE <= end) {
+        val size = ByteBuffer.wrap(chunk, at, 4).int
+        if (String(chunk, at + 4, 4, Charsets.US_ASCII) == "traf") {
+            var inner = at + BOX_HEADER_SIZE
+            while (inner + BOX_HEADER_SIZE <= at + size) {
+                val innerSize = ByteBuffer.wrap(chunk, inner, 4).int
+                if (String(chunk, inner + 4, 4, Charsets.US_ASCII) == "tfhd") action(inner)
+                inner += innerSize
+            }
+        }
+        at += size
+    }
+}
 
 /**
  * Finds boxes by type at any depth, so that a rewritten chunk can be inspected without knowing the

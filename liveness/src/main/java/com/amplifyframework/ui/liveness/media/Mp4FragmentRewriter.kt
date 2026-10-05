@@ -48,11 +48,16 @@ internal class Mp4FragmentRewriter {
     private var decodeTime = 0L
     private var enabled = true
 
-    fun rewrite(chunk: ByteArray): ByteArray {
+    /**
+     * @param chunk the bytes to rewrite.
+     * @param fileOffset where the chunk begins in the file it was read from, which is what the
+     *   positions a fragment holds are measured from.
+     */
+    fun rewrite(chunk: ByteArray, fileOffset: Long): ByteArray {
         if (!enabled) return chunk
 
         return try {
-            rewriteBoxes(chunk)
+            rewriteBoxes(chunk, fileOffset)
         } catch (e: Exception) {
             /*
             A reader that takes one chunk at a time is no worse off for a chunk left alone than it
@@ -66,11 +71,11 @@ internal class Mp4FragmentRewriter {
         }
     }
 
-    private fun rewriteBoxes(chunk: ByteArray): ByteArray {
+    private fun rewriteBoxes(chunk: ByteArray, fileOffset: Long): ByteArray {
         val output = ByteArrayOutputStream(chunk.size + CHUNK_GROWTH)
         forEachBox(chunk, 0, chunk.size) { box ->
             when (box.type) {
-                TYPE_MOOF -> output.write(rewriteFragment(chunk, box))
+                TYPE_MOOF -> output.write(rewriteFragment(chunk, box, fileOffset + box.offset))
                 TYPE_FTYP -> output.write(rewriteFileType(chunk, box))
                 else -> output.write(chunk, box.offset, box.size)
             }
@@ -104,7 +109,11 @@ internal class Mp4FragmentRewriter {
         }.array()
     }
 
-    private fun rewriteFragment(chunk: ByteArray, fragment: Box): ByteArray {
+    /**
+     * @param position where the fragment begins in the file, which is what it measures the position of
+     *   its sample data from.
+     */
+    private fun rewriteFragment(chunk: ByteArray, fragment: Box, position: Long): ByteArray {
         var header: ByteArray? = null
         val tracks = mutableListOf<Box>()
 
@@ -124,12 +133,7 @@ internal class Mp4FragmentRewriter {
          */
         check(tracks.size == 1) { "Fragment covers ${tracks.size} tracks" }
 
-        /*
-        The track fragment loses the absolute position from its header and gains a decode time, so the
-        sample data moves further from the start of the fragment by the difference.
-         */
-        val growth = TFDT_BOX_SIZE - BASE_DATA_OFFSET_SIZE
-        val rewritten = rewriteTrack(chunk, tracks.single(), growth)
+        val rewritten = rewriteTrack(chunk, tracks.single(), fragment, position)
 
         val contentSize = fragmentHeader.size + rewritten.bytes.size
         val bytes = ByteBuffer.allocate(BOX_HEADER_SIZE + contentSize).apply {
@@ -144,7 +148,7 @@ internal class Mp4FragmentRewriter {
         return bytes
     }
 
-    private fun rewriteTrack(chunk: ByteArray, track: Box, growth: Int): RewrittenTrack {
+    private fun rewriteTrack(chunk: ByteArray, track: Box, fragment: Box, position: Long): RewrittenTrack {
         var header: Box? = null
         var run: Box? = null
 
@@ -172,7 +176,25 @@ internal class Mp4FragmentRewriter {
             "Track fragment header is ${trackHeader.size} bytes"
         }
         val trackId = chunk.readInt(trackHeader.contentOffset + Int.SIZE_BYTES)
+
+        /*
+        Dropping the absolute position only leaves the sample data where it was if the position being
+        dropped is the one the fragment starts at, since that is what the rewrite measures from.
+         */
+        val baseDataOffset = chunk.readLong(trackHeader.contentOffset + 2 * Int.SIZE_BYTES)
+        check(baseDataOffset == position) {
+            "Sample data is measured from $baseDataOffset rather than from the fragment at $position"
+        }
+
         val samples = readSamples(chunk, trackRun)
+
+        /*
+        Moving the sample data further from the start of the fragment is only correct if it follows the
+        fragment, rather than sitting before it.
+         */
+        check(samples.dataOffset >= fragment.size) {
+            "Sample data at ${samples.dataOffset} is not beyond the ${fragment.size} byte fragment"
+        }
 
         val content = ByteBuffer.allocate(TFHD_BOX_SIZE + TFDT_BOX_SIZE + trackRun.size).apply {
             // Locate the sample data relative to the enclosing fragment instead of the whole file
@@ -189,7 +211,7 @@ internal class Mp4FragmentRewriter {
             put(chunk, trackRun.offset, trackRun.size)
 
             // The sample data has moved further from the fragment, so its recorded offset moves too
-            putInt(TFHD_BOX_SIZE + TFDT_BOX_SIZE + TRUN_DATA_OFFSET, samples.dataOffset + growth)
+            putInt(TFHD_BOX_SIZE + TFDT_BOX_SIZE + TRUN_DATA_OFFSET, samples.dataOffset + TRACK_GROWTH)
         }.array()
 
         val bytes = ByteBuffer.allocate(BOX_HEADER_SIZE + content.size).apply {
@@ -304,10 +326,13 @@ internal class Mp4FragmentRewriter {
         const val TRUN_FLAG_SAMPLE_DURATION = 0x000100
 
         /*
-        What a chunk holding one movie fragment grows by: the brand added to its file type box, and the
-        decode time its track fragment gains less the absolute position it loses.
+        What a track fragment grows by: the decode time it gains less the absolute position it loses.
+        The sample data moves away from the start of its fragment by the same amount.
          */
-        const val CHUNK_GROWTH = BRAND_SIZE + TFDT_BOX_SIZE - BASE_DATA_OFFSET_SIZE
+        const val TRACK_GROWTH = TFDT_BOX_SIZE - BASE_DATA_OFFSET_SIZE
+
+        // What a chunk holding one fragment grows by, counting the brand added to its file type box
+        const val CHUNK_GROWTH = BRAND_SIZE + TRACK_GROWTH
 
         /**
          * The per sample fields of a track run, in the order they are written, so that the number of

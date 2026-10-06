@@ -18,11 +18,17 @@ package com.amplifyframework.ui.liveness.media
 import android.media.MediaCodec
 import androidx.media3.common.util.MediaFormatUtil
 import com.amplifyframework.ui.liveness.camera.OnMuxedSegment
+import com.amplifyframework.ui.liveness.testUtil.Mp4Reader
 import com.amplifyframework.ui.liveness.testUtil.TestMuxer
+import com.amplifyframework.ui.liveness.testUtil.atFileOffset
+import com.amplifyframework.ui.liveness.testUtil.chunkOf
+import com.amplifyframework.ui.liveness.testUtil.movieFragment
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.collections.shouldContainExactly
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.slot
 import io.mockk.unmockkStatic
 import io.mockk.verify
 import java.nio.ByteBuffer
@@ -114,6 +120,31 @@ class Mp4MuxerTest {
         }
     }
 
+    /*
+    TestMuxer writes the bytes it is given straight to the output file, so supplying complete movie
+    fragments as sample data puts a readable fragment in the file without a real muxer.
+     */
+    @Test
+    fun `sends rewritten fragments`() {
+        val file = folder.newFile()
+        val chunk = slot<ByteArray>()
+
+        muxer.start(outputFile = file, mediaFormat = mockk(), onMuxedSegment = onMuxedSegment)
+
+        // The fragments record where they land in the file, which is what the rewrite is checked against
+        val first = chunkOf(movieFragment(sampleDurations = listOf(100, 100)))
+        val second = chunkOf(movieFragment(sampleDurations = listOf(100, 100)))
+        val written = atFileOffset(first + second)
+
+        muxer.write(buffer(written, 0, first.size), bufferInfo(isKeyFrame = true))
+        muxer.write(buffer(written, first.size, written.size), bufferInfo(isKeyFrame = true))
+
+        verify { onMuxedSegment.invoke(capture(chunk), any()) }
+        val sent = Mp4Reader(chunk.captured)
+        sent.boxes("tfdt").map { it.decodeTime } shouldContainExactly listOf(0L, 200L)
+        sent.boxes("tfhd").map { it.flags } shouldContainExactly listOf(DEFAULT_BASE_IS_MOOF, DEFAULT_BASE_IS_MOOF)
+    }
+
     @Test
     fun `closes media muxer on stop`() {
         val file = folder.newFile()
@@ -130,6 +161,13 @@ class Mp4MuxerTest {
 
     private fun bufferInfo(isKeyFrame: Boolean = false) = MediaCodec.BufferInfo().apply {
         if (isKeyFrame) flags = MediaCodec.BUFFER_FLAG_KEY_FRAME
+    }
+
+    private fun buffer(bytes: ByteArray, from: Int, to: Int): ByteBuffer =
+        ByteBuffer.allocate(to - from).put(bytes, from, to - from).also { it.flip() }
+
+    private companion object {
+        const val DEFAULT_BASE_IS_MOOF = 0x020000
     }
 
     private fun randomData(numBytes: Int = 100): ByteBuffer {

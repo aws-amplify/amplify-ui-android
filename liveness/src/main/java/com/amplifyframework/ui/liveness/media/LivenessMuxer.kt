@@ -168,6 +168,8 @@ internal class Mp4Muxer(private val createMediaMuxer: (outputStream: FileOutputS
 
     private val logger = Amplify.Logging.forNamespace("Liveness")
 
+    private val fragmentRewriter = Mp4FragmentRewriter()
+
     private var muxer: Muxer? = null
     private var videoTrackToken: Int? = null
     private var firstKeyframeReceived = false
@@ -248,13 +250,17 @@ internal class Mp4Muxer(private val createMediaMuxer: (outputStream: FileOutputS
                 }
 
                 val chunkByteArray = ByteArray(sizeToRead.toInt())
+                val chunkFileOffset = currentBytePosition
                 raf.seek(currentBytePosition)
-                raf.read(chunkByteArray)
+                raf.readFully(chunkByteArray)
                 currentBytePosition += sizeToRead
 
                 val sendMuxedSegment = sendMuxedSegment
                 if (sendMuxedSegment != null) {
-                    sendMuxedSegment(chunkByteArray, currentVideoStartTime)
+                    sendMuxedSegment(
+                        fragmentRewriter.rewrite(chunkByteArray, chunkFileOffset),
+                        currentVideoStartTime
+                    )
                     true
                 } else {
                     logger.error("sendMuxedSegmentHandler unexpectedly null")

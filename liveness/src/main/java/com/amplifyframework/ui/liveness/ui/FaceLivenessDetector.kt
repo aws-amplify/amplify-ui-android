@@ -19,6 +19,7 @@ import android.graphics.RectF
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -102,6 +103,8 @@ fun FaceLivenessDetector(
  * @param disableStartView to bypass warmup screen.
  * @param challengeOptions is the list of ChallengeOptions that are to be overridden from the default configuration
  * @param videoCodec
+ * @param hideCancelButton to hide the cancel button shown during the challenge. When hidden, the host is responsible
+ * for providing a way to leave the challenge.
  * @param onComplete callback notifying a completed challenge
  * @param onError callback containing exception for cause
  */
@@ -114,7 +117,8 @@ fun FaceLivenessDetector(
     onComplete: Action,
     onError: Consumer<FaceLivenessDetectionException>,
     challengeOptions: ChallengeOptions = ChallengeOptions(),
-    videoOptions: VideoOptions = VideoOptions()
+    videoOptions: VideoOptions = VideoOptions(),
+    hideCancelButton: Boolean = false
 ) {
     val scope = rememberCoroutineScope()
     val key = DetectorStateKey(sessionId, region, credentialsProvider, videoOptions)
@@ -158,6 +162,7 @@ fun FaceLivenessDetector(
                 disableStartView,
                 challengeOptions = challengeOptions,
                 videoOptions = videoOptions,
+                hideCancelButton = hideCancelButton,
                 onChallengeComplete = {
                     scope.launch {
                         // if we are already finished, we already provided a result in complete or failed
@@ -192,6 +197,7 @@ internal fun ChallengeView(
     disableStartView: Boolean,
     challengeOptions: ChallengeOptions,
     videoOptions: VideoOptions,
+    hideCancelButton: Boolean,
     onChallengeComplete: OnChallengeComplete,
     onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -363,18 +369,9 @@ internal fun ChallengeView(
                     }
                 }
 
-                livenessState.faceGuideRect?.let {
-                    RecordingIndicator(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(16.dp)
-                    )
-                }
-
-                CancelChallengeButton(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(16.dp)
+                ChallengeOverlayControls(
+                    showRecordingIndicator = livenessState.faceGuideRect != null,
+                    hideCancelButton = hideCancelButton
                 ) {
                     livenessCoordinator.processSessionError(
                         FaceLivenessDetectionException.UserCancelledException(),
@@ -446,6 +443,34 @@ internal fun ChallengeView(
                 }
             }
         }
+    }
+}
+
+/**
+ * Controls drawn over the top of the running challenge: the recording indicator and, unless
+ * [hideCancelButton] is set, the cancel button.
+ */
+@Composable
+internal fun BoxScope.ChallengeOverlayControls(
+    showRecordingIndicator: Boolean,
+    hideCancelButton: Boolean,
+    onCancel: () -> Unit
+) {
+    if (showRecordingIndicator) {
+        RecordingIndicator(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+        )
+    }
+
+    if (!hideCancelButton) {
+        CancelChallengeButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
+            action = onCancel
+        )
     }
 }
 

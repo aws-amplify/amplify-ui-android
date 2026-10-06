@@ -71,6 +71,12 @@ internal data class LivenessState(
     private var faceOvalMatchTimer: TimerTask? = null
     private var detectedFaceMatchedOval = false
 
+    // Set once the state is cleaned up, so a session that becomes ready afterwards is stopped
+    // instead of being used
+    @Volatile
+    private var isDestroyed = false
+    private var destroyedWebSocketCloseCode: WebSocketCloseCode? = null
+
     @VisibleForTesting
     var readyForOval = false
 
@@ -95,6 +101,8 @@ internal data class LivenessState(
     // Cleans up state when challenge is completed or cancelled.
     // We only send webSocketCloseCode if error encountered.
     fun onDestroy(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
+        destroyedWebSocketCloseCode = webSocketCloseCode
+        isDestroyed = true
         livenessCheckState = LivenessCheckState.Error
         faceOvalMatchTimer?.cancel()
         readyForOval = false
@@ -105,13 +113,22 @@ internal data class LivenessState(
         }
     }
 
-    fun onLivenessSessionReady(faceLivenessSession: FaceLivenessSession) {
+    /**
+     * Returns false, after stopping the session, if the state was already cleaned up, for example
+     * because the host removed the FaceLivenessDetector while the session was still starting.
+     */
+    fun onLivenessSessionReady(faceLivenessSession: FaceLivenessSession): Boolean {
+        if (isDestroyed) {
+            faceLivenessSession.stopSession(destroyedWebSocketCloseCode?.code)
+            return false
+        }
         livenessSessionInfo = faceLivenessSession
         faceTargetChallenge = faceLivenessSession.challenges
             .filterIsInstance<FaceTargetChallenge>().firstOrNull()
         colorChallenge = faceLivenessSession.challenges
             .filterIsInstance<ColorChallenge>().firstOrNull()
         readyForOval = true
+        return true
     }
 
     fun onFullChallengeComplete() {

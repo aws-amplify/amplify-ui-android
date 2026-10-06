@@ -195,6 +195,53 @@ internal class LivenessStateTest {
     }
 
     @Test
+    fun `session that becomes ready is used`() {
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        val faceLivenessSession = createFaceLivenessSession(stopSession)
+
+        val isSessionUsable = livenessState.onLivenessSessionReady(faceLivenessSession)
+
+        assertTrue(isSessionUsable)
+        assertEquals(faceLivenessSession, livenessState.livenessSessionInfo)
+        verify(exactly = 0) { stopSession(any()) }
+    }
+
+    @Test
+    fun `session that becomes ready after onDestroy is stopped with the destroy close code`() {
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        val faceLivenessSession = createFaceLivenessSession(stopSession)
+        // the host removed the detector while the session was still starting
+        livenessState.onDestroy(true, WebSocketCloseCode.DISPOSED)
+
+        val isSessionUsable = livenessState.onLivenessSessionReady(faceLivenessSession)
+
+        assertFalse(isSessionUsable)
+        assertEquals(null, livenessState.livenessSessionInfo)
+        verify(exactly = 1) { stopSession(WebSocketCloseCode.DISPOSED.code) }
+    }
+
+    @Test
+    fun `session that becomes ready after an error is stopped with the error close code`() {
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        val faceLivenessSession = createFaceLivenessSession(stopSession)
+        livenessState.onError(true, WebSocketCloseCode.RUNTIME_ERROR)
+
+        val isSessionUsable = livenessState.onLivenessSessionReady(faceLivenessSession)
+
+        assertFalse(isSessionUsable)
+        verify(exactly = 1) { stopSession(WebSocketCloseCode.RUNTIME_ERROR.code) }
+    }
+
+    private fun createFaceLivenessSession(stopSession: (Int?) -> Unit) = FaceLivenessSession(
+        challengeId = "12345",
+        challengeType = FaceLivenessChallengeType.FaceMovementChallenge,
+        challenges = listOf(mockk<FaceTargetChallenge>(relaxed = true)),
+        onVideoEvent = { },
+        onChallengeResponseEvent = { },
+        stopLivenessSession = stopSession
+    )
+
+    @Test
     fun `null close code is sent when no close code provided in onDestroy`() {
         val challenges = mockk<List<FaceLivenessSessionChallenge>>(relaxed = true)
         val stopSession = mockk<(Int?) -> Unit>(relaxed = true)

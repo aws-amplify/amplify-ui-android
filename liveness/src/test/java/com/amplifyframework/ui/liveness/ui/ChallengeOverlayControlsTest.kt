@@ -18,6 +18,9 @@ package com.amplifyframework.ui.liveness.ui
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -76,17 +79,53 @@ class ChallengeOverlayControlsTest : ComposeTest() {
         composeTestRule.onNodeWithContentDescription(cancelDescription).assertIsDisplayed()
     }
 
+    @Test
+    fun `replacement cancel button is shown instead of the default`() {
+        setControls(hideCancelButton = false, cancelButtonContent = replacement)
+
+        composeTestRule.onNodeWithText(REPLACEMENT_LABEL).assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(cancelDescription).assertDoesNotExist()
+    }
+
+    @Test
+    fun `clicking replacement cancel button invokes onCancel`() {
+        var cancelCount = 0
+        setControls(hideCancelButton = false, cancelButtonContent = replacement) { cancelCount++ }
+
+        composeTestRule.onNodeWithText(REPLACEMENT_LABEL).performClick()
+
+        cancelCount shouldBe 1
+    }
+
+    @Test
+    fun `hiding the cancel button takes precedence over a replacement`() {
+        setControls(hideCancelButton = true, cancelButtonContent = replacement)
+
+        composeTestRule.onNodeWithText(REPLACEMENT_LABEL).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(cancelDescription).assertDoesNotExist()
+    }
+
+    private val replacement: @Composable (onCancel: () -> Unit) -> Unit = { onCancel ->
+        Button(onClick = onCancel) { Text(REPLACEMENT_LABEL) }
+    }
+
     private fun setControls(
         showRecordingIndicator: Boolean = true,
         hideCancelButton: Boolean,
+        cancelButtonContent: @Composable (onCancel: () -> Unit) -> Unit = { CancelChallengeButton(action = it) },
         onCancel: () -> Unit = {}
     ) = setContent {
         Box(modifier = Modifier.fillMaxSize()) {
             ChallengeOverlayControls(
                 showRecordingIndicator = showRecordingIndicator,
                 hideCancelButton = hideCancelButton,
+                cancelButtonContent = cancelButtonContent,
                 onCancel = onCancel
             )
         }
+    }
+
+    private companion object {
+        const val REPLACEMENT_LABEL = "Leave check"
     }
 }

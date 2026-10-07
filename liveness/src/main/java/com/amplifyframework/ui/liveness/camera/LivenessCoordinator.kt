@@ -241,8 +241,8 @@ internal class LivenessCoordinator(
             faceLivenessSessionOptions,
             BuildConfig.LIVENESS_VERSION_NAME,
             {
-                livenessState.onLivenessSessionReady(it)
-                if (!challengeOptions.hasOneCameraConfigured()) {
+                val isSessionUsable = livenessState.onLivenessSessionReady(it)
+                if (isSessionUsable && !challengeOptions.hasOneCameraConfigured()) {
                     val foundChallenge = challengeOptions.getLivenessChallenge(it.challengeType)
                     launchCamera(foundChallenge.camera)
                 }

@@ -71,6 +71,13 @@ internal data class LivenessState(
     private var faceOvalMatchTimer: TimerTask? = null
     private var detectedFaceMatchedOval = false
 
+    // Set by any terminal transition (a session error or the detector being disposed), so a session
+    // that becomes ready afterwards is stopped instead of being used. Guarded by this instance's
+    // monitor: onDestroy runs on the main thread, while onLivenessSessionReady runs on the websocket
+    // thread.
+    private var isTerminated = false
+    private var terminatedWebSocketCloseCode: WebSocketCloseCode? = null
+
     @VisibleForTesting
     var readyForOval = false
 
@@ -94,7 +101,10 @@ internal data class LivenessState(
 
     // Cleans up state when challenge is completed or cancelled.
     // We only send webSocketCloseCode if error encountered.
+    @Synchronized
     fun onDestroy(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode? = null) {
+        terminatedWebSocketCloseCode = webSocketCloseCode
+        isTerminated = true
         livenessCheckState = LivenessCheckState.Error
         faceOvalMatchTimer?.cancel()
         readyForOval = false
@@ -105,13 +115,23 @@ internal data class LivenessState(
         }
     }
 
-    fun onLivenessSessionReady(faceLivenessSession: FaceLivenessSession) {
+    /**
+     * Returns false, after stopping the session, if the state already reached a terminal state, for
+     * example because the host removed the FaceLivenessDetector while the session was still starting.
+     */
+    @Synchronized
+    fun onLivenessSessionReady(faceLivenessSession: FaceLivenessSession): Boolean {
+        if (isTerminated) {
+            faceLivenessSession.stopSession(terminatedWebSocketCloseCode?.code)
+            return false
+        }
         livenessSessionInfo = faceLivenessSession
         faceTargetChallenge = faceLivenessSession.challenges
             .filterIsInstance<FaceTargetChallenge>().firstOrNull()
         colorChallenge = faceLivenessSession.challenges
             .filterIsInstance<ColorChallenge>().firstOrNull()
         readyForOval = true
+        return true
     }
 
     fun onFullChallengeComplete() {

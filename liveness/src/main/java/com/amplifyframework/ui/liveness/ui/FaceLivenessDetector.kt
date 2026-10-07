@@ -103,11 +103,11 @@ fun FaceLivenessDetector(
  * @param disableStartView to bypass warmup screen.
  * @param challengeOptions is the list of ChallengeOptions that are to be overridden from the default configuration
  * @param videoCodec
- * @param hideCancelButton to hide the cancel button shown during the challenge. When hidden, the host is responsible
- * for providing a way to leave the challenge. Takes precedence over [cancelButtonContent].
- * @param cancelButtonContent to replace the cancel button shown during the challenge, for example to confirm before
- * leaving. It is placed where the default button is. Calling onCancel ends the challenge the same way as the default
- * button, with [FaceLivenessDetectionException.UserCancelledException].
+ * @param cancelButton to replace the cancel button shown during the challenge, for example to confirm before leaving,
+ * or pass an empty composable to hide it. When hidden, the host is responsible for providing a way to leave the
+ * challenge. Calling onCancel ends the challenge the same way as the default button, with
+ * [FaceLivenessDetectionException.UserCancelledException]. The content positions itself within the challenge view;
+ * the default button is aligned to the top end.
  * @param onComplete callback notifying a completed challenge
  * @param onError callback containing exception for cause
  */
@@ -121,8 +121,7 @@ fun FaceLivenessDetector(
     onError: Consumer<FaceLivenessDetectionException>,
     challengeOptions: ChallengeOptions = ChallengeOptions(),
     videoOptions: VideoOptions = VideoOptions(),
-    hideCancelButton: Boolean = false,
-    cancelButtonContent: @Composable (onCancel: () -> Unit) -> Unit = { CancelChallengeButton(action = it) }
+    cancelButton: @Composable BoxScope.(onCancel: () -> Unit) -> Unit = { DefaultCancelButton(it) }
 ) {
     val scope = rememberCoroutineScope()
     val key = DetectorStateKey(sessionId, region, credentialsProvider, videoOptions)
@@ -166,8 +165,7 @@ fun FaceLivenessDetector(
                 disableStartView,
                 challengeOptions = challengeOptions,
                 videoOptions = videoOptions,
-                hideCancelButton = hideCancelButton,
-                cancelButtonContent = cancelButtonContent,
+                cancelButton = cancelButton,
                 onChallengeComplete = {
                     scope.launch {
                         // if we are already finished, we already provided a result in complete or failed
@@ -202,8 +200,7 @@ internal fun ChallengeView(
     disableStartView: Boolean,
     challengeOptions: ChallengeOptions,
     videoOptions: VideoOptions,
-    hideCancelButton: Boolean,
-    cancelButtonContent: @Composable (onCancel: () -> Unit) -> Unit,
+    cancelButton: @Composable BoxScope.(onCancel: () -> Unit) -> Unit,
     onChallengeComplete: OnChallengeComplete,
     onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -377,8 +374,7 @@ internal fun ChallengeView(
 
                 ChallengeOverlayControls(
                     showRecordingIndicator = livenessState.faceGuideRect != null,
-                    hideCancelButton = hideCancelButton,
-                    cancelButtonContent = cancelButtonContent
+                    cancelButton = cancelButton
                 ) {
                     livenessCoordinator.processSessionError(
                         FaceLivenessDetectionException.UserCancelledException(),
@@ -454,14 +450,13 @@ internal fun ChallengeView(
 }
 
 /**
- * Controls drawn over the top of the running challenge: the recording indicator and, unless
- * [hideCancelButton] is set, the cancel button drawn by [cancelButtonContent].
+ * Controls drawn over the top of the running challenge: the recording indicator and the cancel
+ * button drawn by [cancelButton].
  */
 @Composable
 internal fun BoxScope.ChallengeOverlayControls(
     showRecordingIndicator: Boolean,
-    hideCancelButton: Boolean,
-    cancelButtonContent: @Composable (onCancel: () -> Unit) -> Unit,
+    cancelButton: @Composable BoxScope.(onCancel: () -> Unit) -> Unit,
     onCancel: () -> Unit
 ) {
     if (showRecordingIndicator) {
@@ -472,15 +467,20 @@ internal fun BoxScope.ChallengeOverlayControls(
         )
     }
 
-    if (!hideCancelButton) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-        ) {
-            cancelButtonContent(onCancel)
-        }
-    }
+    cancelButton(onCancel)
+}
+
+/**
+ * The default cancel button, aligned to the top end of the challenge view.
+ */
+@Composable
+internal fun BoxScope.DefaultCancelButton(onCancel: () -> Unit) {
+    CancelChallengeButton(
+        modifier = Modifier
+            .align(Alignment.TopEnd)
+            .padding(16.dp),
+        action = onCancel
+    )
 }
 
 internal data class DetectorStateKey(

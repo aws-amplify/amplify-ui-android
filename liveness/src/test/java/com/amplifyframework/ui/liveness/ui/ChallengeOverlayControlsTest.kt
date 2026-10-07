@@ -17,10 +17,12 @@ package com.amplifyframework.ui.liveness.ui
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -41,16 +43,16 @@ class ChallengeOverlayControlsTest : ComposeTest() {
         context.getString(R.string.amplify_ui_liveness_challenge_recording_indicator_label)
 
     @Test
-    fun `cancel button is shown by default`() {
-        setControls(hideCancelButton = false)
+    fun `default cancel button is shown`() {
+        setControls()
 
         composeTestRule.onNodeWithContentDescription(cancelDescription).assertIsDisplayed()
     }
 
     @Test
-    fun `clicking cancel button invokes onCancel`() {
+    fun `clicking default cancel button invokes onCancel`() {
         var cancelCount = 0
-        setControls(hideCancelButton = false) { cancelCount++ }
+        setControls { cancelCount++ }
 
         composeTestRule.onNodeWithContentDescription(cancelDescription).performClick()
 
@@ -58,22 +60,22 @@ class ChallengeOverlayControlsTest : ComposeTest() {
     }
 
     @Test
-    fun `cancel button is not shown when hideCancelButton is true`() {
-        setControls(hideCancelButton = true)
+    fun `empty cancel button hides the cancel button`() {
+        setControls(cancelButton = { })
 
         composeTestRule.onNodeWithContentDescription(cancelDescription).assertDoesNotExist()
     }
 
     @Test
     fun `recording indicator is still shown when cancel button is hidden`() {
-        setControls(showRecordingIndicator = true, hideCancelButton = true)
+        setControls(showRecordingIndicator = true, cancelButton = { })
 
         composeTestRule.onNodeWithText(recordingLabel).assertIsDisplayed()
     }
 
     @Test
     fun `recording indicator is not shown before the face guide is shown`() {
-        setControls(showRecordingIndicator = false, hideCancelButton = false)
+        setControls(showRecordingIndicator = false)
 
         composeTestRule.onNodeWithText(recordingLabel).assertDoesNotExist()
         composeTestRule.onNodeWithContentDescription(cancelDescription).assertIsDisplayed()
@@ -81,7 +83,7 @@ class ChallengeOverlayControlsTest : ComposeTest() {
 
     @Test
     fun `replacement cancel button is shown instead of the default`() {
-        setControls(hideCancelButton = false, cancelButtonContent = replacement)
+        setControls(cancelButton = replacement)
 
         composeTestRule.onNodeWithText(REPLACEMENT_LABEL).assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription(cancelDescription).assertDoesNotExist()
@@ -90,36 +92,26 @@ class ChallengeOverlayControlsTest : ComposeTest() {
     @Test
     fun `clicking replacement cancel button invokes onCancel`() {
         var cancelCount = 0
-        setControls(hideCancelButton = false, cancelButtonContent = replacement) { cancelCount++ }
+        setControls(cancelButton = replacement) { cancelCount++ }
 
         composeTestRule.onNodeWithText(REPLACEMENT_LABEL).performClick()
 
         cancelCount shouldBe 1
     }
 
-    @Test
-    fun `hiding the cancel button takes precedence over a replacement`() {
-        setControls(hideCancelButton = true, cancelButtonContent = replacement)
-
-        composeTestRule.onNodeWithText(REPLACEMENT_LABEL).assertDoesNotExist()
-        composeTestRule.onNodeWithContentDescription(cancelDescription).assertDoesNotExist()
-    }
-
-    private val replacement: @Composable (onCancel: () -> Unit) -> Unit = { onCancel ->
-        Button(onClick = onCancel) { Text(REPLACEMENT_LABEL) }
+    private val replacement: @Composable BoxScope.(onCancel: () -> Unit) -> Unit = { onCancel ->
+        Button(onClick = onCancel, modifier = Modifier.align(Alignment.BottomCenter)) { Text(REPLACEMENT_LABEL) }
     }
 
     private fun setControls(
         showRecordingIndicator: Boolean = true,
-        hideCancelButton: Boolean,
-        cancelButtonContent: @Composable (onCancel: () -> Unit) -> Unit = { CancelChallengeButton(action = it) },
+        cancelButton: @Composable BoxScope.(onCancel: () -> Unit) -> Unit = { DefaultCancelButton(it) },
         onCancel: () -> Unit = {}
     ) = setContent {
         Box(modifier = Modifier.fillMaxSize()) {
             ChallengeOverlayControls(
                 showRecordingIndicator = showRecordingIndicator,
-                hideCancelButton = hideCancelButton,
-                cancelButtonContent = cancelButtonContent,
+                cancelButton = cancelButton,
                 onCancel = onCancel
             )
         }

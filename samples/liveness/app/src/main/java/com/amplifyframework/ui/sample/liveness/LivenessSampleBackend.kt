@@ -19,15 +19,17 @@ import com.amplifyframework.api.rest.RestOptions
 import com.amplifyframework.kotlin.core.Amplify
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 object LivenessSampleBackend {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun createSession(): String {
+    suspend fun createSession(challenge: LivenessChallengeOption): String {
         val request = RestOptions.builder()
             .addPath("/liveness/create")
+            .addBody(json.encodeToString(CreateSessionRequest(challenge.challengeType)).toByteArray())
             .build()
 
         return Amplify.API.post(request).data.asJSONObject()["sessionId"] as String
@@ -49,3 +51,6 @@ data class LivenessSessionResult(
     val isLive: Boolean,
     val auditImageBytes: String
 )
+
+@Serializable
+private data class CreateSessionRequest(val challenge: String)

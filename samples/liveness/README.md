@@ -152,6 +152,21 @@ Provide the responses shown after each of the following prompts.
     `N`
 ```
 2. Copy the code for from amplify-ui-android/samples/backend-lambda-functions to the path provided
+
+    The app sends `POST /liveness/create` with the challenge picked on the home screen, and expects `{"sessionId": "<id>"}` back:
+
+    ```
+    { "challenge": "FaceMovementAndLightChallenge" }   // Light
+    { "challenge": "FaceMovementChallenge" }           // No light
+    ```
+
+    The `createSession` function passes that value to `CreateFaceLivenessSession` as the session's only challenge preference:
+
+    ```
+    Settings: { ChallengePreferences: [{ Type: challenge }] }
+    ```
+
+    A backend that ignores the body creates every session with its own challenge preferences, so the choice has no effect.
 3. Once finished, run `amplify push` to publish your changes. 
 4. Follow the steps below to create an inline policy to enable the **createSession** lambda function to access Rekognition.
    1. Go to AWS Lambda console -> **CreateSession**  -> Configuration -> Permissions
@@ -201,5 +216,6 @@ You may need to go to File -> Sync Project with Gradle Files if you get an error
 
 Build and run the project on an Android device in Android Studio. 
 
+On the home screen, choose **Light** or **No light** to pick the challenge the session is created with (`FaceMovementAndLightChallenge` or `FaceMovementChallenge`), and choose the video codec the check records with. Both choices are kept between launches and apply to the next session created.
 
 The project requires Android SDK API level 24 (Android 7.0) or higher.

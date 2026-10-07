@@ -5,25 +5,18 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.amplifyframework.ui.liveness.media.VideoCodec
 import com.amplifyframework.ui.sample.liveness.AuthState
+import com.amplifyframework.ui.sample.liveness.LivenessChallengeOption
+import com.amplifyframework.ui.sample.liveness.LivenessCodecOption
 import com.amplifyframework.ui.sample.liveness.MainViewModel
 import com.amplifyframework.ui.sample.liveness.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -87,32 +82,30 @@ fun HomeScreen(viewModel: MainViewModel, onStartChallenge: (sessionId: String, v
             }
 
             else -> {
-                var videoCodec by remember { mutableStateOf<VideoCodec>(VideoCodec.VP8) }
+                val challengeOption = rememberChallengeOption()
+                val codecOption = rememberCodecOption()
 
-                Column {
-                    FormatSelector(
-                        modifier = Modifier.heightIn(min = 48.dp),
-                        videoCodec = VideoCodec.VP8,
-                        selectedFormat = videoCodec,
-                        onSelect = { videoCodec = it }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    OptionSelector(
+                        options = LivenessChallengeOption.entries,
+                        selected = challengeOption.value,
+                        label = { it.label },
+                        onSelect = challengeOption::select
                     )
-                    FormatSelector(
-                        modifier = Modifier.heightIn(min = 48.dp),
-                        videoCodec = VideoCodec.VP9,
-                        selectedFormat = videoCodec,
-                        onSelect = { videoCodec = it }
-                    )
-                    FormatSelector(
-                        modifier = Modifier.heightIn(min = 48.dp),
-                        videoCodec = VideoCodec.H264,
-                        selectedFormat = videoCodec,
-                        onSelect = { videoCodec = it }
+
+                    OptionSelector(
+                        modifier = Modifier.padding(top = 8.dp),
+                        options = LivenessCodecOption.entries,
+                        selected = codecOption.value,
+                        label = { it.label },
+                        onSelect = codecOption::select
                     )
 
                     Button(
+                        modifier = Modifier.padding(top = 16.dp),
                         onClick = {
-                            viewModel.createLivenessSession { sessionId ->
-                                sessionId?.let { onStartChallenge(it, videoCodec) }
+                            viewModel.createLivenessSession(challengeOption.value) { sessionId ->
+                                sessionId?.let { onStartChallenge(it, codecOption.value.codec) }
                             }
                         }
                     ) {
@@ -121,24 +114,6 @@ fun HomeScreen(viewModel: MainViewModel, onStartChallenge: (sessionId: String, v
                 }
             }
         }
-    }
-}
-
-@Composable
-fun FormatSelector(
-    videoCodec: VideoCodec,
-    selectedFormat: VideoCodec,
-    onSelect: (VideoCodec) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier = modifier.clickable { onSelect(videoCodec) }) {
-        RadioButton(
-            selected = videoCodec == selectedFormat,
-            onClick = null
-        )
-        Text(modifier = Modifier.padding(start = 8.dp),
-            text = videoCodec::class.simpleName!!,
-            color = MaterialTheme.colorScheme.onBackground)
     }
 }
 

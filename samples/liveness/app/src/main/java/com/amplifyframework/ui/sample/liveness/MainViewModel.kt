@@ -71,11 +71,14 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun createLivenessSession(onComplete: (sessionId: String?) -> Unit) {
+    fun createLivenessSession(
+        challenge: LivenessChallengeOption,
+        onComplete: (sessionId: String?) -> Unit
+    ) {
         _fetchingSession.value = true
         viewModelScope.launch {
             try {
-                val sessionId = LivenessSampleBackend.createSession()
+                val sessionId = LivenessSampleBackend.createSession(challenge)
                 _sessionId.value = sessionId
                 onComplete(sessionId)
             } catch (e: Exception) {

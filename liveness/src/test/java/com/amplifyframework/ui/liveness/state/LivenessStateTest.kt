@@ -33,8 +33,13 @@ import com.amplifyframework.ui.liveness.util.WebSocketCloseCode
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -230,6 +235,34 @@ internal class LivenessStateTest {
 
         assertFalse(isSessionUsable)
         verify(exactly = 1) { stopSession(WebSocketCloseCode.RUNTIME_ERROR.code) }
+    }
+
+    @Test
+    fun `session that becomes ready while onDestroy runs is stopped`() {
+        val stopSession = mockk<(Int?) -> Unit>(relaxed = true)
+        val faceLivenessSession = createFaceLivenessSession(stopSession)
+        val executor = Executors.newSingleThreadExecutor()
+        try {
+            lateinit var isSessionUsable: Future<Boolean>
+            // hold the state's monitor as onDestroy does on the main thread, while the session
+            // becomes ready on another thread, as the websocket callback does
+            synchronized(livenessState) {
+                isSessionUsable = executor.submit<Boolean> {
+                    livenessState.onLivenessSessionReady(faceLivenessSession)
+                }
+                // the ready callback must wait for teardown rather than interleave with it
+                assertThrows(TimeoutException::class.java) {
+                    isSessionUsable.get(200, TimeUnit.MILLISECONDS)
+                }
+                livenessState.onDestroy(true, WebSocketCloseCode.DISPOSED)
+            }
+
+            assertFalse(isSessionUsable.get(5, TimeUnit.SECONDS))
+            assertEquals(null, livenessState.livenessSessionInfo)
+            verify(exactly = 1) { stopSession(WebSocketCloseCode.DISPOSED.code) }
+        } finally {
+            executor.shutdownNow()
+        }
     }
 
     private fun createFaceLivenessSession(stopSession: (Int?) -> Unit) = FaceLivenessSession(

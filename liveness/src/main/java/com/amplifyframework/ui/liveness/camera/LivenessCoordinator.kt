@@ -202,6 +202,7 @@ internal class LivenessCoordinator(
                             preview,
                             analysis
                         )
+                        livenessState.loadingCameraPreview = false
                     } else {
                         livenessState.loadingCameraPreview = false
                         val faceLivenessException = FaceLivenessDetectionException(

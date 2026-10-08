@@ -95,6 +95,7 @@ internal data class LivenessState(
     }
 
     fun onError(stopLivenessSession: Boolean, webSocketCloseCode: WebSocketCloseCode) {
+        loadingCameraPreview = false
         livenessCheckState = LivenessCheckState.Error
         onDestroy(stopLivenessSession, webSocketCloseCode)
     }

@@ -1,3 +1,14 @@
+## [Release 1.12.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.12.0)
+
+### Features
+- **liveness:** add SessionInterruptedException for an interrupted check ([#334](https://github.com/aws-amplify/amplify-ui-android/issues/334))
+- **liveness:** add options to hide or replace the cancel button ([#340](https://github.com/aws-amplify/amplify-ui-android/issues/340))
+
+### Bug Fixes
+- **liveness:** make H264 movie fragments readable on their own ([#338](https://github.com/aws-amplify/amplify-ui-android/issues/338))
+
+[See all changes between 1.11.0 and 1.12.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.11.0...release_liveness_v1.12.0)
+
 ## [Release 1.11.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.11.0)
 
 ### Features

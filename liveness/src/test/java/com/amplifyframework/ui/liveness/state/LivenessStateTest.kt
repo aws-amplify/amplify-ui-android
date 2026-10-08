@@ -556,4 +556,13 @@ internal class LivenessStateTest {
         livenessState.onFrameFaceUpdate(faceRect, landmark, landmark, landmark)
         verify(exactly = 1) { sendChallengeResponse(any<InitialFaceDetected>()) }
     }
+
+    @Test
+    fun `loading camera preview is cleared on error`() {
+        livenessState.loadingCameraPreview = true
+
+        livenessState.onError(true, WebSocketCloseCode.RUNTIME_ERROR)
+
+        assertFalse(livenessState.loadingCameraPreview)
+    }
 }

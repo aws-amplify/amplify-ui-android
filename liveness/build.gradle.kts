@@ -5,6 +5,12 @@ plugins {
 
 android {
     namespace = "com.amplifyframework.ui.liveness"
+
+    // This is the only module with native sources, so it is the only one that needs an NDK. Pinned
+    // rather than left to AGP's default, which moves with the AGP version and silently changes the
+    // toolchain the native code is built with.
+    ndkVersion = "27.0.12077973"
+
     defaultConfig {
         externalNativeBuild {
             cmake {

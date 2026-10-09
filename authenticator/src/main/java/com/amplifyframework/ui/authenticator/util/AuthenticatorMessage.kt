@@ -98,19 +98,15 @@ internal class UnknownErrorMessage(override val cause: AuthException) :
     AuthenticatorMessageImpl(R.string.amplify_ui_authenticator_error_unknown),
     AuthenticatorMessage.Error {
 
-    override fun message(context: Context): String {
-        return message(context, cachedErrorMessages)
-    }
+    override fun message(context: Context): String = message(context, cachedErrorMessages)
 
     @SuppressLint("DiscouragedApi")
-    internal fun message(context: Context, cache: ErrorCache): String {
-        return cache.getOrPut(cause::class) {
-            // Check if the customer application has defined a specific string for this Exception type. If not, return
-            // the generic error message.
-            val resourceName = cause.toResourceName()
-            val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
-            if (resourceId != 0) context.getString(resourceId) else super.message(context)
-        }
+    internal fun message(context: Context, cache: ErrorCache): String = cache.getOrPut(cause::class) {
+        // Check if the customer application has defined a specific string for this Exception type. If not, return
+        // the generic error message.
+        val resourceName = cause.toResourceName()
+        val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
+        if (resourceId != 0) context.getString(resourceId) else super.message(context)
     }
 }
 

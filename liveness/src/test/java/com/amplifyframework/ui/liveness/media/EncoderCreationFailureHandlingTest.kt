@@ -100,7 +100,10 @@ class EncoderCreationFailureHandlingTest {
         encoder.createMuxer()
         verify(exactly = 1) { mockOnError(capture(errorSlot)) }
 
-        runBlocking { encoder.stop(); encoder.destroy() }
+        runBlocking {
+            encoder.stop()
+            encoder.destroy()
+        }
         tempDir.deleteRecursively()
     }
 
@@ -127,7 +130,10 @@ class EncoderCreationFailureHandlingTest {
         repeat(3) { encoder.createMuxer() }
         verify(exactly = 0) { mockOnError(any()) }
 
-        runBlocking { encoder.stop(); encoder.destroy() }
+        runBlocking {
+            encoder.stop()
+            encoder.destroy()
+        }
         tempDir.deleteRecursively()
     }
 }

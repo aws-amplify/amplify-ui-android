@@ -21,7 +21,7 @@ internal fun Project.configureAndroid(extension: CommonExtension<*, *, *, *, *, 
     val sdkVersionName = findProperty("VERSION_NAME") ?: rootProject.findProperty("VERSION_NAME")
 
     extension.apply {
-        compileSdk = 36
+        compileSdk = 37
 
         buildFeatures {
             buildConfig = true

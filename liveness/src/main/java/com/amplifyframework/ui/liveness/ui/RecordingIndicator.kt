@@ -52,6 +52,7 @@ internal fun RecordingIndicator(modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
+
 @Composable
 private fun RecordingIndicator(
     label: String,
@@ -106,7 +107,7 @@ private fun RecordingIndicatorCustomThemePreview() {
     LivenessPreviewContainer(
         colorScheme = lightColorScheme(
             background = Color.Blue,
-            onBackground = Color.Yellow,
+            onBackground = Color.Yellow
         ),
         typography = Typography(
             labelMedium = TextStyle(

@@ -120,9 +120,7 @@ internal class FormStateImpl : MutableFormState {
         buildForm(func).fields.forEach { add(it) }
     }
 
-    fun getTrimmed(key: FieldKey): String? {
-        return fields[key]?.state?.content?.trim()
-    }
+    fun getTrimmed(key: FieldKey): String? = fields[key]?.state?.content?.trim()
 
     fun getUserAttributes() = fields.mapNotNull { (key, field) ->
         if (key is FieldKey.UserAttributeKey) {

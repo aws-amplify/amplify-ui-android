@@ -5,6 +5,12 @@ plugins {
 
 android {
     namespace = "com.amplifyframework.ui.liveness"
+
+    // This is the only module with native sources, so it is the only one that needs an NDK. Pinned
+    // rather than left to AGP's default, which moves with the AGP version and silently changes the
+    // toolchain the native code is built with.
+    ndkVersion = "27.0.12077973"
+
     defaultConfig {
         externalNativeBuild {
             cmake {
@@ -15,17 +21,17 @@ android {
         buildConfigField(
             "String",
             "LIVENESS_VERSION_NAME",
-            "\"${project.properties["VERSION_NAME"]}\""
+            "\"${project.findProperty("VERSION_NAME")}\""
         )
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     externalNativeBuild {
         cmake {
-            // AGP doesn"t allow us to use project.buildDir (or subdirs) for CMake"s generated
-            // build files (ninja build files, CMakeCache.txt, etc.). Use a staging directory that
-            // lives alongside the project"s buildDir.
-            buildStagingDirectory = file("${project.buildDir}/../buildNative")
+            // AGP doesn"t allow us to use the project build directory (or subdirs) for CMake"s
+            // generated build files (ninja build files, CMakeCache.txt, etc.). Use a staging
+            // directory that lives alongside it.
+            buildStagingDirectory = layout.buildDirectory.dir("../buildNative").get().asFile
             path = file("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
         }

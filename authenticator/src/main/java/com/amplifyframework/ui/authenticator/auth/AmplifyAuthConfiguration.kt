@@ -20,11 +20,14 @@ import com.amplifyframework.auth.AuthUserAttributeKey
 import com.amplifyframework.ui.authenticator.forms.FieldKey
 
 internal enum class SignInMethod {
-    Username, Email, PhoneNumber
+    Username,
+    Email,
+    PhoneNumber
 }
 
 internal enum class VerificationMechanism {
-    PhoneNumber, Email
+    PhoneNumber,
+    Email
 }
 
 internal data class PasswordCriteria(

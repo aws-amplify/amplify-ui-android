@@ -41,15 +41,13 @@ import kotlinx.coroutines.launch
 private object NewPasswordStringResolver : StringResolver() {
     @Composable
     @ReadOnlyComposable
-    override fun label(config: FieldConfig): String {
-        return when (config.key) {
-            is FieldKey.Password ->
-                stringResource(R.string.amplify_ui_authenticator_field_label_new_password)
-            is FieldKey.ConfirmPassword ->
-                stringResource(R.string.amplify_ui_authenticator_field_label_new_password_confirm)
-            else ->
-                super.label(config)
-        }
+    override fun label(config: FieldConfig): String = when (config.key) {
+        is FieldKey.Password ->
+            stringResource(R.string.amplify_ui_authenticator_field_label_new_password)
+        is FieldKey.ConfirmPassword ->
+            stringResource(R.string.amplify_ui_authenticator_field_label_new_password_confirm)
+        else ->
+            super.label(config)
     }
 }
 

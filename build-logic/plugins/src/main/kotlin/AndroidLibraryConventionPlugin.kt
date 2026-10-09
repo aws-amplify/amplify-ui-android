@@ -20,27 +20,22 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 /**
  * This convention plugin configures an Android library module
  */
-@Suppress("LocalVariableName")
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target.pluginManager) {
             apply("com.android.library")
             apply("org.jetbrains.kotlin.plugin.compose")
-            apply("org.jetbrains.kotlin.android")
             apply("amplify.android.ktlint")
         }
 
-        val POM_GROUP: String by target
-
         with(target) {
-            group = POM_GROUP
+            group = property("POM_GROUP").toString()
             extensions.configure<LibraryExtension> {
                 target.configureAndroid(this)
                 defaultConfig {

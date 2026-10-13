@@ -347,6 +347,9 @@ internal class LivenessStateTest {
         val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
         val challenges = listOf<FaceLivenessSessionChallenge>(faceTargetChallenge)
         every { faceTargetChallenge.faceTargetMatching.faceDistanceThresholdMin } returns 1f
+        // A relaxed mock reports an oval fit timeout of 0, which makes the oval match timer fire on
+        // its own thread and clear readyForOval before the assertions below can read it.
+        every { faceTargetChallenge.faceTargetMatching.ovalFitTimeout } returns 60_000
         val faceLivenessSession = FaceLivenessSession(
             challengeId = "12345",
             challengeType = FaceLivenessChallengeType.FaceMovementAndLightChallenge,

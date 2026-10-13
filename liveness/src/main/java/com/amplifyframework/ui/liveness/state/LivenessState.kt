@@ -47,7 +47,7 @@ internal data class LivenessState(
     val disableStartView: Boolean,
     val onCaptureReady: () -> Unit,
     val onSessionError: (FaceLivenessDetectionException, Boolean) -> Unit,
-    val onFinalEventsSent: () -> Unit,
+    val onFinalEventsSent: () -> Unit
 ) {
     var videoViewportSize: VideoViewportSize? by mutableStateOf(null)
     var livenessCheckState by mutableStateOf<LivenessCheckState>(
@@ -63,8 +63,10 @@ internal data class LivenessState(
     var loadingCameraPreview by mutableStateOf(false)
 
     private var initialStreamFace: InitialStreamFace? = null
+
     @VisibleForTesting
     var faceMatchOvalStart: Long? = null
+
     @VisibleForTesting
     var faceMatchOvalEnd: Long? = null
     private var initialFaceOvalIou = -1f
@@ -241,8 +243,11 @@ internal data class LivenessState(
 
         if (!initialFaceDistanceCheckPassed) {
             val faceDistance = FaceDetector.calculateFaceDistance(
-                leftEye, rightEye, mouth,
-                LivenessCoordinator.TARGET_WIDTH, LivenessCoordinator.TARGET_HEIGHT
+                leftEye,
+                rightEye,
+                mouth,
+                LivenessCoordinator.TARGET_WIDTH,
+                LivenessCoordinator.TARGET_HEIGHT
             )
             if (faceDistance >= faceTargetChallenge!!.faceTargetMatching.faceDistanceThresholdMin) {
                 livenessCheckState =
@@ -307,7 +312,8 @@ internal data class LivenessState(
 
             if (detectedFaceMatchedOval && faceMatchOvalStart == null) {
                 faceMatchOvalStart = Date().time
-            } else if (!detectedFaceMatchedOval && faceMatchOvalStart != null &&
+            } else if (!detectedFaceMatchedOval &&
+                faceMatchOvalStart != null &&
                 faceMatchOvalEnd == null
             ) {
                 faceMatchOvalEnd = Date().time

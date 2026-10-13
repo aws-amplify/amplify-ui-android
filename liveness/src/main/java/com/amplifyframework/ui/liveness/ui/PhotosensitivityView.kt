@@ -88,14 +88,14 @@ internal fun PhotosensitivityView(infoClicked: () -> Unit) {
                     R.string.amplify_ui_liveness_get_ready_photosensitivity_title
                 ),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer,
+                color = MaterialTheme.colorScheme.onErrorContainer
             )
             Text(
                 text = stringResource(
                     R.string.amplify_ui_liveness_get_ready_photosensitivity_description
                 ),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer,
+                color = MaterialTheme.colorScheme.onErrorContainer
             )
         }
         IconButton(
@@ -104,9 +104,8 @@ internal fun PhotosensitivityView(infoClicked: () -> Unit) {
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = stringResource(
-                    /* ktlint-disable max-line-length */
+                    @Suppress("ktlint:standard:max-line-length")
                     R.string.amplify_ui_liveness_get_ready_a11y_photosensitivity_icon_content_description
-                    /* ktlint-enable max-line-length */
                 ),
 
                 tint = MaterialTheme.colorScheme.onErrorContainer

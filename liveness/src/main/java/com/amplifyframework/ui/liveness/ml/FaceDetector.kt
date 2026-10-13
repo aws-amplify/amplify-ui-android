@@ -227,7 +227,9 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             ) {
                 val scale = calculateScale(
                     MIN_SCALE,
-                    MAX_SCALE, lastSameStrideLayer, strides.size
+                    MAX_SCALE,
+                    lastSameStrideLayer,
+                    strides.size
                 )
                 for (aspectRatioId in 0 until ASPECT_RATIOS_SIZE) {
                     aspectRatios.add(1.0f)
@@ -238,7 +240,9 @@ internal class FaceDetector(private val livenessState: LivenessState) {
                 } else {
                     calculateScale(
                         MIN_SCALE,
-                        MAX_SCALE, lastSameStrideLayer + 1, strides.size
+                        MAX_SCALE,
+                        lastSameStrideLayer + 1,
+                        strides.size
                     )
                 }
                 scales.add(sqrt(scale * scaleNext))
@@ -275,9 +279,7 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         maxScale: Float,
         strideIndex: Int,
         numStrides: Int
-    ): Float {
-        return minScale + (maxScale - minScale) * 1.0f * strideIndex / (numStrides - 1.0f)
-    }
+    ): Float = minScale + (maxScale - minScale) * 1.0f * strideIndex / (numStrides - 1.0f)
 
     private fun computeSigmoid(inputValue: Float): Float {
         var finalInputValue = max(inputValue, -100f)
@@ -488,7 +490,8 @@ internal class FaceDetector(private val livenessState: LivenessState) {
             val modelInputStream = FileInputStream(modelFileDescriptor.fileDescriptor)
             val modelByteBuffer = modelInputStream.channel.map(
                 FileChannel.MapMode.READ_ONLY,
-                modelFileDescriptor.startOffset, modelFileDescriptor.declaredLength
+                modelFileDescriptor.startOffset,
+                modelFileDescriptor.declaredLength
             )
             return Interpreter(modelByteBuffer)
         }
@@ -564,13 +567,13 @@ internal class FaceDetector(private val livenessState: LivenessState) {
         }
 
         @VisibleForTesting(VisibleForTesting.PRIVATE)
-        internal fun calculatePupilDistance(leftEye: Landmark, rightEye: Landmark): Float {
-            return sqrt((leftEye.x - rightEye.x).pow(2) + (leftEye.y - rightEye.y).pow(2))
-        }
+        internal fun calculatePupilDistance(
+            leftEye: Landmark,
+            rightEye: Landmark
+        ): Float = sqrt((leftEye.x - rightEye.x).pow(2) + (leftEye.y - rightEye.y).pow(2))
 
         @VisibleForTesting(VisibleForTesting.PRIVATE)
-        internal fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark):
-            Float {
+        internal fun calculateFaceHeight(leftEye: Landmark, rightEye: Landmark, mouth: Landmark): Float {
             val eyeCenterX = (leftEye.x + rightEye.x) / 2
             val eyeCenterY = (leftEye.y + rightEye.y) / 2
             return sqrt((eyeCenterX - mouth.x).pow(2) + (eyeCenterY - mouth.y).pow(2))

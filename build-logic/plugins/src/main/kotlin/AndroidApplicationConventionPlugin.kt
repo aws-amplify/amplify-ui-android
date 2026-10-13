@@ -20,7 +20,6 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
@@ -32,7 +31,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target.pluginManager) {
             apply("com.android.application")
             apply("org.jetbrains.kotlin.plugin.compose")
-            apply("org.jetbrains.kotlin.android")
         }
 
         with(target) {

@@ -52,6 +52,7 @@ import com.amplifyframework.ui.liveness.model.LivenessCheckState
         InstructionMessage(message = instructionText, showProgress = true)
     }
 }
+
 @Composable
 private fun InstructionMessage(
     message: String,
@@ -71,7 +72,7 @@ private fun InstructionMessage(
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(16.dp),
-                strokeWidth = 2.dp,
+                strokeWidth = 2.dp
             )
             Spacer(modifier = Modifier.size(8.dp))
         }
@@ -88,7 +89,6 @@ private fun InstructionMessage(
 private fun FaceOvalInstructionMessage(
     message: String
 ) {
-
     val isTooClose = message == stringResource(FaceDetector.FaceOvalPosition.TOO_CLOSE.instructionStringRes)
     val isInitialCenterFace =
         LivenessCheckState.Initial.withStartViewMessage().instructionId?.let { stringResource(it) == message } == true
@@ -136,6 +136,7 @@ private fun InstructionMessagePreview() {
         InstructionMessage("Success", true)
     }
 }
+
 @Preview
 @Composable
 private fun InstructionMessageProgressPreview() {
@@ -171,7 +172,7 @@ private fun InstructionMessageCustomThemePreview() {
         colorScheme = lightColorScheme(
             primary = Color.White,
             background = Color.Blue,
-            onBackground = Color.Yellow,
+            onBackground = Color.Yellow
         ),
         typography = Typography(
             bodyMedium = TextStyle(

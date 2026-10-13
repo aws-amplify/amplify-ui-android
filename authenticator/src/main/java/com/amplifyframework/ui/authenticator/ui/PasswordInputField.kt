@@ -83,18 +83,16 @@ internal fun PasswordInputField(
     )
 }
 
-private fun getTrailingIcon(visible: Boolean, onClick: () -> Unit): @Composable (() -> Unit) {
-    return {
-        val icon = when (visible) {
-            false -> R.drawable.ic_authenticator_visible
-            true -> R.drawable.ic_authenticator_invisible
-        }
-        val contentDescription = when (visible) {
-            true -> R.string.amplify_ui_authenticator_field_a11y_password_hide
-            false -> R.string.amplify_ui_authenticator_field_a11y_password_show
-        }
-        IconButton(onClick = onClick, modifier = Modifier.testTag(TestTags.ShowPasswordIcon)) {
-            Icon(painter = painterResource(icon), contentDescription = stringResource(contentDescription))
-        }
+private fun getTrailingIcon(visible: Boolean, onClick: () -> Unit): @Composable (() -> Unit) = {
+    val icon = when (visible) {
+        false -> R.drawable.ic_authenticator_visible
+        true -> R.drawable.ic_authenticator_invisible
+    }
+    val contentDescription = when (visible) {
+        true -> R.string.amplify_ui_authenticator_field_a11y_password_hide
+        false -> R.string.amplify_ui_authenticator_field_a11y_password_show
+    }
+    IconButton(onClick = onClick, modifier = Modifier.testTag(TestTags.ShowPasswordIcon)) {
+        Icon(painter = painterResource(icon), contentDescription = stringResource(contentDescription))
     }
 }

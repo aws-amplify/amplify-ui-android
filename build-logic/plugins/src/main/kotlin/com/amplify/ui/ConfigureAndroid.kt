@@ -17,32 +17,33 @@ package com.amplify.ui
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
 
-internal fun Project.configureAndroid(extension: CommonExtension<*, *, *, *, *, *>) {
+internal fun Project.configureAndroid(extension: CommonExtension) {
     val sdkVersionName = findProperty("VERSION_NAME") ?: rootProject.findProperty("VERSION_NAME")
 
     extension.apply {
-        compileSdk = 36
+        compileSdk = 37
 
-        buildFeatures {
+        buildFeatures.apply {
             buildConfig = true
+            compose = true
         }
 
-        defaultConfig {
+        defaultConfig.apply {
             minSdk = 24
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             testInstrumentationRunnerArguments += "clearPackageData" to "true"
 
-            testOptions {
-                animationsDisabled = true
-                unitTests {
-                    isIncludeAndroidResources = true
-                }
-            }
-
             buildConfigField("String", "VERSION_NAME", "\"$sdkVersionName\"")
         }
 
-        lint {
+        testOptions.apply {
+            animationsDisabled = true
+            unitTests.apply {
+                isIncludeAndroidResources = true
+            }
+        }
+
+        lint.apply {
             warningsAsErrors = true
             abortOnError = true
             enable += listOf("UnusedResources")
@@ -52,16 +53,8 @@ internal fun Project.configureAndroid(extension: CommonExtension<*, *, *, *, *, 
         // Needed when running integration tests. The oauth2 library uses relies on two
         // dependencies (Apache's httpcore and httpclient), both of which include
         // META-INF/DEPENDENCIES. Tried a couple other options to no avail.
-        packaging {
+        packaging.apply {
             resources.excludes += setOf("META-INF/DEPENDENCIES", "META-INF/LICENSE*")
-        }
-
-        buildFeatures {
-            compose = true
-        }
-
-        composeOptions {
-            kotlinCompilerExtensionVersion = "1.5.3"
         }
     }
 }

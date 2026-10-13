@@ -6,7 +6,6 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.plugins.signing.SigningExtension
 import java.net.URI
 
@@ -58,57 +57,40 @@ class PublishingConventionPlugin : Plugin<Project> {
     }
 
     // Configure the publishing extension in the project
-    @Suppress("LocalVariableName")
     private fun Project.configureMavenPublishing() {
         configure<PublishingExtension> {
             publications {
                 create("maven", MavenPublication::class.java) {
-                    val POM_GROUP: String by project
-                    val POM_ARTIFACT_ID: String by project
-                    val VERSION_NAME: String by project
-
-                    groupId = POM_GROUP
-                    artifactId = POM_ARTIFACT_ID
-                    version = VERSION_NAME
+                    groupId = requiredProperty("POM_GROUP")
+                    artifactId = requiredProperty("POM_ARTIFACT_ID")
+                    version = requiredProperty("VERSION_NAME")
 
                     from(components["release"])
 
                     pom {
-                        val POM_NAME: String? by project
-                        val POM_PACKAGING: String? by project
-                        val POM_DESCRIPTION: String? by project
-                        val POM_URL: String? by project
-                        name.set(POM_NAME)
-                        packaging = POM_PACKAGING
-                        description.set(POM_DESCRIPTION)
-                        url.set(POM_URL)
+                        name.set(optionalProperty("POM_NAME"))
+                        packaging = optionalProperty("POM_PACKAGING")
+                        description.set(optionalProperty("POM_DESCRIPTION"))
+                        url.set(optionalProperty("POM_URL"))
 
                         scm {
-                            val POM_SCM_URL: String? by project
-                            val POM_SCM_CONNECTION: String? by project
-                            val POM_SCM_DEV_CONNECTION: String? by project
-                            url.set(POM_SCM_URL)
-                            connection.set(POM_SCM_CONNECTION)
-                            developerConnection.set(POM_SCM_DEV_CONNECTION)
+                            url.set(optionalProperty("POM_SCM_URL"))
+                            connection.set(optionalProperty("POM_SCM_CONNECTION"))
+                            developerConnection.set(optionalProperty("POM_SCM_DEV_CONNECTION"))
                         }
 
                         licenses {
                             license {
-                                val POM_LICENSE_NAME: String? by project
-                                val POM_LICENSE_URL: String? by project
-                                val POM_LICENSE_DIST: String? by project
-                                name.set(POM_LICENSE_NAME)
-                                url.set(POM_LICENSE_URL)
-                                distribution.set(POM_LICENSE_DIST)
+                                name.set(optionalProperty("POM_LICENSE_NAME"))
+                                url.set(optionalProperty("POM_LICENSE_URL"))
+                                distribution.set(optionalProperty("POM_LICENSE_DIST"))
                             }
                         }
 
                         developers {
                             developer {
-                                val POM_DEVELOPER_ID: String? by project
-                                val POM_DEVELOPER_ORGANIZATION_URL: String? by project
-                                id.set(POM_DEVELOPER_ID)
-                                organizationUrl.set(POM_DEVELOPER_ORGANIZATION_URL)
+                                id.set(optionalProperty("POM_DEVELOPER_ID"))
+                                organizationUrl.set(optionalProperty("POM_DEVELOPER_ORGANIZATION_URL"))
                                 roles.set(listOf("developer"))
                             }
                         }
@@ -147,7 +129,7 @@ class PublishingConventionPlugin : Plugin<Project> {
     }
 
     private val Project.versionName: String
-        get() = properties["VERSION_NAME"]!!.toString()
+        get() = requiredProperty("VERSION_NAME")
 
     private val Project.isReleaseBuild: Boolean
         get() = !versionName.contains("SNAPSHOT")
@@ -179,5 +161,9 @@ class PublishingConventionPlugin : Plugin<Project> {
         default: String
     ) = propertyString(property) ?: default
 
-    private fun Project.propertyString(property: String) = properties[property]?.toString()
+    private fun Project.propertyString(property: String) = findProperty(property)?.toString()
+
+    private fun Project.requiredProperty(name: String) = property(name).toString()
+
+    private fun Project.optionalProperty(name: String) = findProperty(name)?.toString()
 }

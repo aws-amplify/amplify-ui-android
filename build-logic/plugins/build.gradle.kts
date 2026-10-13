@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.ir.backend.js.compile
-
 /*
  * Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *

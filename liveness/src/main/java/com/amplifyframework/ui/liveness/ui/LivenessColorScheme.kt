@@ -72,7 +72,7 @@ object LivenessColorScheme {
             error = Color(0xFFEF8F8F),
             onError = Color(0xFF0D1926),
             errorContainer = Color(0xFF043495),
-            onErrorContainer = Color(0xFFE6EEFE),
+            onErrorContainer = Color(0xFFE6EEFE)
         )
     }
 }

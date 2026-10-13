@@ -51,7 +51,7 @@ internal fun CancelChallengeButton(
 private fun CancelChallengeButton(
     modifier: Modifier = Modifier,
     closeContentDescription: String,
-    action: () -> Unit,
+    action: () -> Unit
 ) {
     IconButton(
         onClick = action,

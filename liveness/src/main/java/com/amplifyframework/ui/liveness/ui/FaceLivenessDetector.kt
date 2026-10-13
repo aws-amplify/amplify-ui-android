@@ -278,13 +278,12 @@ internal fun ChallengeView(
             }
 
             if (livenessState.showingStartView) {
-
                 if (livenessState.loadingCameraPreview) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .align(Alignment.Center),
-                        strokeWidth = 2.dp,
+                        strokeWidth = 2.dp
                     )
                 }
 

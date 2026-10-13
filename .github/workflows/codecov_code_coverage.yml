@@ -28,7 +28,7 @@ jobs:
         run: ./gradlew koverXmlReportCoverage
 
       - name: Upload Test Report
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           name: report
           files: build/reports/kover/reportCoverage.xml

@@ -37,15 +37,28 @@ import org.tensorflow.lite.Interpreter
 internal class FaceDetector(private val livenessState: LivenessState) {
     private val anchors = generateAnchors()
 
+    /**
+     * The highest detection score observed in the most recent call to [getBoundingBoxes], including
+     * scores below the detection threshold. Diagnostics reads this to distinguish a model that saw
+     * nothing from one that nearly matched.
+     */
+    @Volatile
+    var lastFrameMaxScore: Float = 0f
+        private set
+
     fun getBoundingBoxes(
         outputBoxes: Array<Array<FloatArray>>,
         outputScores: Array<Array<FloatArray>>
     ): List<Detection> {
         val detections = mutableListOf<Detection>()
+        lastFrameMaxScore = 0f
         val faceTargetChallenge = livenessState.faceTargetChallenge ?: return emptyList()
         for (i in 0 until NUM_BOXES) {
             var score = outputScores[0][i][0]
             score = computeSigmoid(score)
+            if (score > lastFrameMaxScore) {
+                lastFrameMaxScore = score
+            }
 
             if (score < faceTargetChallenge.faceTargetMatching.faceDetectionThreshold) {
                 continue

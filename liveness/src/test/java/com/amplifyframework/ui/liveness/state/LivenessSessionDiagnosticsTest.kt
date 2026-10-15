@@ -277,4 +277,85 @@ class LivenessSessionDiagnosticsTest {
 
         logger.warns.last() shouldContain "maxDetectionScore=0.68"
     }
+
+    @Test
+    fun `the watchdog does not fire once a face has been detected`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.registerGateProvider { gateSnapshot() }
+
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        subject.onFrameAnalyzed(faceCount = 1, topScore = 0.9f)
+        subject.emitWatchdogSnapshot()
+
+        logger.warns.none { it.contains("FaceDetectionWatchdog") } shouldBe true
+    }
+
+    @Test
+    fun `the watchdog fires at most once`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.registerGateProvider { gateSnapshot() }
+
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        repeat(5) { subject.emitWatchdogSnapshot() }
+
+        logger.warns.filter { it.contains("FaceDetectionWatchdog") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `the watchdog does not fire after destroy`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.registerGateProvider { gateSnapshot() }
+
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        subject.onDestroy("DISPOSED")
+        subject.emitWatchdogSnapshot()
+
+        logger.warns.none { it.contains("FaceDetectionWatchdog") } shouldBe true
+    }
+
+    @Test
+    fun `the watchdog renders gates as unknown when no provider was registered`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        subject.emitWatchdogSnapshot()
+
+        val line = logger.warns.last()
+        line shouldContain "faceTargetChallenge=unknown"
+        line shouldContain "checkState=unknown"
+    }
+
+    @Test
+    fun `the watchdog reports the threshold captured at session ready`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.registerGateProvider { gateSnapshot() }
+        subject.onSessionReady(
+            challengeType = "FaceMovementAndLightChallenge",
+            challengeId = "challenge-1",
+            faceDetectionThreshold = 0.7f,
+            ovalFitTimeout = 7000
+        )
+
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        subject.emitWatchdogSnapshot()
+
+        logger.warns.last() shouldContain "faceDetectionThreshold=0.7"
+    }
+
+    @Test
+    fun `session error cancels the watchdog`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.registerGateProvider { gateSnapshot() }
+
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        subject.onSessionError("VideoEncodingException", stopSession = true, closeCode = "RUNTIME_ERROR")
+
+        logger.warns.filter { it.contains("SessionError") } shouldHaveSize 1
+    }
 }

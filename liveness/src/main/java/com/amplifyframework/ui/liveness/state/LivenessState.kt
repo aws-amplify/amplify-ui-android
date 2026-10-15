@@ -47,7 +47,8 @@ internal data class LivenessState(
     val disableStartView: Boolean,
     val onCaptureReady: () -> Unit,
     val onSessionError: (FaceLivenessDetectionException, Boolean) -> Unit,
-    val onFinalEventsSent: () -> Unit
+    val onFinalEventsSent: () -> Unit,
+    val diagnostics: LivenessSessionDiagnostics
 ) {
     var videoViewportSize: VideoViewportSize? by mutableStateOf(null)
     var livenessCheckState by mutableStateOf<LivenessCheckState>(
@@ -89,6 +90,18 @@ internal data class LivenessState(
     var livenessSessionInfo: FaceLivenessSession? by mutableStateOf(null)
     var faceTargetChallenge: FaceTargetChallenge? by mutableStateOf(null)
     var colorChallenge: ColorChallenge? = null
+
+    init {
+        diagnostics.registerGateProvider {
+            GateSnapshot(
+                showingStartView = showingStartView,
+                readyForOval = readyForOval,
+                faceTargetChallengePresent = faceTargetChallenge != null,
+                initialFaceDistanceCheckPassed = initialFaceDistanceCheckPassed,
+                checkState = livenessCheckState::class.simpleName ?: "Unknown"
+            )
+        }
+    }
 
     fun updateVideoViewportSize(newVideoViewportSize: VideoViewportSize) {
         if (newVideoViewportSize != videoViewportSize) {
@@ -134,6 +147,14 @@ internal data class LivenessState(
         colorChallenge = faceLivenessSession.challenges
             .filterIsInstance<ColorChallenge>().firstOrNull()
         readyForOval = true
+        faceTargetChallenge?.let {
+            diagnostics.onSessionReady(
+                challengeType = faceLivenessSession.challengeType.name,
+                challengeId = faceLivenessSession.challengeId,
+                faceDetectionThreshold = it.faceTargetMatching.faceDetectionThreshold,
+                ovalFitTimeout = it.faceTargetMatching.ovalFitTimeout
+            )
+        }
         return true
     }
 
@@ -270,6 +291,7 @@ internal data class LivenessState(
                 )
 
                 this.initialStreamFace = face
+                diagnostics.onInitialFaceDetectedSent()
             }
 
             if (faceGuideRect == null) {
@@ -300,15 +322,13 @@ internal data class LivenessState(
             detectedFaceMatchedOval = detectedFaceMatchedOval ||
                 faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
 
-            if (detectedFaceMatchedOval) {
-                livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(
-                    FaceDetector.FaceOvalPosition.MATCHED
-                )
+            val reportedPosition = if (detectedFaceMatchedOval) {
+                FaceDetector.FaceOvalPosition.MATCHED
             } else {
-                livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(
-                    faceOvalPosition
-                )
+                faceOvalPosition
             }
+            diagnostics.onOvalPositionChanged(reportedPosition)
+            livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(reportedPosition)
 
             if (detectedFaceMatchedOval && faceMatchOvalStart == null) {
                 faceMatchOvalStart = Date().time

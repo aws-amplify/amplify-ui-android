@@ -1,5 +1,5 @@
 [versions]
-accompanist = "0.28.0"
+accompanist = "0.37.3"
 agp = "9.4.1"
 amplify = "2.42.0"
 appcompat = "1.8.0"

@@ -54,6 +54,7 @@ internal class LivenessStateTest {
     private val onSessionError =
         mockk<(FaceLivenessDetectionException, Boolean) -> Unit>(relaxed = true)
     private val onFinalEventsSent = mockk<() -> Unit>(relaxed = true)
+    private val diagnostics = mockk<LivenessSessionDiagnostics>(relaxed = true)
 
     @Before
     fun setUp() {
@@ -63,7 +64,8 @@ internal class LivenessStateTest {
             false,
             onCaptureReady,
             onSessionError,
-            onFinalEventsSent
+            onFinalEventsSent,
+            diagnostics
         )
         livenessState.onStartViewComplete()
     }
@@ -77,7 +79,8 @@ internal class LivenessStateTest {
             false,
             onCaptureReady,
             onSessionError,
-            onFinalEventsSent
+            onFinalEventsSent,
+            diagnostics
         )
 
         val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
@@ -127,7 +130,8 @@ internal class LivenessStateTest {
             true,
             onCaptureReady,
             onSessionError,
-            onFinalEventsSent
+            onFinalEventsSent,
+            diagnostics
         )
 
         val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
@@ -262,6 +266,22 @@ internal class LivenessStateTest {
             verify(exactly = 1) { stopSession(WebSocketCloseCode.DISPOSED.code) }
         } finally {
             executor.shutdownNow()
+        }
+    }
+
+    @Test
+    fun `session ready reports the challenge to diagnostics`() {
+        val session = createFaceLivenessSession { }
+
+        livenessState.onLivenessSessionReady(session)
+
+        verify(exactly = 1) {
+            diagnostics.onSessionReady(
+                challengeType = "FaceMovementChallenge",
+                challengeId = "12345",
+                faceDetectionThreshold = any(),
+                ovalFitTimeout = any()
+            )
         }
     }
 

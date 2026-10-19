@@ -62,7 +62,7 @@ dependencies {
     implementation(libs.kotlin.serialization.json)
 
     implementation(libs.litert)
-    implementation(libs.litert.support)
+    implementation(libs.litert.support.api)
 
     // Needed to workaround warning for missing annotations from a transitive dependency of media3
     implementation(libs.errorpone)

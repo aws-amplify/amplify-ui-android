@@ -223,6 +223,26 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
+    fun `a quarter-turned frame that matches the target after rotation is not a mismatch`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        // A camera reporting a quarter turn delivers the target resolution transposed.
+        subject.onFirstFrame(
+            width = 640,
+            height = 480,
+            rowStride = 2560,
+            pixelStride = 4,
+            rotationDegrees = 270,
+            format = "RGBA_8888"
+        )
+
+        val line = logger.infos.single { it.contains("FirstFrame") }
+        line shouldContain "resolutionMatchesTarget=true"
+        line shouldContain "rowStridePadded=false"
+    }
+
+    @Test
     fun `frame before session ready is logged once`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)

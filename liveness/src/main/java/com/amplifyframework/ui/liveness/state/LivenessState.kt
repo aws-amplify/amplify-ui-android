@@ -322,13 +322,18 @@ internal data class LivenessState(
             detectedFaceMatchedOval = detectedFaceMatchedOval ||
                 faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
 
-            val reportedPosition = if (detectedFaceMatchedOval) {
+            // Diagnostics reports the position measured on this frame, not the displayed one. Once
+            // the face has matched the oval the displayed position stays MATCHED so the user is not
+            // prompted again, which would otherwise hide a face drifting out of position later in
+            // the challenge.
+            diagnostics.onOvalPositionChanged(faceOvalPosition)
+
+            val displayedPosition = if (detectedFaceMatchedOval) {
                 FaceDetector.FaceOvalPosition.MATCHED
             } else {
                 faceOvalPosition
             }
-            diagnostics.onOvalPositionChanged(reportedPosition)
-            livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(reportedPosition)
+            livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(displayedPosition)
 
             if (detectedFaceMatchedOval && faceMatchOvalStart == null) {
                 faceMatchOvalStart = Date().time

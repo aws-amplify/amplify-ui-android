@@ -113,9 +113,18 @@ internal class LivenessSessionDiagnostics(
         if (firstFrameLogged) return
         firstFrameLogged = true
         firstFrameAt = clock()
+        // Row stride is reported in buffer coordinates, so it is compared against the delivered
+        // width before any rotation is applied.
         val expectedRowStride = width * BYTES_PER_RGBA_PIXEL
-        val matchesTarget = width == LivenessCoordinator.TARGET_WIDTH &&
-            height == LivenessCoordinator.TARGET_HEIGHT
+
+        // The target resolution describes the frame after rotation, which a camera reporting a
+        // quarter turn delivers with its dimensions transposed. Comparing raw dimensions would
+        // report a mismatch for every such device.
+        val quarterTurned = rotationDegrees == 90 || rotationDegrees == 270
+        val rotatedWidth = if (quarterTurned) height else width
+        val rotatedHeight = if (quarterTurned) width else height
+        val matchesTarget = rotatedWidth == LivenessCoordinator.TARGET_WIDTH &&
+            rotatedHeight == LivenessCoordinator.TARGET_HEIGHT
         emit(
             FirstFrame(
                 sessionId = sessionId,

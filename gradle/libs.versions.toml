@@ -69,7 +69,7 @@ kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android
 
 # TensorFlow
 litert = { module = "com.google.ai.edge.litert:litert", version.ref = "litert" }
-litert-support = { module = "com.google.ai.edge.litert:litert-support", version.ref = "litert" }
+litert-support-api = { module = "com.google.ai.edge.litert:litert-support-api", version.ref = "litert" }
 
 # Other
 zxing = { module = "com.google.zxing:core", version.ref = "zxing" }

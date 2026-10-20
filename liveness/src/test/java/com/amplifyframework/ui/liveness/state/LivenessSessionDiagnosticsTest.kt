@@ -18,6 +18,7 @@ package com.amplifyframework.ui.liveness.state
 import com.amplifyframework.logging.LogLevel
 import com.amplifyframework.logging.Logger
 import com.amplifyframework.ui.liveness.ml.FaceDetector
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -359,6 +360,7 @@ class LivenessSessionDiagnosticsTest {
             challengeId = "challenge-1",
             faceDetectionThreshold = 0.7f,
             faceDistanceThresholdMin = 0f,
+            targetIouThreshold = 0f,
             ovalFitTimeout = 7000
         )
 
@@ -584,46 +586,54 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
-    fun `off target frames are counted from the first oval match onwards`() {
+    fun `iou statistics report the lowest and mean overlap`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
 
-        // Before any match, nothing is counted towards the share.
-        repeat(5) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
-        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
-        repeat(3) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
+        subject.onFaceIou(0.8f)
+        subject.onFaceIou(0.4f)
+        subject.onFaceIou(0.6f)
         subject.onDestroy("NORMAL")
 
         val line = logger.infos.last()
-        line shouldContain "framesMatched=1"
-        line shouldContain "framesOffTarget=3"
+        line shouldContain "minIou=0.4"
+        line shouldContain "meanIou=0.6"
     }
 
     @Test
-    fun `a session that never matched the oval reports no off target frames`() {
+    fun `iou statistics emit nothing per frame`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
 
-        repeat(5) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
+        repeat(100) { subject.onFaceIou(0.5f) }
+
+        logger.infos.shouldBeEmpty()
+        logger.debugs.shouldBeEmpty()
+    }
+
+    @Test
+    fun `a session with no oval reports zero iou rather than a sentinel`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
         subject.onDestroy("NORMAL")
 
         val line = logger.infos.last()
-        line shouldContain "framesMatched=0"
-        line shouldContain "framesOffTarget=0"
+        line shouldContain "minIou=0.0"
+        line shouldContain "meanIou=0.0"
     }
 
     @Test
-    fun `the off target share is reported even when the challenge never completed`() {
+    fun `iou statistics survive a session that never completed its challenge`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
 
-        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
-        repeat(2) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
+        subject.onFaceIou(0.3f)
         subject.onSessionError("VideoEncodingException", stopSession = true, closeCode = "RUNTIME_ERROR")
         subject.onDestroy("RUNTIME_ERROR")
 
         logger.infos.none { it.contains("ChallengeCompleted") } shouldBe true
-        logger.infos.last() shouldContain "framesOffTarget=2"
+        logger.infos.last() shouldContain "minIou=0.3"
     }
 
     @Test
@@ -670,6 +680,7 @@ class LivenessSessionDiagnosticsTest {
             challengeId = "challenge-1",
             faceDetectionThreshold = 0.75f,
             faceDistanceThresholdMin = 0.9f,
+            targetIouThreshold = 0.75f,
             ovalFitTimeout = 30000
         )
 
@@ -689,6 +700,7 @@ class LivenessSessionDiagnosticsTest {
             challengeId = "challenge-1",
             faceDetectionThreshold = 0.75f,
             faceDistanceThresholdMin = 0.9f,
+            targetIouThreshold = 0.75f,
             ovalFitTimeout = 30000
         )
 

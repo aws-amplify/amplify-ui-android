@@ -281,6 +281,7 @@ internal class LivenessStateTest {
                 challengeId = "12345",
                 faceDetectionThreshold = any(),
                 faceDistanceThresholdMin = any(),
+                targetIouThreshold = any(),
                 ovalFitTimeout = any()
             )
         }

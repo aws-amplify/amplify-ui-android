@@ -62,10 +62,13 @@ internal class LivenessSessionDiagnostics(
     private var ovalPositionChanges = 0
 
     @Volatile
-    private var framesMatched = 0
+    private var iouSum = 0f
 
     @Volatile
-    private var framesOffTarget = 0
+    private var iouSamples = 0
+
+    @Volatile
+    private var lowestIou = Float.MAX_VALUE
 
     private var lastFaceCount: Int? = null
     private var lastOvalPosition: FaceDetector.FaceOvalPosition? = null
@@ -112,6 +115,7 @@ internal class LivenessSessionDiagnostics(
         challengeId: String,
         faceDetectionThreshold: Float,
         faceDistanceThresholdMin: Float,
+        targetIouThreshold: Float,
         ovalFitTimeout: Int
     ) {
         this.faceDetectionThreshold = faceDetectionThreshold
@@ -122,6 +126,7 @@ internal class LivenessSessionDiagnostics(
                 challengeType = challengeType,
                 challengeId = challengeId,
                 faceDetectionThreshold = faceDetectionThreshold,
+                targetIouThreshold = targetIouThreshold,
                 ovalFitTimeout = ovalFitTimeout
             )
         )
@@ -238,6 +243,16 @@ internal class LivenessSessionDiagnostics(
      * still. Every observed change is still counted into [SessionEnded], so the oscillation
      * remains visible as a number.
      */
+    /**
+     * Records the overlap between the detected face and the oval for this frame. Accumulated only;
+     * the statistics are reported once in [SessionEnded], so this emits nothing per frame.
+     */
+    fun onFaceIou(iou: Float) {
+        iouSum += iou
+        iouSamples += 1
+        if (iou < lowestIou) lowestIou = iou
+    }
+
     fun onOvalPositionChanged(position: FaceDetector.FaceOvalPosition) {
         if (position == FaceDetector.FaceOvalPosition.MATCHED) {
             ovalEverMatched = true
@@ -250,16 +265,6 @@ internal class LivenessSessionDiagnostics(
                         phase = phase
                     )
                 )
-            }
-        }
-
-        // Counted from the first match onwards, which is when the challenge is genuinely underway
-        // for both challenge types, and before the debounce so the share reflects every frame.
-        if (ovalEverMatched) {
-            if (position == FaceDetector.FaceOvalPosition.MATCHED) {
-                framesMatched += 1
-            } else {
-                framesOffTarget += 1
             }
         }
 
@@ -360,8 +365,8 @@ internal class LivenessSessionDiagnostics(
                 faceEverDetected = faceEverDetected,
                 ovalEverMatched = ovalEverMatched,
                 ovalPositionChanges = ovalPositionChanges,
-                framesMatched = framesMatched,
-                framesOffTarget = framesOffTarget,
+                minIou = if (iouSamples == 0) 0f else lowestIou,
+                meanIou = if (iouSamples == 0) 0f else iouSum / iouSamples,
                 analyzeErrors = analyzeErrors,
                 closeCode = closeCode
             )

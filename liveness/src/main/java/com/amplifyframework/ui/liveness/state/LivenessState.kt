@@ -153,6 +153,7 @@ internal data class LivenessState(
                 challengeId = faceLivenessSession.challengeId,
                 faceDetectionThreshold = it.faceTargetMatching.faceDetectionThreshold,
                 faceDistanceThresholdMin = it.faceTargetMatching.faceDistanceThresholdMin,
+                targetIouThreshold = it.faceTargetMatching.targetIouThreshold,
                 ovalFitTimeout = it.faceTargetMatching.ovalFitTimeout
             )
         }
@@ -313,8 +314,13 @@ internal data class LivenessState(
                 faceTargetChallenge!!.faceTargetMatching
             )
 
+            // Overlap drives the match decision, so it is recorded every frame as a graded
+            // measure of how well the face is positioned.
+            val currentIou = FaceDetector.intersectionOverUnion(faceRect, oval)
+            diagnostics.onFaceIou(currentIou)
+
             if (initialFaceOvalIou < 0) {
-                initialFaceOvalIou = FaceDetector.intersectionOverUnion(faceRect, oval)
+                initialFaceOvalIou = currentIou
             }
 
             faceMatchPercentage = FaceDetector.calculateFaceMatchPercentage(

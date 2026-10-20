@@ -97,6 +97,7 @@ internal data class SessionReady(
     val challengeType: String,
     val challengeId: String,
     val faceDetectionThreshold: Float,
+    val targetIouThreshold: Float,
     val ovalFitTimeout: Int
 ) : SessionEvent {
     override val level = LogLevel.INFO
@@ -128,12 +129,16 @@ internal data class SessionEnded(
      */
     val ovalPositionChanges: Int,
     /**
-     * Frames from the first oval match onwards whose measured position was `MATCHED`, and those
-     * whose was not. Their ratio is the share of the active challenge the face spent off target,
-     * which is comparable between sessions in a way a transition count is not.
+     * The lowest and mean intersection-over-union between the detected face and the oval, over
+     * every frame for which the oval was displayed.
+     *
+     * A graded measure is used rather than a count of matched frames because `MATCHED` requires an
+     * IoU threshold and three edge alignments to hold at once — a boundary the face passes through
+     * rather than rests in, so any count derived from it saturates. These are comparable between
+     * sessions and are read against the `targetIouThreshold` reported at session ready.
      */
-    val framesMatched: Int,
-    val framesOffTarget: Int,
+    val minIou: Float,
+    val meanIou: Float,
     val analyzeErrors: Int,
     val closeCode: String
 ) : SessionEvent {

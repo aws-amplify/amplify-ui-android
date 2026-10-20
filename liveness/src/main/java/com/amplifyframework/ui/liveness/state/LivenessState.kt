@@ -152,6 +152,8 @@ internal data class LivenessState(
                 challengeType = faceLivenessSession.challengeType.name,
                 challengeId = faceLivenessSession.challengeId,
                 faceDetectionThreshold = it.faceTargetMatching.faceDetectionThreshold,
+                faceDistanceThreshold = it.faceTargetMatching.faceDistanceThreshold,
+                faceDistanceThresholdMin = it.faceTargetMatching.faceDistanceThresholdMin,
                 ovalFitTimeout = it.faceTargetMatching.ovalFitTimeout
             )
         }
@@ -262,14 +264,18 @@ internal data class LivenessState(
             return false
         }
 
+        // Measured on every frame rather than only until the pre-check passes, so a face drifting
+        // during the challenge is still observable.
+        val faceDistance = FaceDetector.calculateFaceDistance(
+            leftEye,
+            rightEye,
+            mouth,
+            LivenessCoordinator.TARGET_WIDTH,
+            LivenessCoordinator.TARGET_HEIGHT
+        )
+        diagnostics.onFaceDistance(faceDistance)
+
         if (!initialFaceDistanceCheckPassed) {
-            val faceDistance = FaceDetector.calculateFaceDistance(
-                leftEye,
-                rightEye,
-                mouth,
-                LivenessCoordinator.TARGET_WIDTH,
-                LivenessCoordinator.TARGET_HEIGHT
-            )
             if (faceDistance >= faceTargetChallenge!!.faceTargetMatching.faceDistanceThresholdMin) {
                 livenessCheckState =
                     LivenessCheckState.Initial.withMoveFaceFurtherAwayMessage()

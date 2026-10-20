@@ -280,9 +280,28 @@ internal class LivenessStateTest {
                 challengeType = "FaceMovementChallenge",
                 challengeId = "12345",
                 faceDetectionThreshold = any(),
+                faceDistanceThreshold = any(),
+                faceDistanceThresholdMin = any(),
                 ovalFitTimeout = any()
             )
         }
+    }
+
+    @Test
+    fun `face distance is reported on every frame update`() {
+        val session = createFaceLivenessSession { }
+        livenessState.onLivenessSessionReady(session)
+
+        repeat(2) {
+            livenessState.onFrameFaceUpdate(
+                RectF(0f, 0f, 1f, 1f),
+                FaceDetector.Landmark(0f, 0f),
+                FaceDetector.Landmark(1f, 0f),
+                FaceDetector.Landmark(1f, 1f)
+            )
+        }
+
+        verify(exactly = 2) { diagnostics.onFaceDistance(any()) }
     }
 
     private fun createFaceLivenessSession(stopSession: (Int?) -> Unit) = FaceLivenessSession(

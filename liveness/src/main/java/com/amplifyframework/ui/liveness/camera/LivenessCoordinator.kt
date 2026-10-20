@@ -315,6 +315,7 @@ internal class LivenessCoordinator(
         sequenceNumber: Int,
         colorStartTime: Long
     ) {
+        diagnostics.onColorDisplayed()
         livenessState.livenessSessionInfo!!.sendChallengeResponseEvent(
             ColorChallengeResponse(
                 livenessState.colorChallenge!!.challengeId,

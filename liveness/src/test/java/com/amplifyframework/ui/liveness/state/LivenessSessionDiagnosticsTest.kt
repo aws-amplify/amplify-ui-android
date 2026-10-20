@@ -36,7 +36,7 @@ class LivenessSessionDiagnosticsTest {
 
     @Test
     fun `debug events do not carry a sessionId`() {
-        val event = FaceCountChanged(from = 0, to = 1, framesAnalyzed = 42, topScore = 0.93f)
+        val event = FrameBeforeSessionReady
 
         event.toString() shouldNotContain "sessionId"
         event.level shouldBe LogLevel.DEBUG
@@ -160,7 +160,7 @@ class LivenessSessionDiagnosticsTest {
 
         repeat(100) { subject.onFrameAnalyzed(faceCount = 0, topScore = 0.01f) }
 
-        logger.debugs.none { it.contains("FaceCountChanged") } shouldBe true
+        logger.infos.none { it.contains("FaceCountChanged") } shouldBe true
     }
 
     @Test
@@ -172,7 +172,7 @@ class LivenessSessionDiagnosticsTest {
         repeat(3) { subject.onFrameAnalyzed(faceCount = 1, topScore = 0.93f) }
         repeat(3) { subject.onFrameAnalyzed(faceCount = 0, topScore = 0.02f) }
 
-        logger.debugs.filter { it.contains("FaceCountChanged") } shouldHaveSize 2
+        logger.infos.filter { it.contains("FaceCountChanged") } shouldHaveSize 2
     }
 
     @Test
@@ -184,7 +184,7 @@ class LivenessSessionDiagnosticsTest {
         subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
         repeat(5) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED) }
 
-        logger.debugs.filter { it.contains("OvalPositionChanged") } shouldHaveSize 2
+        logger.infos.filter { it.contains("OvalPositionChanged") } shouldHaveSize 2
     }
 
     @Test
@@ -194,7 +194,7 @@ class LivenessSessionDiagnosticsTest {
 
         repeat(5) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED) }
 
-        logger.debugs.filter { it.contains("FirstOvalMatch") } shouldHaveSize 1
+        logger.infos.filter { it.contains("FirstOvalMatch") } shouldHaveSize 1
     }
 
     @Test
@@ -436,5 +436,61 @@ class LivenessSessionDiagnosticsTest {
 
         event.level shouldBe LogLevel.INFO
         event.toString() shouldBe "ColorSequenceStarted(sessionId=session-1)"
+    }
+
+    @Test
+    fun `face events are tagged PRE_CHECK before the initial face is detected`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        subject.onFrameAnalyzed(faceCount = 1, topScore = 0.9f)
+
+        logger.infos.single { it.contains("FaceCountChanged") } shouldContain "phase=PRE_CHECK"
+    }
+
+    @Test
+    fun `the phase advances to OVAL_FIT once the initial face is detected`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onInitialFaceDetectedSent()
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+
+        logger.infos.single { it.contains("OvalPositionChanged") } shouldContain "phase=OVAL_FIT"
+    }
+
+    @Test
+    fun `the phase advances to COLOR_SEQUENCE once a colour is displayed`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onInitialFaceDetectedSent()
+        subject.onColorDisplayed()
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+
+        logger.infos.single { it.contains("OvalPositionChanged") } shouldContain "phase=COLOR_SEQUENCE"
+    }
+
+    @Test
+    fun `the phase stays at OVAL_FIT when no colour is ever displayed`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onInitialFaceDetectedSent()
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+
+        logger.infos.none { it.contains("COLOR_SEQUENCE") } shouldBe true
+        logger.infos.none { it.contains("ColorSequenceStarted") } shouldBe true
+    }
+
+    @Test
+    fun `color sequence started is emitted once across repeated colours`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        repeat(8) { subject.onColorDisplayed() }
+
+        logger.infos.filter { it.contains("ColorSequenceStarted") } shouldHaveSize 1
     }
 }

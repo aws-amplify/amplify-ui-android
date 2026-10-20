@@ -70,6 +70,11 @@ internal class LivenessSessionDiagnostics(
     private var gateProvider: (() -> GateSnapshot)? = null
     private var destroyed = false
 
+    @Volatile
+    private var phase: ChallengePhase = ChallengePhase.PRE_CHECK
+
+    private var colorSequenceStartedLogged = false
+
     fun onSessionStartRequested(attempt: Int, codec: String, preCheckEnabled: Boolean) = emit(
         SessionStarting(
             sessionId = sessionId,
@@ -101,6 +106,17 @@ internal class LivenessSessionDiagnostics(
     }
 
     fun onCameraBound(facing: String) = emit(CameraBound(sessionId = sessionId, facing = facing))
+
+    /**
+     * Called for every colour displayed during a colour challenge. Only the first call changes the
+     * phase and emits a marker; the rest are ignored.
+     */
+    fun onColorDisplayed() {
+        phase = ChallengePhase.COLOR_SEQUENCE
+        if (colorSequenceStartedLogged) return
+        colorSequenceStartedLogged = true
+        emit(ColorSequenceStarted(sessionId = sessionId))
+    }
 
     fun onFirstFrame(
         width: Int,
@@ -163,10 +179,12 @@ internal class LivenessSessionDiagnostics(
             if (previous != null) {
                 emit(
                     FaceCountChanged(
+                        sessionId = sessionId,
                         from = previous,
                         to = faceCount,
                         framesAnalyzed = framesAnalyzed,
-                        topScore = topScore
+                        topScore = topScore,
+                        phase = phase
                     )
                 )
             }
@@ -178,21 +196,37 @@ internal class LivenessSessionDiagnostics(
             ovalEverMatched = true
             if (!firstOvalMatchLogged) {
                 firstOvalMatchLogged = true
-                emit(FirstOvalMatch(framesAnalyzed = framesAnalyzed))
+                emit(
+                    FirstOvalMatch(
+                        sessionId = sessionId,
+                        framesAnalyzed = framesAnalyzed,
+                        phase = phase
+                    )
+                )
             }
         }
         val previous = lastOvalPosition
         if (previous == position) return
         lastOvalPosition = position
-        emit(OvalPositionChanged(from = previous, to = position))
+        emit(
+            OvalPositionChanged(
+                sessionId = sessionId,
+                from = previous,
+                to = position,
+                phase = phase
+            )
+        )
     }
 
-    fun onInitialFaceDetectedSent() = emit(
-        InitialFaceDetected(
-            sessionId = sessionId,
-            elapsedSinceFirstFrameMs = firstFrameAt?.let { clock() - it } ?: 0L
+    fun onInitialFaceDetectedSent() {
+        phase = ChallengePhase.OVAL_FIT
+        emit(
+            InitialFaceDetected(
+                sessionId = sessionId,
+                elapsedSinceFirstFrameMs = firstFrameAt?.let { clock() - it } ?: 0L
+            )
         )
-    )
+    }
 
     fun onAnalyzeError(throwable: Throwable) {
         analyzeErrors += 1

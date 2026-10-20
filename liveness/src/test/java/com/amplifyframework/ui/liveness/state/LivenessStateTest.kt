@@ -280,7 +280,6 @@ internal class LivenessStateTest {
                 challengeType = "FaceMovementChallenge",
                 challengeId = "12345",
                 faceDetectionThreshold = any(),
-                faceDistanceThreshold = any(),
                 faceDistanceThresholdMin = any(),
                 ovalFitTimeout = any()
             )

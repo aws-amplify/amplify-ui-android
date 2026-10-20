@@ -58,8 +58,14 @@ internal class LivenessSessionDiagnostics(
     @Volatile
     private var firstFrameAt: Long? = null
 
+    @Volatile
+    private var ovalPositionChanges = 0
+
     private var lastFaceCount: Int? = null
     private var lastOvalPosition: FaceDetector.FaceOvalPosition? = null
+    private var lastObservedOvalPosition: FaceDetector.FaceOvalPosition? = null
+    private var candidateOvalPosition: FaceDetector.FaceOvalPosition? = null
+    private var candidateOvalPositionFrames = 0
     private var firstFrameLogged = false
     private var frameBeforeSessionReadyLogged = false
     private var firstOvalMatchLogged = false
@@ -75,9 +81,6 @@ internal class LivenessSessionDiagnostics(
     private var phase: ChallengePhase = ChallengePhase.PRE_CHECK
 
     private var colorSequenceStartedLogged = false
-
-    @Volatile
-    private var faceDistanceThreshold = 0f
 
     @Volatile
     private var faceDistanceThresholdMin = 0f
@@ -101,12 +104,10 @@ internal class LivenessSessionDiagnostics(
         challengeType: String,
         challengeId: String,
         faceDetectionThreshold: Float,
-        faceDistanceThreshold: Float,
         faceDistanceThresholdMin: Float,
         ovalFitTimeout: Int
     ) {
         this.faceDetectionThreshold = faceDetectionThreshold
-        this.faceDistanceThreshold = faceDistanceThreshold
         this.faceDistanceThresholdMin = faceDistanceThresholdMin
         emit(
             SessionReady(
@@ -205,6 +206,15 @@ internal class LivenessSessionDiagnostics(
         }
     }
 
+    /**
+     * Reports the face oval position measured on this frame.
+     *
+     * A position change is only logged once it has held for [OVAL_POSITION_DEBOUNCE_FRAMES]
+     * consecutive frames. A face resting on the match boundary flips position on frame-to-frame
+     * variation alone, which would otherwise emit a burst of changes for a user who is holding
+     * still. Every observed change is still counted into [SessionEnded], so the oscillation
+     * remains visible as a number.
+     */
     fun onOvalPositionChanged(position: FaceDetector.FaceOvalPosition) {
         if (position == FaceDetector.FaceOvalPosition.MATCHED) {
             ovalEverMatched = true
@@ -219,9 +229,33 @@ internal class LivenessSessionDiagnostics(
                 )
             }
         }
+
+        // Counted before the debounce, so the summary reflects what was measured.
+        if (position != lastObservedOvalPosition) {
+            if (lastObservedOvalPosition != null) {
+                ovalPositionChanges += 1
+            }
+            lastObservedOvalPosition = position
+        }
+
+        if (position == lastOvalPosition) {
+            candidateOvalPosition = null
+            candidateOvalPositionFrames = 0
+            return
+        }
+
+        if (position == candidateOvalPosition) {
+            candidateOvalPositionFrames += 1
+        } else {
+            candidateOvalPosition = position
+            candidateOvalPositionFrames = 1
+        }
+        if (candidateOvalPositionFrames < OVAL_POSITION_DEBOUNCE_FRAMES) return
+
         val previous = lastOvalPosition
-        if (previous == position) return
         lastOvalPosition = position
+        candidateOvalPosition = null
+        candidateOvalPositionFrames = 0
         emit(
             OvalPositionChanged(
                 sessionId = sessionId,
@@ -245,7 +279,6 @@ internal class LivenessSessionDiagnostics(
             FaceDistanceChanged(
                 sessionId = sessionId,
                 distance = distance,
-                faceDistanceThreshold = faceDistanceThreshold,
                 faceDistanceThresholdMin = faceDistanceThresholdMin,
                 exceedsThresholdMin = distance >= faceDistanceThresholdMin,
                 phase = phase
@@ -293,6 +326,7 @@ internal class LivenessSessionDiagnostics(
                 framesAnalyzed = framesAnalyzed,
                 faceEverDetected = faceEverDetected,
                 ovalEverMatched = ovalEverMatched,
+                ovalPositionChanges = ovalPositionChanges,
                 analyzeErrors = analyzeErrors,
                 closeCode = closeCode
             )
@@ -366,6 +400,7 @@ internal class LivenessSessionDiagnostics(
         const val FACE_DETECTION_WATCHDOG_TIMEOUT_MS = 10_000L
         private const val BYTES_PER_RGBA_PIXEL = 4
         private const val DISTANCE_REPORT_DELTA = 0.05f
+        private const val OVAL_POSITION_DEBOUNCE_FRAMES = 3
         private const val WATCHDOG_THREAD_NAME = "LivenessFaceDetectionWatchdog"
     }
 }

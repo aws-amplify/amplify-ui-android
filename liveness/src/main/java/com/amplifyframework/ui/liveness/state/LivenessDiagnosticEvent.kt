@@ -121,6 +121,12 @@ internal data class SessionEnded(
     val framesAnalyzed: Int,
     val faceEverDetected: Boolean,
     val ovalEverMatched: Boolean,
+    /**
+     * Every face oval position change observed, including the rapid ones suppressed by the
+     * reporting debounce. A count far above the number of logged changes means the face sat on the
+     * match boundary, where frame-to-frame variation tips the position back and forth.
+     */
+    val ovalPositionChanges: Int,
     val analyzeErrors: Int,
     val closeCode: String
 ) : SessionEvent {
@@ -200,14 +206,14 @@ internal data class FirstOvalMatch(
  * The measured apparent face size. The value rises as the face moves closer, so a falling value
  * means the face is moving away.
  *
- * Both server-provided thresholds are reported alongside the raw value. Only
- * [exceedsThresholdMin] is derived, because that is the one threshold whose comparison direction
- * the SDK establishes elsewhere; nothing consumes [faceDistanceThreshold].
+ * The raw value is reported rather than a classification. [faceDistanceThresholdMin] is an upper
+ * bound on closeness, so it can only identify a face that is too near; the service provides no
+ * lower bound, which means a face that has moved too far away is detectable only from the trend in
+ * [distance].
  */
 internal data class FaceDistanceChanged(
     override val sessionId: String,
     val distance: Float,
-    val faceDistanceThreshold: Float,
     val faceDistanceThresholdMin: Float,
     val exceedsThresholdMin: Boolean,
     val phase: ChallengePhase

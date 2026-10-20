@@ -152,7 +152,6 @@ internal data class LivenessState(
                 challengeType = faceLivenessSession.challengeType.name,
                 challengeId = faceLivenessSession.challengeId,
                 faceDetectionThreshold = it.faceTargetMatching.faceDetectionThreshold,
-                faceDistanceThreshold = it.faceTargetMatching.faceDistanceThreshold,
                 faceDistanceThresholdMin = it.faceTargetMatching.faceDistanceThresholdMin,
                 ovalFitTimeout = it.faceTargetMatching.ovalFitTimeout
             )

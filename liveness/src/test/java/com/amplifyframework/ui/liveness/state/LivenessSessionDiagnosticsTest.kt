@@ -358,7 +358,6 @@ class LivenessSessionDiagnosticsTest {
             challengeType = "FaceMovementAndLightChallenge",
             challengeId = "challenge-1",
             faceDetectionThreshold = 0.7f,
-            faceDistanceThreshold = 0f,
             faceDistanceThresholdMin = 0f,
             ovalFitTimeout = 7000
         )
@@ -417,7 +416,6 @@ class LivenessSessionDiagnosticsTest {
         val event = FaceDistanceChanged(
             sessionId = "session-1",
             distance = 0.31f,
-            faceDistanceThreshold = 0.45f,
             faceDistanceThresholdMin = 0.9f,
             exceedsThresholdMin = false,
             phase = ChallengePhase.COLOR_SEQUENCE
@@ -426,7 +424,6 @@ class LivenessSessionDiagnosticsTest {
         event.level shouldBe LogLevel.INFO
         val rendered = event.toString()
         rendered shouldContain "distance=0.31"
-        rendered shouldContain "faceDistanceThreshold=0.45"
         rendered shouldContain "faceDistanceThresholdMin=0.9"
         rendered shouldContain "exceedsThresholdMin=false"
         rendered shouldContain "phase=COLOR_SEQUENCE"
@@ -457,7 +454,7 @@ class LivenessSessionDiagnosticsTest {
         val subject = diagnostics(logger)
 
         subject.onInitialFaceDetectedSent()
-        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+        repeat(3) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
 
         logger.infos.single { it.contains("OvalPositionChanged") } shouldContain "phase=OVAL_FIT"
     }
@@ -469,7 +466,7 @@ class LivenessSessionDiagnosticsTest {
 
         subject.onInitialFaceDetectedSent()
         subject.onColorDisplayed()
-        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+        repeat(3) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
 
         logger.infos.single { it.contains("OvalPositionChanged") } shouldContain "phase=COLOR_SEQUENCE"
     }
@@ -494,6 +491,59 @@ class LivenessSessionDiagnosticsTest {
         repeat(8) { subject.onColorDisplayed() }
 
         logger.infos.filter { it.contains("ColorSequenceStarted") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `an oval position change is not logged until it has held for three frames`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+        logger.infos.none { it.contains("OvalPositionChanged") } shouldBe true
+
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+        logger.infos.filter { it.contains("OvalPositionChanged") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `a position flapping on the match boundary is not logged`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        repeat(3) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED) }
+
+        // Alternating every frame, as a face resting on the boundary does.
+        repeat(6) {
+            subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+            subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        }
+
+        logger.infos.filter { it.contains("OvalPositionChanged") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `every observed position change is counted into the session summary`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        repeat(6) {
+            subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
+            subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        }
+        subject.onDestroy("NORMAL")
+
+        // 12 observations alternating from a null start gives 11 changes.
+        logger.infos.last() shouldContain "ovalPositionChanges=11"
+    }
+
+    @Test
+    fun `a session with no face reports no position changes`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onDestroy("NORMAL")
+
+        logger.infos.last() shouldContain "ovalPositionChanges=0"
     }
 
     @Test
@@ -539,7 +589,6 @@ class LivenessSessionDiagnosticsTest {
             challengeType = "FaceMovementAndLightChallenge",
             challengeId = "challenge-1",
             faceDetectionThreshold = 0.75f,
-            faceDistanceThreshold = 0.45f,
             faceDistanceThresholdMin = 0.9f,
             ovalFitTimeout = 30000
         )
@@ -547,7 +596,6 @@ class LivenessSessionDiagnosticsTest {
         subject.onFaceDistance(0.31f)
 
         val line = logger.infos.single { it.contains("FaceDistanceChanged") }
-        line shouldContain "faceDistanceThreshold=0.45"
         line shouldContain "faceDistanceThresholdMin=0.9"
         line shouldContain "exceedsThresholdMin=false"
     }
@@ -560,7 +608,6 @@ class LivenessSessionDiagnosticsTest {
             challengeType = "FaceMovementAndLightChallenge",
             challengeId = "challenge-1",
             faceDetectionThreshold = 0.75f,
-            faceDistanceThreshold = 0.45f,
             faceDistanceThresholdMin = 0.9f,
             ovalFitTimeout = 30000
         )

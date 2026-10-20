@@ -53,6 +53,18 @@ internal data class GateSnapshot(
     val checkState: String
 )
 
+/**
+ * Which part of the check a face observation belongs to.
+ *
+ * [COLOR_SEQUENCE] is reachable only for a colour challenge; a movement-only challenge never
+ * displays a colour, so it stays at [OVAL_FIT] for the whole check.
+ */
+internal enum class ChallengePhase {
+    PRE_CHECK,
+    OVAL_FIT,
+    COLOR_SEQUENCE
+}
+
 internal data class SessionStarting(
     override val sessionId: String,
     val attempt: Int,
@@ -157,23 +169,54 @@ internal data object FrameBeforeSessionReady : LivenessDiagnosticEvent {
 }
 
 internal data class FaceCountChanged(
+    override val sessionId: String,
     val from: Int,
     val to: Int,
     val framesAnalyzed: Int,
-    val topScore: Float
-) : LivenessDiagnosticEvent {
-    override val level = LogLevel.DEBUG
+    val topScore: Float,
+    val phase: ChallengePhase
+) : SessionEvent {
+    override val level = LogLevel.INFO
 }
 
 internal data class OvalPositionChanged(
+    override val sessionId: String,
     val from: FaceDetector.FaceOvalPosition?,
-    val to: FaceDetector.FaceOvalPosition
-) : LivenessDiagnosticEvent {
-    override val level = LogLevel.DEBUG
+    val to: FaceDetector.FaceOvalPosition,
+    val phase: ChallengePhase
+) : SessionEvent {
+    override val level = LogLevel.INFO
 }
 
 internal data class FirstOvalMatch(
-    val framesAnalyzed: Int
-) : LivenessDiagnosticEvent {
-    override val level = LogLevel.DEBUG
+    override val sessionId: String,
+    val framesAnalyzed: Int,
+    val phase: ChallengePhase
+) : SessionEvent {
+    override val level = LogLevel.INFO
+}
+
+/**
+ * The measured apparent face size. The value rises as the face moves closer, so a falling value
+ * means the face is moving away.
+ *
+ * Both server-provided thresholds are reported alongside the raw value. Only
+ * [exceedsThresholdMin] is derived, because that is the one threshold whose comparison direction
+ * the SDK establishes elsewhere; nothing consumes [faceDistanceThreshold].
+ */
+internal data class FaceDistanceChanged(
+    override val sessionId: String,
+    val distance: Float,
+    val faceDistanceThreshold: Float,
+    val faceDistanceThresholdMin: Float,
+    val exceedsThresholdMin: Boolean,
+    val phase: ChallengePhase
+) : SessionEvent {
+    override val level = LogLevel.INFO
+}
+
+internal data class ColorSequenceStarted(
+    override val sessionId: String
+) : SessionEvent {
+    override val level = LogLevel.INFO
 }

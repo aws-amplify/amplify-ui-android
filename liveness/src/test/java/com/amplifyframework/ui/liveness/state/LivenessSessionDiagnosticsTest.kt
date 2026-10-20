@@ -378,4 +378,63 @@ class LivenessSessionDiagnosticsTest {
 
         logger.warns.filter { it.contains("SessionError") } shouldHaveSize 1
     }
+
+    @Test
+    fun `promoted face events are session events at info level`() {
+        val faceCount = FaceCountChanged(
+            sessionId = "session-1",
+            from = 0,
+            to = 1,
+            framesAnalyzed = 42,
+            topScore = 0.93f,
+            phase = ChallengePhase.OVAL_FIT
+        )
+        val ovalPosition = OvalPositionChanged(
+            sessionId = "session-1",
+            from = FaceDetector.FaceOvalPosition.MATCHED,
+            to = FaceDetector.FaceOvalPosition.TOO_FAR,
+            phase = ChallengePhase.COLOR_SEQUENCE
+        )
+        val firstMatch = FirstOvalMatch(
+            sessionId = "session-1",
+            framesAnalyzed = 120,
+            phase = ChallengePhase.OVAL_FIT
+        )
+
+        faceCount.level shouldBe LogLevel.INFO
+        ovalPosition.level shouldBe LogLevel.INFO
+        firstMatch.level shouldBe LogLevel.INFO
+        faceCount.toString() shouldContain "sessionId=session-1"
+        faceCount.toString() shouldContain "phase=OVAL_FIT"
+        ovalPosition.toString() shouldContain "phase=COLOR_SEQUENCE"
+        firstMatch.toString() shouldContain "sessionId=session-1"
+    }
+
+    @Test
+    fun `face distance renders the raw value and both thresholds`() {
+        val event = FaceDistanceChanged(
+            sessionId = "session-1",
+            distance = 0.31f,
+            faceDistanceThreshold = 0.45f,
+            faceDistanceThresholdMin = 0.9f,
+            exceedsThresholdMin = false,
+            phase = ChallengePhase.COLOR_SEQUENCE
+        )
+
+        event.level shouldBe LogLevel.INFO
+        val rendered = event.toString()
+        rendered shouldContain "distance=0.31"
+        rendered shouldContain "faceDistanceThreshold=0.45"
+        rendered shouldContain "faceDistanceThresholdMin=0.9"
+        rendered shouldContain "exceedsThresholdMin=false"
+        rendered shouldContain "phase=COLOR_SEQUENCE"
+    }
+
+    @Test
+    fun `color sequence started is a session event at info level`() {
+        val event = ColorSequenceStarted(sessionId = "session-1")
+
+        event.level shouldBe LogLevel.INFO
+        event.toString() shouldBe "ColorSequenceStarted(sessionId=session-1)"
+    }
 }

@@ -81,6 +81,7 @@ internal class LivenessSessionDiagnostics(
     private var phase: ChallengePhase = ChallengePhase.PRE_CHECK
 
     private var colorSequenceStartedLogged = false
+    private var challengeCompletedLogged = false
 
     @Volatile
     private var faceDistanceThresholdMin = 0f
@@ -168,6 +169,22 @@ internal class LivenessSessionDiagnostics(
                 pixelStride = pixelStride,
                 rotation = rotationDegrees,
                 format = format
+            )
+        )
+    }
+
+    /**
+     * Called when the active challenge finishes. Emitted once; the movement-only call site sits in
+     * a composable effect, so a repeat call is possible and is ignored.
+     */
+    fun onChallengeCompleted() {
+        if (challengeCompletedLogged) return
+        challengeCompletedLogged = true
+        emit(
+            ChallengeCompleted(
+                sessionId = sessionId,
+                framesAnalyzed = framesAnalyzed,
+                phase = phase
             )
         )
     }

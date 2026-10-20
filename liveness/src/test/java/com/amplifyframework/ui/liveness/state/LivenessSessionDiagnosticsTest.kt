@@ -547,6 +547,43 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
+    fun `challenge completed reports the colour phase for a colour challenge`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onInitialFaceDetectedSent()
+        subject.onColorDisplayed()
+        subject.onFrameAnalyzed(faceCount = 1, topScore = 0.9f)
+        subject.onChallengeCompleted()
+
+        val line = logger.infos.single { it.contains("ChallengeCompleted") }
+        line shouldContain "phase=COLOR_SEQUENCE"
+        line shouldContain "framesAnalyzed=1"
+        line shouldContain "sessionId=session-1"
+    }
+
+    @Test
+    fun `challenge completed reports the oval fit phase for a movement only challenge`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onInitialFaceDetectedSent()
+        subject.onChallengeCompleted()
+
+        logger.infos.single { it.contains("ChallengeCompleted") } shouldContain "phase=OVAL_FIT"
+    }
+
+    @Test
+    fun `challenge completed is emitted once`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        repeat(5) { subject.onChallengeCompleted() }
+
+        logger.infos.filter { it.contains("ChallengeCompleted") } shouldHaveSize 1
+    }
+
+    @Test
     fun `face distance is emitted on the first observation`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)

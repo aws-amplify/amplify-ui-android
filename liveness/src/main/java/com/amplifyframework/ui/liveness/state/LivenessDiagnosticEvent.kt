@@ -226,3 +226,19 @@ internal data class ColorSequenceStarted(
 ) : SessionEvent {
     override val level = LogLevel.INFO
 }
+
+/**
+ * The active challenge has finished and the session is waiting on its result. Bounds the period
+ * during which the user's face still mattered, separating it from the time spent waiting for the
+ * service.
+ *
+ * [phase] identifies which challenge ran: `COLOR_SEQUENCE` for a colour challenge,
+ * `OVAL_FIT` for a movement-only one.
+ */
+internal data class ChallengeCompleted(
+    override val sessionId: String,
+    val framesAnalyzed: Int,
+    val phase: ChallengePhase
+) : SessionEvent {
+    override val level = LogLevel.INFO
+}

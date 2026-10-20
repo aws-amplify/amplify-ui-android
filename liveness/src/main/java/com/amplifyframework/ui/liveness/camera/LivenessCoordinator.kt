@@ -328,6 +328,7 @@ internal class LivenessCoordinator(
     }
 
     fun processLivenessCheckComplete() {
+        diagnostics.onChallengeCompleted()
         livenessState.onLivenessChallengeComplete()
         coordinatorScope.launch {
             encoder.stop()

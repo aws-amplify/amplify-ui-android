@@ -242,15 +242,6 @@ internal class LivenessSessionDiagnostics(
     }
 
     /**
-     * Reports the face oval position measured on this frame.
-     *
-     * A position change is only logged once it has held for [OVAL_POSITION_DEBOUNCE_FRAMES]
-     * consecutive frames. A face resting on the match boundary flips position on frame-to-frame
-     * variation alone, which would otherwise emit a burst of changes for a user who is holding
-     * still. Every observed change is still counted into [SessionEnded], so the oscillation
-     * remains visible as a number.
-     */
-    /**
      * Records the overlap between the detected face and the oval for this frame. Accumulated only;
      * the statistics are reported once in [SessionEnded], so this emits nothing per frame.
      *
@@ -265,6 +256,15 @@ internal class LivenessSessionDiagnostics(
         if (iou < lowestIou) lowestIou = iou
     }
 
+    /**
+     * Reports the face oval position measured on this frame.
+     *
+     * A position change is only logged once it has held for [OVAL_POSITION_DEBOUNCE_FRAMES]
+     * consecutive frames. A face resting on the match boundary flips position on frame-to-frame
+     * variation alone, which would otherwise emit a burst of changes for a user who is holding
+     * still. Every observed change is still counted into [SessionEnded], so the oscillation
+     * remains visible as a number.
+     */
     fun onOvalPositionChanged(position: FaceDetector.FaceOvalPosition) {
         if (position == FaceDetector.FaceOvalPosition.MATCHED) {
             ovalEverMatched = true

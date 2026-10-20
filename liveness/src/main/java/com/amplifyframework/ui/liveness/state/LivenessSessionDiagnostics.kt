@@ -61,6 +61,12 @@ internal class LivenessSessionDiagnostics(
     @Volatile
     private var ovalPositionChanges = 0
 
+    @Volatile
+    private var framesMatched = 0
+
+    @Volatile
+    private var framesOffTarget = 0
+
     private var lastFaceCount: Int? = null
     private var lastOvalPosition: FaceDetector.FaceOvalPosition? = null
     private var lastObservedOvalPosition: FaceDetector.FaceOvalPosition? = null
@@ -247,6 +253,16 @@ internal class LivenessSessionDiagnostics(
             }
         }
 
+        // Counted from the first match onwards, which is when the challenge is genuinely underway
+        // for both challenge types, and before the debounce so the share reflects every frame.
+        if (ovalEverMatched) {
+            if (position == FaceDetector.FaceOvalPosition.MATCHED) {
+                framesMatched += 1
+            } else {
+                framesOffTarget += 1
+            }
+        }
+
         // Counted before the debounce, so the summary reflects what was measured.
         if (position != lastObservedOvalPosition) {
             if (lastObservedOvalPosition != null) {
@@ -344,6 +360,8 @@ internal class LivenessSessionDiagnostics(
                 faceEverDetected = faceEverDetected,
                 ovalEverMatched = ovalEverMatched,
                 ovalPositionChanges = ovalPositionChanges,
+                framesMatched = framesMatched,
+                framesOffTarget = framesOffTarget,
                 analyzeErrors = analyzeErrors,
                 closeCode = closeCode
             )

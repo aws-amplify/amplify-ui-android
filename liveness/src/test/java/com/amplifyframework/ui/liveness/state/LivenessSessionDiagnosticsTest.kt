@@ -184,7 +184,7 @@ class LivenessSessionDiagnosticsTest {
         subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
         repeat(5) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED) }
 
-        logger.infos.filter { it.contains("OvalPositionChanged") } shouldHaveSize 2
+        logger.debugs.filter { it.contains("OvalPositionChanged") } shouldHaveSize 2
     }
 
     @Test
@@ -381,7 +381,7 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
-    fun `promoted face events are session events at info level`() {
+    fun `promoted face events are session events carrying the phase`() {
         val faceCount = FaceCountChanged(
             sessionId = "session-1",
             from = 0,
@@ -403,7 +403,7 @@ class LivenessSessionDiagnosticsTest {
         )
 
         faceCount.level shouldBe LogLevel.INFO
-        ovalPosition.level shouldBe LogLevel.INFO
+        ovalPosition.level shouldBe LogLevel.DEBUG
         firstMatch.level shouldBe LogLevel.INFO
         faceCount.toString() shouldContain "sessionId=session-1"
         faceCount.toString() shouldContain "phase=OVAL_FIT"
@@ -412,7 +412,7 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
-    fun `face distance renders the raw value and both thresholds`() {
+    fun `face distance renders the raw value and the closeness threshold`() {
         val event = FaceDistanceChanged(
             sessionId = "session-1",
             distance = 0.31f,
@@ -421,7 +421,7 @@ class LivenessSessionDiagnosticsTest {
             phase = ChallengePhase.COLOR_SEQUENCE
         )
 
-        event.level shouldBe LogLevel.INFO
+        event.level shouldBe LogLevel.DEBUG
         val rendered = event.toString()
         rendered shouldContain "distance=0.31"
         rendered shouldContain "faceDistanceThresholdMin=0.9"
@@ -456,7 +456,7 @@ class LivenessSessionDiagnosticsTest {
         subject.onInitialFaceDetectedSent()
         repeat(3) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
 
-        logger.infos.single { it.contains("OvalPositionChanged") } shouldContain "phase=OVAL_FIT"
+        logger.debugs.single { it.contains("OvalPositionChanged") } shouldContain "phase=OVAL_FIT"
     }
 
     @Test
@@ -468,7 +468,7 @@ class LivenessSessionDiagnosticsTest {
         subject.onColorDisplayed()
         repeat(3) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
 
-        logger.infos.single { it.contains("OvalPositionChanged") } shouldContain "phase=COLOR_SEQUENCE"
+        logger.debugs.single { it.contains("OvalPositionChanged") } shouldContain "phase=COLOR_SEQUENCE"
     }
 
     @Test
@@ -500,10 +500,10 @@ class LivenessSessionDiagnosticsTest {
 
         subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
         subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
-        logger.infos.none { it.contains("OvalPositionChanged") } shouldBe true
+        logger.debugs.none { it.contains("OvalPositionChanged") } shouldBe true
 
         subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR)
-        logger.infos.filter { it.contains("OvalPositionChanged") } shouldHaveSize 1
+        logger.debugs.filter { it.contains("OvalPositionChanged") } shouldHaveSize 1
     }
 
     @Test
@@ -518,7 +518,7 @@ class LivenessSessionDiagnosticsTest {
             subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
         }
 
-        logger.infos.filter { it.contains("OvalPositionChanged") } shouldHaveSize 1
+        logger.debugs.filter { it.contains("OvalPositionChanged") } shouldHaveSize 1
     }
 
     @Test
@@ -584,13 +584,56 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
+    fun `off target frames are counted from the first oval match onwards`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        // Before any match, nothing is counted towards the share.
+        repeat(5) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        repeat(3) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
+        subject.onDestroy("NORMAL")
+
+        val line = logger.infos.last()
+        line shouldContain "framesMatched=1"
+        line shouldContain "framesOffTarget=3"
+    }
+
+    @Test
+    fun `a session that never matched the oval reports no off target frames`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        repeat(5) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
+        subject.onDestroy("NORMAL")
+
+        val line = logger.infos.last()
+        line shouldContain "framesMatched=0"
+        line shouldContain "framesOffTarget=0"
+    }
+
+    @Test
+    fun `the off target share is reported even when the challenge never completed`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        repeat(2) { subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.TOO_FAR) }
+        subject.onSessionError("VideoEncodingException", stopSession = true, closeCode = "RUNTIME_ERROR")
+        subject.onDestroy("RUNTIME_ERROR")
+
+        logger.infos.none { it.contains("ChallengeCompleted") } shouldBe true
+        logger.infos.last() shouldContain "framesOffTarget=2"
+    }
+
+    @Test
     fun `face distance is emitted on the first observation`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
 
         subject.onFaceDistance(0.5f)
 
-        logger.infos.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 1
+        logger.debugs.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 1
     }
 
     @Test
@@ -603,7 +646,7 @@ class LivenessSessionDiagnosticsTest {
         subject.onFaceDistance(0.48f)
         subject.onFaceDistance(0.53f)
 
-        logger.infos.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 1
+        logger.debugs.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 1
     }
 
     @Test
@@ -615,7 +658,7 @@ class LivenessSessionDiagnosticsTest {
         subject.onFaceDistance(0.56f)
         subject.onFaceDistance(0.30f)
 
-        logger.infos.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 3
+        logger.debugs.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 3
     }
 
     @Test
@@ -632,7 +675,7 @@ class LivenessSessionDiagnosticsTest {
 
         subject.onFaceDistance(0.31f)
 
-        val line = logger.infos.single { it.contains("FaceDistanceChanged") }
+        val line = logger.debugs.single { it.contains("FaceDistanceChanged") }
         line shouldContain "faceDistanceThresholdMin=0.9"
         line shouldContain "exceedsThresholdMin=false"
     }
@@ -651,7 +694,7 @@ class LivenessSessionDiagnosticsTest {
 
         subject.onFaceDistance(0.95f)
 
-        logger.infos.single { it.contains("FaceDistanceChanged") } shouldContain
+        logger.debugs.single { it.contains("FaceDistanceChanged") } shouldContain
             "exceedsThresholdMin=true"
     }
 }

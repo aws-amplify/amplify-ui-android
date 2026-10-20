@@ -127,6 +127,13 @@ internal data class SessionEnded(
      * match boundary, where frame-to-frame variation tips the position back and forth.
      */
     val ovalPositionChanges: Int,
+    /**
+     * Frames from the first oval match onwards whose measured position was `MATCHED`, and those
+     * whose was not. Their ratio is the share of the active challenge the face spent off target,
+     * which is comparable between sessions in a way a transition count is not.
+     */
+    val framesMatched: Int,
+    val framesOffTarget: Int,
     val analyzeErrors: Int,
     val closeCode: String
 ) : SessionEvent {
@@ -191,7 +198,10 @@ internal data class OvalPositionChanged(
     val to: FaceDetector.FaceOvalPosition,
     val phase: ChallengePhase
 ) : SessionEvent {
-    override val level = LogLevel.INFO
+    // Reported at debug: the oval match bounds are tuned to coach the user, not to match what the
+    // service tolerates, so a position change does not predict a failed check. The share of the
+    // challenge spent off target, reported once in SessionEnded, is the comparable signal.
+    override val level = LogLevel.DEBUG
 }
 
 internal data class FirstOvalMatch(
@@ -218,7 +228,10 @@ internal data class FaceDistanceChanged(
     val exceedsThresholdMin: Boolean,
     val phase: ChallengePhase
 ) : SessionEvent {
-    override val level = LogLevel.INFO
+    // Reported at debug for the same reason as OvalPositionChanged: a single measurement is not
+    // interpretable without the session's outcome, so it serves a per-device deep dive rather
+    // than field aggregation.
+    override val level = LogLevel.DEBUG
 }
 
 internal data class ColorSequenceStarted(

@@ -246,8 +246,13 @@ internal class LivenessSessionDiagnostics(
     /**
      * Records the overlap between the detected face and the oval for this frame. Accumulated only;
      * the statistics are reported once in [SessionEnded], so this emits nothing per frame.
+     *
+     * Frames before the first oval match are ignored. The face is still being brought into
+     * position then, so including them measures how long the user took to line up rather than how
+     * well they held position once the challenge was underway.
      */
     fun onFaceIou(iou: Float) {
+        if (!ovalEverMatched) return
         iouSum += iou
         iouSamples += 1
         if (iou < lowestIou) lowestIou = iou
@@ -365,8 +370,8 @@ internal class LivenessSessionDiagnostics(
                 faceEverDetected = faceEverDetected,
                 ovalEverMatched = ovalEverMatched,
                 ovalPositionChanges = ovalPositionChanges,
-                minIou = if (iouSamples == 0) 0f else lowestIou,
-                meanIou = if (iouSamples == 0) 0f else iouSum / iouSamples,
+                challengeMinIou = if (iouSamples == 0) 0f else lowestIou,
+                challengeMeanIou = if (iouSamples == 0) 0f else iouSum / iouSamples,
                 analyzeErrors = analyzeErrors,
                 closeCode = closeCode
             )

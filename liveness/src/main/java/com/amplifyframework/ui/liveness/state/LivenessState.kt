@@ -314,10 +314,7 @@ internal data class LivenessState(
                 faceTargetChallenge!!.faceTargetMatching
             )
 
-            // Overlap drives the match decision, so it is recorded every frame as a graded
-            // measure of how well the face is positioned.
             val currentIou = FaceDetector.intersectionOverUnion(faceRect, oval)
-            diagnostics.onFaceIou(currentIou)
 
             if (initialFaceOvalIou < 0) {
                 initialFaceOvalIou = currentIou
@@ -338,6 +335,10 @@ internal data class LivenessState(
             // prompted again, which would otherwise hide a face drifting out of position later in
             // the challenge.
             diagnostics.onOvalPositionChanged(faceOvalPosition)
+
+            // Reported after the position, so the frame that first matches the oval is itself
+            // included in the challenge statistics.
+            diagnostics.onFaceIou(currentIou)
 
             val displayedPosition = if (detectedFaceMatchedOval) {
                 FaceDetector.FaceOvalPosition.MATCHED

@@ -586,9 +586,10 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
-    fun `iou statistics report the lowest and mean overlap`() {
+    fun `iou statistics report the lowest and mean overlap after the first match`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
 
         subject.onFaceIou(0.8f)
         subject.onFaceIou(0.4f)
@@ -596,44 +597,65 @@ class LivenessSessionDiagnosticsTest {
         subject.onDestroy("NORMAL")
 
         val line = logger.infos.last()
-        line shouldContain "minIou=0.4"
-        line shouldContain "meanIou=0.6"
+        line shouldContain "challengeMinIou=0.4"
+        line shouldContain "challengeMeanIou=0.6"
+    }
+
+    @Test
+    fun `overlap before the first oval match is excluded`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        // The approach, while the face is still being brought into position.
+        subject.onFaceIou(0.05f)
+        subject.onFaceIou(0.1f)
+
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        subject.onFaceIou(0.7f)
+        subject.onDestroy("NORMAL")
+
+        val line = logger.infos.last()
+        line shouldContain "challengeMinIou=0.7"
+        line shouldContain "challengeMeanIou=0.7"
     }
 
     @Test
     fun `iou statistics emit nothing per frame`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        logger.infos.clear()
 
         repeat(100) { subject.onFaceIou(0.5f) }
 
         logger.infos.shouldBeEmpty()
-        logger.debugs.shouldBeEmpty()
     }
 
     @Test
-    fun `a session with no oval reports zero iou rather than a sentinel`() {
+    fun `a session that never matched the oval reports zero overlap not a sentinel`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
 
+        repeat(5) { subject.onFaceIou(0.2f) }
         subject.onDestroy("NORMAL")
 
         val line = logger.infos.last()
-        line shouldContain "minIou=0.0"
-        line shouldContain "meanIou=0.0"
+        line shouldContain "challengeMinIou=0.0"
+        line shouldContain "challengeMeanIou=0.0"
     }
 
     @Test
     fun `iou statistics survive a session that never completed its challenge`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
 
         subject.onFaceIou(0.3f)
         subject.onSessionError("VideoEncodingException", stopSession = true, closeCode = "RUNTIME_ERROR")
         subject.onDestroy("RUNTIME_ERROR")
 
         logger.infos.none { it.contains("ChallengeCompleted") } shouldBe true
-        logger.infos.last() shouldContain "minIou=0.3"
+        logger.infos.last() shouldContain "challengeMinIou=0.3"
     }
 
     @Test

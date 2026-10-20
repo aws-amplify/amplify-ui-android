@@ -130,15 +130,16 @@ internal data class SessionEnded(
     val ovalPositionChanges: Int,
     /**
      * The lowest and mean intersection-over-union between the detected face and the oval, over
-     * every frame for which the oval was displayed.
+     * every frame from the first oval match to the end of the session — the period during which
+     * the user is meant to be holding position.
      *
      * A graded measure is used rather than a count of matched frames because `MATCHED` requires an
      * IoU threshold and three edge alignments to hold at once — a boundary the face passes through
      * rather than rests in, so any count derived from it saturates. These are comparable between
      * sessions and are read against the `targetIouThreshold` reported at session ready.
      */
-    val minIou: Float,
-    val meanIou: Float,
+    val challengeMinIou: Float,
+    val challengeMeanIou: Float,
     val analyzeErrors: Int,
     val closeCode: String
 ) : SessionEvent {

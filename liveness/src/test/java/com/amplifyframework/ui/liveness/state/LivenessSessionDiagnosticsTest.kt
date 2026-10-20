@@ -659,6 +659,59 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
+    fun `challenge frames count from the first match and expose the overlap sample size`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        // Four frames before the match, none of which should be in the challenge window.
+        repeat(4) { subject.onFrameAnalyzed(faceCount = 1, topScore = 0.9f) }
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        subject.onFaceIou(0.7f)
+
+        // Two further analysed frames, only one of which carries a face.
+        subject.onFrameAnalyzed(faceCount = 1, topScore = 0.9f)
+        subject.onFaceIou(0.6f)
+        subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
+        subject.onDestroy("NORMAL")
+
+        val line = logger.infos.last()
+        line shouldContain "challengeFrames=3"
+        line shouldContain "challengeFramesWithFace=2"
+    }
+
+    @Test
+    fun `a face that leaves the frame shows as a gap between frames and frames with face`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.onFrameAnalyzed(faceCount = 1, topScore = 0.9f)
+        subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
+        subject.onFaceIou(0.7f)
+
+        // The face is gone for the rest of the challenge, so no overlap is sampled.
+        repeat(20) { subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f) }
+        subject.onDestroy("NORMAL")
+
+        val line = logger.infos.last()
+        line shouldContain "challengeFrames=21"
+        line shouldContain "challengeFramesWithFace=1"
+        // The surviving sample still reads high, which is why the counts must accompany it.
+        line shouldContain "challengeMeanIou=0.7"
+    }
+
+    @Test
+    fun `a session that never matched the oval reports no challenge frames`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        repeat(10) { subject.onFrameAnalyzed(faceCount = 1, topScore = 0.9f) }
+        subject.onDestroy("NORMAL")
+
+        val line = logger.infos.last()
+        line shouldContain "challengeFrames=0"
+        line shouldContain "challengeFramesWithFace=0"
+    }
+
+    @Test
     fun `face distance is emitted on the first observation`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)

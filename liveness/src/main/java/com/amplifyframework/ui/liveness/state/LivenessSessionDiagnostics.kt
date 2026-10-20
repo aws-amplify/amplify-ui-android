@@ -70,6 +70,9 @@ internal class LivenessSessionDiagnostics(
     @Volatile
     private var lowestIou = Float.MAX_VALUE
 
+    @Volatile
+    private var framesAnalyzedAtFirstMatch = 0
+
     private var lastFaceCount: Int? = null
     private var lastOvalPosition: FaceDetector.FaceOvalPosition? = null
     private var lastObservedOvalPosition: FaceDetector.FaceOvalPosition? = null
@@ -263,6 +266,7 @@ internal class LivenessSessionDiagnostics(
             ovalEverMatched = true
             if (!firstOvalMatchLogged) {
                 firstOvalMatchLogged = true
+                framesAnalyzedAtFirstMatch = framesAnalyzed
                 emit(
                     FirstOvalMatch(
                         sessionId = sessionId,
@@ -370,6 +374,10 @@ internal class LivenessSessionDiagnostics(
                 faceEverDetected = faceEverDetected,
                 ovalEverMatched = ovalEverMatched,
                 ovalPositionChanges = ovalPositionChanges,
+                // Derived rather than counted, so it cannot drift out of step with the sample
+                // count regardless of the order the per-frame hooks are called in.
+                challengeFrames = if (ovalEverMatched) framesAnalyzed - framesAnalyzedAtFirstMatch + 1 else 0,
+                challengeFramesWithFace = iouSamples,
                 challengeMinIou = if (iouSamples == 0) 0f else lowestIou,
                 challengeMeanIou = if (iouSamples == 0) 0f else iouSum / iouSamples,
                 analyzeErrors = analyzeErrors,

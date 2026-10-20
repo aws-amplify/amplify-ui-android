@@ -129,9 +129,19 @@ internal data class SessionEnded(
      */
     val ovalPositionChanges: Int,
     /**
+     * Frames analysed from the first oval match onwards, and how many of those carried exactly one
+     * detected face. A face is only measurable against the oval when exactly one is found, so the
+     * gap between these two is the number of frames where the face was missing or ambiguous.
+     *
+     * [challengeFramesWithFace] is the sample size behind the overlap statistics below, and the
+     * reason they must not be read without it: a face that leaves the frame contributes no samples
+     * at all, which *raises* the mean rather than lowering it.
+     */
+    val challengeFrames: Int,
+    val challengeFramesWithFace: Int,
+    /**
      * The lowest and mean intersection-over-union between the detected face and the oval, over
-     * every frame from the first oval match to the end of the session — the period during which
-     * the user is meant to be holding position.
+     * every frame from the first oval match to the end of the session that carried a single face.
      *
      * A graded measure is used rather than a count of matched frames because `MATCHED` requires an
      * IoU threshold and three edge alignments to hold at once — a boundary the face passes through

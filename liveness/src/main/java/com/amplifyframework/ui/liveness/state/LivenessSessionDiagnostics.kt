@@ -73,6 +73,9 @@ internal class LivenessSessionDiagnostics(
     @Volatile
     private var framesAnalyzedAtFirstMatch = 0
 
+    @Volatile
+    private var terminalCloseCode: String? = null
+
     private var lastFaceCount: Int? = null
     private var lastOvalPosition: FaceDetector.FaceOvalPosition? = null
     private var lastObservedOvalPosition: FaceDetector.FaceOvalPosition? = null
@@ -352,6 +355,13 @@ internal class LivenessSessionDiagnostics(
 
     fun onSessionError(type: String, stopSession: Boolean, closeCode: String) {
         cancelWatchdog()
+        // Retained for the session summary. The host removes the detector in response to the
+        // error, so by the time the session ends the only code available describes that disposal
+        // rather than the reason the session actually ended. The first error is kept, since a
+        // later one is a consequence of it.
+        if (terminalCloseCode == null) {
+            terminalCloseCode = closeCode
+        }
         emit(
             SessionError(
                 sessionId = sessionId,
@@ -381,7 +391,7 @@ internal class LivenessSessionDiagnostics(
                 challengeMinIou = if (iouSamples == 0) 0f else lowestIou,
                 challengeMeanIou = if (iouSamples == 0) 0f else iouSum / iouSamples,
                 analyzeErrors = analyzeErrors,
-                closeCode = closeCode
+                closeCode = terminalCloseCode ?: closeCode
             )
         )
     }

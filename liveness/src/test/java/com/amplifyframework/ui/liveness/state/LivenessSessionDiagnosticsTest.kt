@@ -712,6 +712,40 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
+    fun `the session summary reports why the session ended not how it was disposed`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onSessionError("UserCancelledException", stopSession = true, closeCode = "CANCELED")
+        // The host removes the detector in response, which disposes the coordinator.
+        subject.onDestroy("DISPOSED")
+
+        logger.infos.last() shouldContain "closeCode=CANCELED"
+    }
+
+    @Test
+    fun `the disposal code is reported when the session ended without an error`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onDestroy("DISPOSED")
+
+        logger.infos.last() shouldContain "closeCode=DISPOSED"
+    }
+
+    @Test
+    fun `the first error is the one reported when several follow`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onSessionError("FaceInOvalMatchExceededTimeLimitException", true, "TIMEOUT")
+        subject.onSessionError("VideoEncodingException", true, "RUNTIME_ERROR")
+        subject.onDestroy("DISPOSED")
+
+        logger.infos.last() shouldContain "closeCode=TIMEOUT"
+    }
+
+    @Test
     fun `face distance is emitted on the first observation`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)

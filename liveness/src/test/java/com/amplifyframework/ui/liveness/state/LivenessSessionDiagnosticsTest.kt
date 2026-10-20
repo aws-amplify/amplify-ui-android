@@ -358,6 +358,8 @@ class LivenessSessionDiagnosticsTest {
             challengeType = "FaceMovementAndLightChallenge",
             challengeId = "challenge-1",
             faceDetectionThreshold = 0.7f,
+            faceDistanceThreshold = 0f,
+            faceDistanceThresholdMin = 0f,
             ovalFitTimeout = 7000
         )
 
@@ -492,5 +494,80 @@ class LivenessSessionDiagnosticsTest {
         repeat(8) { subject.onColorDisplayed() }
 
         logger.infos.filter { it.contains("ColorSequenceStarted") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `face distance is emitted on the first observation`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onFaceDistance(0.5f)
+
+        logger.infos.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `face distance inside the hysteresis band is not re-emitted`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onFaceDistance(0.50f)
+        subject.onFaceDistance(0.52f)
+        subject.onFaceDistance(0.48f)
+        subject.onFaceDistance(0.53f)
+
+        logger.infos.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `face distance crossing the hysteresis band is emitted again`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onFaceDistance(0.50f)
+        subject.onFaceDistance(0.56f)
+        subject.onFaceDistance(0.30f)
+
+        logger.infos.filter { it.contains("FaceDistanceChanged") } shouldHaveSize 3
+    }
+
+    @Test
+    fun `face distance reports the thresholds captured at session ready`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.onSessionReady(
+            challengeType = "FaceMovementAndLightChallenge",
+            challengeId = "challenge-1",
+            faceDetectionThreshold = 0.75f,
+            faceDistanceThreshold = 0.45f,
+            faceDistanceThresholdMin = 0.9f,
+            ovalFitTimeout = 30000
+        )
+
+        subject.onFaceDistance(0.31f)
+
+        val line = logger.infos.single { it.contains("FaceDistanceChanged") }
+        line shouldContain "faceDistanceThreshold=0.45"
+        line shouldContain "faceDistanceThresholdMin=0.9"
+        line shouldContain "exceedsThresholdMin=false"
+    }
+
+    @Test
+    fun `exceedsThresholdMin is true when the face is closer than the minimum`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+        subject.onSessionReady(
+            challengeType = "FaceMovementAndLightChallenge",
+            challengeId = "challenge-1",
+            faceDetectionThreshold = 0.75f,
+            faceDistanceThreshold = 0.45f,
+            faceDistanceThresholdMin = 0.9f,
+            ovalFitTimeout = 30000
+        )
+
+        subject.onFaceDistance(0.95f)
+
+        logger.infos.single { it.contains("FaceDistanceChanged") } shouldContain
+            "exceedsThresholdMin=true"
     }
 }

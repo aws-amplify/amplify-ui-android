@@ -23,6 +23,7 @@ import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import java.util.Timer
 import kotlin.concurrent.schedule
+import kotlin.math.abs
 
 /**
  * Emits diagnostic log lines for one liveness session.
@@ -75,6 +76,15 @@ internal class LivenessSessionDiagnostics(
 
     private var colorSequenceStartedLogged = false
 
+    @Volatile
+    private var faceDistanceThreshold = 0f
+
+    @Volatile
+    private var faceDistanceThresholdMin = 0f
+
+    @Volatile
+    private var lastEmittedDistance: Float? = null
+
     fun onSessionStartRequested(attempt: Int, codec: String, preCheckEnabled: Boolean) = emit(
         SessionStarting(
             sessionId = sessionId,
@@ -91,9 +101,13 @@ internal class LivenessSessionDiagnostics(
         challengeType: String,
         challengeId: String,
         faceDetectionThreshold: Float,
+        faceDistanceThreshold: Float,
+        faceDistanceThresholdMin: Float,
         ovalFitTimeout: Int
     ) {
         this.faceDetectionThreshold = faceDetectionThreshold
+        this.faceDistanceThreshold = faceDistanceThreshold
+        this.faceDistanceThresholdMin = faceDistanceThresholdMin
         emit(
             SessionReady(
                 sessionId = sessionId,
@@ -218,6 +232,27 @@ internal class LivenessSessionDiagnostics(
         )
     }
 
+    /**
+     * Reports the apparent face size measured on this frame. Emits only when the value has moved
+     * at least [DISTANCE_REPORT_DELTA] from the last emitted one, because the measurement is
+     * continuous and arrives on every analysed frame.
+     */
+    fun onFaceDistance(distance: Float) {
+        val last = lastEmittedDistance
+        if (last != null && abs(distance - last) < DISTANCE_REPORT_DELTA) return
+        lastEmittedDistance = distance
+        emit(
+            FaceDistanceChanged(
+                sessionId = sessionId,
+                distance = distance,
+                faceDistanceThreshold = faceDistanceThreshold,
+                faceDistanceThresholdMin = faceDistanceThresholdMin,
+                exceedsThresholdMin = distance >= faceDistanceThresholdMin,
+                phase = phase
+            )
+        )
+    }
+
     fun onInitialFaceDetectedSent() {
         phase = ChallengePhase.OVAL_FIT
         emit(
@@ -330,6 +365,7 @@ internal class LivenessSessionDiagnostics(
         @VisibleForTesting
         const val FACE_DETECTION_WATCHDOG_TIMEOUT_MS = 10_000L
         private const val BYTES_PER_RGBA_PIXEL = 4
+        private const val DISTANCE_REPORT_DELTA = 0.05f
         private const val WATCHDOG_THREAD_NAME = "LivenessFaceDetectionWatchdog"
     }
 }

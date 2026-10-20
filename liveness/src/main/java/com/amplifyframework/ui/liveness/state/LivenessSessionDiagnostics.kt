@@ -21,6 +21,7 @@ import com.amplifyframework.logging.LogLevel
 import com.amplifyframework.logging.Logger
 import com.amplifyframework.ui.liveness.camera.LivenessCoordinator
 import com.amplifyframework.ui.liveness.ml.FaceDetector
+import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import java.util.Timer
 import kotlin.concurrent.schedule
 import kotlin.math.abs
@@ -353,7 +354,11 @@ internal class LivenessSessionDiagnostics(
         emit(AnalyzeFailed(sessionId = sessionId, throwable = throwable))
     }
 
-    fun onSessionError(type: String, stopSession: Boolean, closeCode: String) {
+    fun onSessionError(
+        error: FaceLivenessDetectionException,
+        stopSession: Boolean,
+        closeCode: String
+    ) {
         cancelWatchdog()
         // Retained for the session summary. The host removes the detector in response to the
         // error, so by the time the session ends the only code available describes that disposal
@@ -365,7 +370,9 @@ internal class LivenessSessionDiagnostics(
         emit(
             SessionError(
                 sessionId = sessionId,
-                type = type,
+                type = error::class.simpleName ?: "Unknown",
+                message = error.message,
+                cause = describeCauses(error.throwable),
                 stopSession = stopSession,
                 closeCode = closeCode
             )
@@ -446,6 +453,18 @@ internal class LivenessSessionDiagnostics(
         )
     }
 
+    /**
+     * Flattens a cause chain into one line, outermost first, or null when there is no cause.
+     *
+     * The chain is read rather than handed to the logger as a throwable so that a session error
+     * stays a single greppable line, matching every other diagnostic event. Depth is bounded so a
+     * chain that refers back to itself cannot be followed forever.
+     */
+    private fun describeCauses(throwable: Throwable?): String? = generateSequence(throwable) { it.cause }
+        .take(MAX_CAUSE_DEPTH)
+        .joinToString(CAUSE_SEPARATOR) { "${it::class.simpleName}: ${it.message}" }
+        .ifEmpty { null }
+
     private fun emit(event: LivenessDiagnosticEvent) {
         val message = "Liveness $event"
         when (event.level) {
@@ -462,7 +481,9 @@ internal class LivenessSessionDiagnostics(
         @VisibleForTesting
         const val FACE_DETECTION_WATCHDOG_TIMEOUT_MS = 10_000L
         private const val BYTES_PER_RGBA_PIXEL = 4
+        private const val CAUSE_SEPARATOR = " <- "
         private const val DISTANCE_REPORT_DELTA = 0.05f
+        private const val MAX_CAUSE_DEPTH = 5
         private const val OVAL_POSITION_DEBOUNCE_FRAMES = 3
         private const val WATCHDOG_THREAD_NAME = "LivenessFaceDetectionWatchdog"
     }

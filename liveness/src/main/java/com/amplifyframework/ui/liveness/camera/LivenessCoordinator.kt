@@ -300,7 +300,7 @@ internal class LivenessCoordinator(
             else -> WebSocketCloseCode.RUNTIME_ERROR
         }
         diagnostics.onSessionError(
-            type = faceLivenessException::class.simpleName ?: "Unknown",
+            error = faceLivenessException,
             stopSession = stopLivenessSession,
             closeCode = webSocketCloseCode.name
         )

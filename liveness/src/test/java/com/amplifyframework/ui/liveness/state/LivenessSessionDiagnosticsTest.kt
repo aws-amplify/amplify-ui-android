@@ -18,6 +18,7 @@ package com.amplifyframework.ui.liveness.state
 import com.amplifyframework.logging.LogLevel
 import com.amplifyframework.logging.Logger
 import com.amplifyframework.ui.liveness.ml.FaceDetector
+import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -377,9 +378,75 @@ class LivenessSessionDiagnosticsTest {
         subject.registerGateProvider { gateSnapshot() }
 
         subject.onFrameAnalyzed(faceCount = 0, topScore = 0.1f)
-        subject.onSessionError("VideoEncodingException", stopSession = true, closeCode = "RUNTIME_ERROR")
+        subject.onSessionError(
+            FaceLivenessDetectionException.VideoEncodingException(),
+            stopSession = true,
+            closeCode = "RUNTIME_ERROR"
+        )
 
         logger.warns.filter { it.contains("SessionError") } shouldHaveSize 1
+    }
+
+    @Test
+    fun `an unmapped error is identified by its cause chain rather than its type`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        // The shape an error reported by the service arrives in: the predictions layer wraps it in
+        // a message that reads the same for every one of them, so only the innermost cause says
+        // what actually happened.
+        subject.onSessionError(
+            FaceLivenessDetectionException(
+                message = "An error occurred during the face liveness flow.",
+                throwable = RuntimeException(
+                    "An error occurred during the face liveness flow.",
+                    IllegalStateException("Session id is not valid")
+                )
+            ),
+            stopSession = false,
+            closeCode = "RUNTIME_ERROR"
+        )
+
+        val line = logger.warns.last()
+        line shouldContain "type=FaceLivenessDetectionException"
+        line shouldContain "message=An error occurred during the face liveness flow."
+        line shouldContain "RuntimeException: An error occurred during the face liveness flow."
+        line shouldContain "IllegalStateException: Session id is not valid"
+    }
+
+    @Test
+    fun `an error without a cause reports none`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        subject.onSessionError(
+            FaceLivenessDetectionException.UserCancelledException(),
+            stopSession = true,
+            closeCode = "CANCELED"
+        )
+
+        val line = logger.warns.last()
+        line shouldContain "type=UserCancelledException"
+        line shouldContain "message=User cancelled the face liveness check."
+        line shouldContain "cause=null"
+    }
+
+    @Test
+    fun `a cause chain that refers back to itself is not followed forever`() {
+        val logger = FakeLogger()
+        val subject = diagnostics(logger)
+
+        val cyclic = object : RuntimeException("round and round") {
+            override val cause: Throwable get() = this
+        }
+
+        subject.onSessionError(
+            FaceLivenessDetectionException(message = "Boom", throwable = cyclic),
+            stopSession = false,
+            closeCode = "RUNTIME_ERROR"
+        )
+
+        logger.warns.last().split("round and round") shouldHaveSize 6
     }
 
     @Test
@@ -651,7 +718,11 @@ class LivenessSessionDiagnosticsTest {
         subject.onOvalPositionChanged(FaceDetector.FaceOvalPosition.MATCHED)
 
         subject.onFaceIou(0.3f)
-        subject.onSessionError("VideoEncodingException", stopSession = true, closeCode = "RUNTIME_ERROR")
+        subject.onSessionError(
+            FaceLivenessDetectionException.VideoEncodingException(),
+            stopSession = true,
+            closeCode = "RUNTIME_ERROR"
+        )
         subject.onDestroy("RUNTIME_ERROR")
 
         logger.infos.none { it.contains("ChallengeCompleted") } shouldBe true
@@ -716,7 +787,11 @@ class LivenessSessionDiagnosticsTest {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
 
-        subject.onSessionError("UserCancelledException", stopSession = true, closeCode = "CANCELED")
+        subject.onSessionError(
+            FaceLivenessDetectionException.UserCancelledException(),
+            stopSession = true,
+            closeCode = "CANCELED"
+        )
         // The host removes the detector in response, which disposes the coordinator.
         subject.onDestroy("DISPOSED")
 
@@ -738,8 +813,12 @@ class LivenessSessionDiagnosticsTest {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
 
-        subject.onSessionError("FaceInOvalMatchExceededTimeLimitException", true, "TIMEOUT")
-        subject.onSessionError("VideoEncodingException", true, "RUNTIME_ERROR")
+        subject.onSessionError(
+            FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException(),
+            true,
+            "TIMEOUT"
+        )
+        subject.onSessionError(FaceLivenessDetectionException.VideoEncodingException(), true, "RUNTIME_ERROR")
         subject.onDestroy("DISPOSED")
 
         logger.infos.last() shouldContain "closeCode=TIMEOUT"

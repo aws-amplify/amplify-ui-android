@@ -159,6 +159,17 @@ internal data class SessionEnded(
 internal data class SessionError(
     override val sessionId: String,
     val type: String,
+    val message: String,
+    /**
+     * Every cause beneath the reported error, outermost first, each rendered as `Class: message`.
+     *
+     * [type] identifies the failure only for the mapped exception subclasses. Everything else
+     * reaches the host as the base `FaceLivenessDetectionException`, where the only thing
+     * distinguishing one service rejection from another is the service's own wording — and that sits
+     * several causes down, because the predictions layer wraps it in a [message] that reads the same
+     * for every one of them. So the whole chain is recorded rather than just the error's own message.
+     */
+    val cause: String?,
     val stopSession: Boolean,
     val closeCode: String
 ) : SessionEvent {

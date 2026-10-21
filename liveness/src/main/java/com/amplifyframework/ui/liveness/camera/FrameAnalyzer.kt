@@ -77,7 +77,8 @@ internal class FrameAnalyzer(
             cachedBitmap?.let { bitmap ->
                 bitmap.copyPixelsFromBuffer(it.planes[0].buffer)
                 if (livenessState.onFrameAvailable()) {
-                    if (livenessState.faceTargetChallenge == null) {
+                    val sessionReady = livenessState.faceTargetChallenge != null
+                    if (!sessionReady) {
                         diagnostics.onFrameBeforeSessionReady()
                     }
                     val outputLocations = arrayOf(
@@ -93,7 +94,14 @@ internal class FrameAnalyzer(
                     tfLite.runForMultipleInputsOutputs(arrayOf(tfImage.buffer), outputMap)
 
                     val facesFound = faceDetector.getBoundingBoxes(outputLocations, outputScores)
-                    diagnostics.onFrameAnalyzed(facesFound.size, faceDetector.lastFrameMaxScore)
+                    // Only frames the detector actually scored are reported. Until the session is
+                    // ready the detector has no thresholds to compare against, so it returns no
+                    // faces and a zero score without reading the model output. Reporting those
+                    // frames would inflate the frame count and start the face detection watchdog,
+                    // which would then blame the model for a face it was never asked about.
+                    if (sessionReady) {
+                        diagnostics.onFrameAnalyzed(facesFound.size, faceDetector.lastFrameMaxScore)
+                    }
                     livenessState.onFrameFaceCountUpdate(facesFound.size)
 
                     if (facesFound.size > 1) return

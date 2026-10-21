@@ -88,6 +88,7 @@ internal class LivenessSessionDiagnostics(
     private var firstAnalyzeErrorLogged = false
     private var watchdogStarted = false
     private var watchdogFired = false
+    private var watchdogCancelled = false
     private var watchdogTimer: Timer? = null
     private var watchdogStartedAt: Long? = null
     private var gateProvider: (() -> GateSnapshot)? = null
@@ -418,9 +419,17 @@ internal class LivenessSessionDiagnostics(
         timer.schedule(FACE_DETECTION_WATCHDOG_TIMEOUT_MS) { emitWatchdogSnapshot() }
     }
 
-    /** Cancels the timer itself, not just the task, so its thread is released immediately. */
+    /**
+     * Cancels the timer itself, not just the task, so its thread is released immediately.
+     *
+     * Cancellation is also recorded, because cancelling a timer does not stop a task that has
+     * already begun running. A session error cancels the watchdog without the session being
+     * destroyed or a face having been found, so the recorded flag is the only thing that stops a
+     * task already past its own guard from reporting a missing face after the session has failed.
+     */
     @Synchronized
     private fun cancelWatchdog() {
+        watchdogCancelled = true
         watchdogTimer?.cancel()
         watchdogTimer = null
     }
@@ -429,8 +438,11 @@ internal class LivenessSessionDiagnostics(
     @VisibleForTesting
     @Synchronized
     internal fun emitWatchdogSnapshot() {
-        if (watchdogFired || destroyed || faceEverDetected) return
+        if (watchdogFired || watchdogCancelled || destroyed || faceEverDetected) return
         watchdogFired = true
+        // Reads Compose snapshot state from the watchdog's own thread. A snapshot read off the main
+        // thread is allowed and sees the current global snapshot, which is what this wants: the
+        // flags as they stood when no face had been reported for the timeout.
         val gates = gateProvider?.invoke()
         emit(
             FaceDetectionWatchdog(

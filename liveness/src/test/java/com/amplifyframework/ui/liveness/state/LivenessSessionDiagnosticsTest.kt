@@ -372,7 +372,7 @@ class LivenessSessionDiagnosticsTest {
     }
 
     @Test
-    fun `session error cancels the watchdog`() {
+    fun `the watchdog stays silent once a session error has cancelled it`() {
         val logger = FakeLogger()
         val subject = diagnostics(logger)
         subject.registerGateProvider { gateSnapshot() }
@@ -383,8 +383,12 @@ class LivenessSessionDiagnosticsTest {
             stopSession = true,
             closeCode = "RUNTIME_ERROR"
         )
+        // Stands in for a watchdog task that had already started running when the timer was
+        // cancelled, which cancelling the timer cannot stop.
+        subject.emitWatchdogSnapshot()
 
         logger.warns.filter { it.contains("SessionError") } shouldHaveSize 1
+        logger.warns.none { it.contains("FaceDetectionWatchdog") } shouldBe true
     }
 
     @Test

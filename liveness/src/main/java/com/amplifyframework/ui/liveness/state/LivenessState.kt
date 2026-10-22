@@ -47,7 +47,8 @@ internal data class LivenessState(
     val disableStartView: Boolean,
     val onCaptureReady: () -> Unit,
     val onSessionError: (FaceLivenessDetectionException, Boolean) -> Unit,
-    val onFinalEventsSent: () -> Unit
+    val onFinalEventsSent: () -> Unit,
+    val diagnostics: LivenessSessionDiagnostics
 ) {
     var videoViewportSize: VideoViewportSize? by mutableStateOf(null)
     var livenessCheckState by mutableStateOf<LivenessCheckState>(
@@ -89,6 +90,18 @@ internal data class LivenessState(
     var livenessSessionInfo: FaceLivenessSession? by mutableStateOf(null)
     var faceTargetChallenge: FaceTargetChallenge? by mutableStateOf(null)
     var colorChallenge: ColorChallenge? = null
+
+    init {
+        diagnostics.registerGateProvider {
+            GateSnapshot(
+                showingStartView = showingStartView,
+                readyForOval = readyForOval,
+                faceTargetChallengePresent = faceTargetChallenge != null,
+                initialFaceDistanceCheckPassed = initialFaceDistanceCheckPassed,
+                checkState = livenessCheckState::class.simpleName ?: "Unknown"
+            )
+        }
+    }
 
     fun updateVideoViewportSize(newVideoViewportSize: VideoViewportSize) {
         if (newVideoViewportSize != videoViewportSize) {
@@ -134,6 +147,16 @@ internal data class LivenessState(
         colorChallenge = faceLivenessSession.challenges
             .filterIsInstance<ColorChallenge>().firstOrNull()
         readyForOval = true
+        faceTargetChallenge?.let {
+            diagnostics.onSessionReady(
+                challengeType = faceLivenessSession.challengeType.name,
+                challengeId = faceLivenessSession.challengeId,
+                faceDetectionThreshold = it.faceTargetMatching.faceDetectionThreshold,
+                faceDistanceThresholdMin = it.faceTargetMatching.faceDistanceThresholdMin,
+                targetIouThreshold = it.faceTargetMatching.targetIouThreshold,
+                ovalFitTimeout = it.faceTargetMatching.ovalFitTimeout
+            )
+        }
         return true
     }
 
@@ -241,14 +264,18 @@ internal data class LivenessState(
             return false
         }
 
+        // Measured on every frame rather than only until the pre-check passes, so a face drifting
+        // during the challenge is still observable.
+        val faceDistance = FaceDetector.calculateFaceDistance(
+            leftEye,
+            rightEye,
+            mouth,
+            LivenessCoordinator.TARGET_WIDTH,
+            LivenessCoordinator.TARGET_HEIGHT
+        )
+        diagnostics.onFaceDistance(faceDistance)
+
         if (!initialFaceDistanceCheckPassed) {
-            val faceDistance = FaceDetector.calculateFaceDistance(
-                leftEye,
-                rightEye,
-                mouth,
-                LivenessCoordinator.TARGET_WIDTH,
-                LivenessCoordinator.TARGET_HEIGHT
-            )
             if (faceDistance >= faceTargetChallenge!!.faceTargetMatching.faceDistanceThresholdMin) {
                 livenessCheckState =
                     LivenessCheckState.Initial.withMoveFaceFurtherAwayMessage()
@@ -270,6 +297,7 @@ internal data class LivenessState(
                 )
 
                 this.initialStreamFace = face
+                diagnostics.onInitialFaceDetectedSent()
             }
 
             if (faceGuideRect == null) {
@@ -286,8 +314,10 @@ internal data class LivenessState(
                 faceTargetChallenge!!.faceTargetMatching
             )
 
+            val currentIou = FaceDetector.intersectionOverUnion(faceRect, oval)
+
             if (initialFaceOvalIou < 0) {
-                initialFaceOvalIou = FaceDetector.intersectionOverUnion(faceRect, oval)
+                initialFaceOvalIou = currentIou
             }
 
             faceMatchPercentage = FaceDetector.calculateFaceMatchPercentage(
@@ -300,15 +330,22 @@ internal data class LivenessState(
             detectedFaceMatchedOval = detectedFaceMatchedOval ||
                 faceOvalPosition == FaceDetector.FaceOvalPosition.MATCHED
 
-            if (detectedFaceMatchedOval) {
-                livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(
-                    FaceDetector.FaceOvalPosition.MATCHED
-                )
+            // Diagnostics reports the position measured on this frame, not the displayed one. Once
+            // the face has matched the oval the displayed position stays MATCHED so the user is not
+            // prompted again, which would otherwise hide a face drifting out of position later in
+            // the challenge.
+            diagnostics.onOvalPositionChanged(faceOvalPosition)
+
+            // Reported after the position, so the frame that first matches the oval is itself
+            // included in the challenge statistics.
+            diagnostics.onFaceIou(currentIou)
+
+            val displayedPosition = if (detectedFaceMatchedOval) {
+                FaceDetector.FaceOvalPosition.MATCHED
             } else {
-                livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(
-                    faceOvalPosition
-                )
+                faceOvalPosition
             }
+            livenessCheckState = LivenessCheckState.Running.withFaceOvalPosition(displayedPosition)
 
             if (detectedFaceMatchedOval && faceMatchOvalStart == null) {
                 faceMatchOvalStart = Date().time

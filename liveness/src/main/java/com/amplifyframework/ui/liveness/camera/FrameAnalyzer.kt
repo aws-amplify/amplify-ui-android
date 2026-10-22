@@ -17,13 +17,15 @@ package com.amplifyframework.ui.liveness.camera
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.ImageFormat
+import android.graphics.PixelFormat
 import android.util.Size
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.core.graphics.createBitmap
-import com.amplifyframework.core.Amplify
 import com.amplifyframework.ui.liveness.ml.FaceDetector
 import com.amplifyframework.ui.liveness.ml.FaceOval
+import com.amplifyframework.ui.liveness.state.LivenessSessionDiagnostics
 import com.amplifyframework.ui.liveness.state.LivenessState
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.common.ops.NormalizeOp
@@ -32,7 +34,11 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.image.ops.Rot90Op
 
-internal class FrameAnalyzer(context: Context, private val livenessState: LivenessState) : ImageAnalysis.Analyzer {
+internal class FrameAnalyzer(
+    context: Context,
+    private val livenessState: LivenessState,
+    private val diagnostics: LivenessSessionDiagnostics
+) : ImageAnalysis.Analyzer {
 
     private val tfLite = FaceDetector.loadModel(context)
     private val tfImageBuffer = TensorImage(DataType.UINT8)
@@ -41,8 +47,6 @@ internal class FrameAnalyzer(context: Context, private val livenessState: Livene
     private var cachedBitmap: Bitmap? = null
     private var faceDetector = FaceDetector(livenessState)
 
-    private val logger = Amplify.Logging.forNamespace("Liveness")
-
     override fun analyze(image: ImageProxy) {
         try {
             attemptAnalyze(image)
@@ -50,7 +54,9 @@ internal class FrameAnalyzer(context: Context, private val livenessState: Livene
             // We've seen a few instances of exceptions thrown by copyPixelsFromBuffer.
             // This indicates the image received may have been in an unexpected format.
             // We discard this frame, in hopes that the next frame is readable.
-            logger.error("Failed to analyze frame", e)
+            // Diagnostics logs the first occurrence only, because a device that fails on every
+            // frame would otherwise emit one line per frame.
+            diagnostics.onAnalyzeError(e)
         }
     }
 
@@ -60,9 +66,21 @@ internal class FrameAnalyzer(context: Context, private val livenessState: Livene
         }
 
         image.use {
+            diagnostics.onFirstFrame(
+                width = it.width,
+                height = it.height,
+                rowStride = it.planes[0].rowStride,
+                pixelStride = it.planes[0].pixelStride,
+                rotationDegrees = it.imageInfo.rotationDegrees,
+                format = formatName(it.format)
+            )
             cachedBitmap?.let { bitmap ->
                 bitmap.copyPixelsFromBuffer(it.planes[0].buffer)
                 if (livenessState.onFrameAvailable()) {
+                    val sessionReady = livenessState.faceTargetChallenge != null
+                    if (!sessionReady) {
+                        diagnostics.onFrameBeforeSessionReady()
+                    }
                     val outputLocations = arrayOf(
                         Array(FaceDetector.NUM_BOXES) {
                             FloatArray(FaceDetector.NUM_COORDS)
@@ -76,6 +94,14 @@ internal class FrameAnalyzer(context: Context, private val livenessState: Livene
                     tfLite.runForMultipleInputsOutputs(arrayOf(tfImage.buffer), outputMap)
 
                     val facesFound = faceDetector.getBoundingBoxes(outputLocations, outputScores)
+                    // Only frames the detector actually scored are reported. Until the session is
+                    // ready the detector has no thresholds to compare against, so it returns no
+                    // faces and a zero score without reading the model output. Reporting those
+                    // frames would inflate the frame count and start the face detection watchdog,
+                    // which would then blame the model for a face it was never asked about.
+                    if (sessionReady) {
+                        diagnostics.onFrameAnalyzed(facesFound.size, faceDetector.lastFrameMaxScore)
+                    }
                     livenessState.onFrameFaceCountUpdate(facesFound.size)
 
                     if (facesFound.size > 1) return
@@ -108,6 +134,12 @@ internal class FrameAnalyzer(context: Context, private val livenessState: Livene
                 }
             }
         }
+    }
+
+    private fun formatName(format: Int) = when (format) {
+        PixelFormat.RGBA_8888 -> "RGBA_8888"
+        ImageFormat.YUV_420_888 -> "YUV_420_888"
+        else -> "UNKNOWN($format)"
     }
 
     private fun getImageProcessor(imageRotationDegrees: Int): ImageProcessor {

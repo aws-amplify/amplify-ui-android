@@ -18,6 +18,7 @@ package com.amplifyframework.ui.liveness.camera
 import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.camera2.CaptureRequest
+import android.os.Build
 import android.util.Range
 import android.util.Size
 import androidx.camera.camera2.interop.Camera2Interop
@@ -44,6 +45,8 @@ import com.amplifyframework.ui.liveness.model.FaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.model.LivenessCheckState
 import com.amplifyframework.ui.liveness.model.toFaceLivenessDetectionException
 import com.amplifyframework.ui.liveness.state.AttemptCounter
+import com.amplifyframework.ui.liveness.state.DeviceInfo
+import com.amplifyframework.ui.liveness.state.LivenessSessionDiagnostics
 import com.amplifyframework.ui.liveness.state.LivenessState
 import com.amplifyframework.ui.liveness.ui.Camera
 import com.amplifyframework.ui.liveness.ui.ChallengeOptions
@@ -79,7 +82,7 @@ internal class LivenessCoordinator(
     private val credentialsProvider: AWSCredentialsProvider<AWSCredentials>?,
     private val disableStartView: Boolean,
     private val challengeOptions: ChallengeOptions,
-    videoOptions: VideoOptions,
+    private val videoOptions: VideoOptions,
     private val onChallengeComplete: OnChallengeComplete,
     val onChallengeFailed: Consumer<FaceLivenessDetectionException>
 ) {
@@ -88,13 +91,24 @@ internal class LivenessCoordinator(
     private val analysisExecutor = Executors.newSingleThreadExecutor()
     private val coordinatorScope = MainScope() + CoroutineName("LivenessCoordinator")
 
+    private val diagnostics = LivenessSessionDiagnostics(
+        sessionId = sessionId,
+        deviceInfo = DeviceInfo(
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            sdkInt = Build.VERSION.SDK_INT,
+            livenessVersion = BuildConfig.LIVENESS_VERSION_NAME
+        )
+    )
+
     val livenessState = LivenessState(
         sessionId = sessionId,
         context = context,
         disableStartView = disableStartView,
         onCaptureReady = this::processCaptureReady,
         onSessionError = this::processSessionError,
-        onFinalEventsSent = this::processFinalEventsSent
+        onFinalEventsSent = this::processFinalEventsSent,
+        diagnostics = diagnostics
     )
 
     private val preview = Preview.Builder().apply {
@@ -107,7 +121,7 @@ internal class LivenessCoordinator(
         setTargetResolution(TARGET_RESOLUTION_SIZE)
     }.build()
 
-    private val analyzer = FrameAnalyzer(context, livenessState)
+    private val analyzer = FrameAnalyzer(context, livenessState, diagnostics)
 
     private val analysis = ImageAnalysis.Builder().apply {
         Camera2Interop.Extender(this).apply {
@@ -203,6 +217,7 @@ internal class LivenessCoordinator(
                             analysis
                         )
                         livenessState.loadingCameraPreview = false
+                        diagnostics.onCameraBound(orientation)
                     } else {
                         livenessState.loadingCameraPreview = false
                         val faceLivenessException = FaceLivenessDetectionException(
@@ -219,6 +234,11 @@ internal class LivenessCoordinator(
     private fun startLivenessSession() {
         livenessState.livenessCheckState = LivenessCheckState.Initial.withConnectingMessage()
         attemptCounter.countAttempt()
+        diagnostics.onSessionStartRequested(
+            attempt = attemptCounter.getCount(),
+            codec = videoOptions.codec::class.simpleName ?: "Unknown",
+            preCheckEnabled = !disableStartView
+        )
 
         val faceLivenessSessionInformation = FaceLivenessSessionInformation(
             videoWidth = TARGET_WIDTH.toFloat(),
@@ -279,6 +299,11 @@ internal class LivenessCoordinator(
             is FaceLivenessDetectionException.FaceInOvalMatchExceededTimeLimitException -> WebSocketCloseCode.TIMEOUT
             else -> WebSocketCloseCode.RUNTIME_ERROR
         }
+        diagnostics.onSessionError(
+            error = faceLivenessException,
+            stopSession = stopLivenessSession,
+            closeCode = webSocketCloseCode.name
+        )
         livenessState.onError(stopLivenessSession, webSocketCloseCode)
         unbindCamera(context)
         onChallengeFailed.accept(faceLivenessException)
@@ -290,6 +315,7 @@ internal class LivenessCoordinator(
         sequenceNumber: Int,
         colorStartTime: Long
     ) {
+        diagnostics.onColorDisplayed()
         livenessState.livenessSessionInfo!!.sendChallengeResponseEvent(
             ColorChallengeResponse(
                 livenessState.colorChallenge!!.challengeId,
@@ -302,6 +328,7 @@ internal class LivenessCoordinator(
     }
 
     fun processLivenessCheckComplete() {
+        diagnostics.onChallengeCompleted()
         livenessState.onLivenessChallengeComplete()
         coordinatorScope.launch {
             encoder.stop()
@@ -324,6 +351,7 @@ internal class LivenessCoordinator(
             encoder.destroy()
         }
         val webSocketCloseCode = if (!disconnectEventReceived) WebSocketCloseCode.DISPOSED else null
+        diagnostics.onDestroy(webSocketCloseCode?.name ?: "NORMAL")
         livenessState.onDestroy(true, webSocketCloseCode)
         unbindCamera(context)
         analysisExecutor.shutdown()

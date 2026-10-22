@@ -54,6 +54,7 @@ internal class LivenessStateTest {
     private val onSessionError =
         mockk<(FaceLivenessDetectionException, Boolean) -> Unit>(relaxed = true)
     private val onFinalEventsSent = mockk<() -> Unit>(relaxed = true)
+    private val diagnostics = mockk<LivenessSessionDiagnostics>(relaxed = true)
 
     @Before
     fun setUp() {
@@ -63,7 +64,8 @@ internal class LivenessStateTest {
             false,
             onCaptureReady,
             onSessionError,
-            onFinalEventsSent
+            onFinalEventsSent,
+            diagnostics
         )
         livenessState.onStartViewComplete()
     }
@@ -77,7 +79,8 @@ internal class LivenessStateTest {
             false,
             onCaptureReady,
             onSessionError,
-            onFinalEventsSent
+            onFinalEventsSent,
+            diagnostics
         )
 
         val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
@@ -127,7 +130,8 @@ internal class LivenessStateTest {
             true,
             onCaptureReady,
             onSessionError,
-            onFinalEventsSent
+            onFinalEventsSent,
+            diagnostics
         )
 
         val faceTargetChallenge = mockk<FaceTargetChallenge>(relaxed = true)
@@ -263,6 +267,41 @@ internal class LivenessStateTest {
         } finally {
             executor.shutdownNow()
         }
+    }
+
+    @Test
+    fun `session ready reports the challenge to diagnostics`() {
+        val session = createFaceLivenessSession { }
+
+        livenessState.onLivenessSessionReady(session)
+
+        verify(exactly = 1) {
+            diagnostics.onSessionReady(
+                challengeType = "FaceMovementChallenge",
+                challengeId = "12345",
+                faceDetectionThreshold = any(),
+                faceDistanceThresholdMin = any(),
+                targetIouThreshold = any(),
+                ovalFitTimeout = any()
+            )
+        }
+    }
+
+    @Test
+    fun `face distance is reported on every frame update`() {
+        val session = createFaceLivenessSession { }
+        livenessState.onLivenessSessionReady(session)
+
+        repeat(2) {
+            livenessState.onFrameFaceUpdate(
+                RectF(0f, 0f, 1f, 1f),
+                FaceDetector.Landmark(0f, 0f),
+                FaceDetector.Landmark(1f, 0f),
+                FaceDetector.Landmark(1f, 1f)
+            )
+        }
+
+        verify(exactly = 2) { diagnostics.onFaceDistance(any()) }
     }
 
     private fun createFaceLivenessSession(stopSession: (Int?) -> Unit) = FaceLivenessSession(

@@ -15,6 +15,8 @@
 
 package com.amplifyframework.ui.liveness.ml
 
+import com.amplifyframework.predictions.aws.models.FaceTargetChallenge
+import com.amplifyframework.predictions.aws.models.FaceTargetMatchingParameters
 import com.amplifyframework.ui.liveness.ml.FaceDetector.Landmark
 import com.amplifyframework.ui.liveness.state.LivenessState
 import io.mockk.every
@@ -76,6 +78,30 @@ internal class FaceDetectorTest {
         assertApprox(0.07296771f, boundingBox.top)
         assertApprox(0.16585289f + 0.62404186f, boundingBox.right)
         assertApprox(0.07296771f + 0.8144985f, boundingBox.bottom)
+    }
+
+    @Test
+    fun `lastFrameMaxScore records the highest score even when below the threshold`() {
+        val matching = mockk<FaceTargetMatchingParameters>(relaxed = true) {
+            every { faceDetectionThreshold } returns 0.9f
+        }
+        val challenge = mockk<FaceTargetChallenge>(relaxed = true) {
+            every { faceTargetMatching } returns matching
+        }
+        val state = mockk<LivenessState> {
+            every { faceTargetChallenge } returns challenge
+        }
+        val scoringDetector = FaceDetector(state)
+        val outputBoxes = arrayOf(Array(FaceDetector.NUM_BOXES) { FloatArray(FaceDetector.NUM_COORDS) })
+        // Initialise every score low; the default of 0f would sigmoid to 0.5f and dominate the max.
+        val outputScores = arrayOf(Array(FaceDetector.NUM_BOXES) { FloatArray(1) { -10f } })
+        outputScores[0][1][0] = -2f
+
+        val detections = scoringDetector.getBoundingBoxes(outputBoxes, outputScores)
+
+        // sigmoid(-2) ~= 0.1192, which is below the 0.9 threshold, so nothing is detected
+        assertEquals(0, detections.size)
+        assertEquals(0.1192f, scoringDetector.lastFrameMaxScore, 0.001f)
     }
 
     private fun assertApprox(expected: Float, actual: Float, delta: Float = 0.000001f) {

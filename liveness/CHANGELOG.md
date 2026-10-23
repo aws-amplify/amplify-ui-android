@@ -1,3 +1,13 @@
+## [Release 1.13.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.13.0)
+
+### Features
+- **liveness:** add session and face tracking diagnostics ([#371](https://github.com/aws-amplify/amplify-ui-android/issues/371))
+
+### Bug Fixes
+- **liveness:** depend on litert-support-api to avoid duplicate namespace ([#372](https://github.com/aws-amplify/amplify-ui-android/issues/372))
+
+[See all changes between 1.12.0 and 1.13.0](https://github.com/aws-amplify/amplify-ui-android/compare/release_liveness_v1.12.0...release_liveness_v1.13.0)
+
 ## [Release 1.12.0](https://github.com/aws-amplify/amplify-ui-android/releases/tag/release_liveness_v1.12.0)
 
 ### Features

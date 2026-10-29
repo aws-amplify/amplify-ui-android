@@ -1,0 +1,26 @@
+name: CodeBuild
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    name: Build and unit test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.AMPLIFY_UI_ANDROID_CI_TESTS_ROLE }}
+          aws-region: us-east-1
+
+      - name: Run CodeBuild
+        uses: aws-actions/aws-codebuild-run-build@7e46c3fa1c1f217e26a73712796b1f78938b534b # v1.0.19
+        with:
+          project-name: Amplify-UI-Android-Build
